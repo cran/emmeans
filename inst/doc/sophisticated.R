@@ -1,0 +1,82 @@
+## ---- echo = FALSE, results = "hide", message = FALSE--------------------
+require("emmeans") 
+options(show.signif.stars = FALSE) 
+knitr::opts_chunk$set(collapse = TRUE,
+fig.width = 4.5) 
+
+## ------------------------------------------------------------------------
+Oats.lmer <- lme4::lmer(yield ~ Variety + factor(nitro) + (1|Block/Variety),
+                        data = nlme::Oats, subset = -c(1,2,3,5,8,13,21,34,55))
+
+## ------------------------------------------------------------------------
+Oats.emmGrid.n <- emmeans(Oats.lmer, "nitro")
+Oats.emmGrid.n
+
+## ------------------------------------------------------------------------
+emmeans(Oats.lmer, "nitro", lmer.df = "satterthwaite")
+
+## ------------------------------------------------------------------------
+emmeans(Oats.lmer, "nitro", lmer.df = "asymptotic")
+
+## ------------------------------------------------------------------------
+contrast(Oats.emmGrid.n, "poly")
+
+## ------------------------------------------------------------------------
+emmeans(Oats.lmer, pairwise ~ Variety)
+
+## ------------------------------------------------------------------------
+require("ordinal")
+wine.clm <- clm(rating ~ temp + contact, scale = ~ judge,
+                data = wine, link = "probit")
+
+## ------------------------------------------------------------------------
+emmeans(wine.clm, list(pairwise ~ temp, pairwise ~ contact))
+
+## ------------------------------------------------------------------------
+tmp <- ref_grid(wine.clm, mode = "lin")
+tmp
+
+## ------------------------------------------------------------------------
+emmeans(tmp, "temp")
+
+## ------------------------------------------------------------------------
+emmeans(wine.clm, ~ temp, mode = "exc.prob", at = list(cut = "3|4"))
+
+## ------------------------------------------------------------------------
+emmeans(wine.clm, ~ rating | temp, mode = "prob")
+
+## ------------------------------------------------------------------------
+emmeans(wine.clm, "temp", mode = "mean.class")
+
+## ------------------------------------------------------------------------
+summary(ref_grid(wine.clm, mode = "scale"), type = "response")
+
+## ----eval = FALSE--------------------------------------------------------
+#  example_model <- rstanarm::stan_glmer(
+#      cbind(incidence, size - incidence) ~ size + period + (1|herd),
+#      data = lme4::cbpp, family = binomial,
+#      chains = 2, cores = 1, seed = 12345, iter = 500)
+#  rst_ex.rg <- ref_grid(example_model)
+
+## ----echo = FALSE--------------------------------------------------------
+load(system.file("extdata", "rstex.RData", package = "emmeans"))
+rst_ex.rg <- do.call(emmobj, rstex)
+
+## ------------------------------------------------------------------------
+rst_ex.rg
+
+## ------------------------------------------------------------------------
+period.emmGrid <- emmeans(rst_ex.rg, "period")
+period.emmGrid
+
+## ------------------------------------------------------------------------
+require("coda")  ### needed to access generic for as.mcmc()
+summary(as.mcmc(period.emmGrid))
+
+## ------------------------------------------------------------------------
+bayesplot::mcmc_areas(as.mcmc(regrid(period.emmGrid)))
+
+## ------------------------------------------------------------------------
+HPDinterval(as.mcmc(as.matrix(
+    as.mcmc(contrast(period.emmGrid, "consec", reverse = TRUE), names = FALSE))))
+

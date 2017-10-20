@@ -1,0 +1,69 @@
+## ---- echo = FALSE, results = "hide", message = FALSE--------------------
+require("emmeans") 
+options(show.signif.stars = FALSE) 
+knitr::opts_chunk$set(collapse = TRUE,
+fig.width = 4.5) 
+
+## ------------------------------------------------------------------------
+nutr.lm <- lm(gain ~ (age + group + race)^2, data = nutrition) 
+car::Anova(nutr.lm)
+
+## ------------------------------------------------------------------------
+emmeans(nutr.lm, ~ group * race)
+
+## ------------------------------------------------------------------------
+with(nutrition, table(race, age))
+
+## ------------------------------------------------------------------------
+summary(emmeans(nutr.lm, pairwise ~ group | race, at = list(age = "3")), 
+    by = NULL)
+
+## ------------------------------------------------------------------------
+framing <- mediation::framing 
+levels(framing$educ) <- c("NA","Ref","< HS", "HS", "> HS","Coll +") 
+framing.glm <- glm(cong_mesg ~ age + income + educ + emo + gender * factor(treat), 
+    family = binomial, data = framing)
+
+## ------------------------------------------------------------------------
+emmip(framing.glm, treat ~ educ | gender, type = "response") 
+
+## ------------------------------------------------------------------------
+emmip(framing.glm, treat ~ educ | gender, type = "response", 
+    cov.reduce = emo ~ treat*gender + age + educ + income)
+
+## ----eval = FALSE--------------------------------------------------------
+#  emo.adj <- resid(lm(emo ~ treat*gender + age + educ + income, data = framing))
+
+## ----eval = FALSE--------------------------------------------------------
+#  emmeans(..., cov.reduce = list(x1 ~ trt, x2 ~ trt + x1, x3 ~ trt + x1 + x2))
+
+## ----message = FALSE-----------------------------------------------------
+sapply(c("equal", "prop", "outer", "cells", "flat"), function(w)
+    predict(emmeans(nutr.lm, ~ race, weights = w)))
+
+## ------------------------------------------------------------------------
+cows <- data.frame (
+    route = factor(rep(c("injection", "oral"), c(5, 9))),
+    drug = factor(rep(c("Bovineumab", "Charloisazepam", 
+              "Angustatin", "Herefordmycin", "Mollycoddle"), c(3,2,  4,2,3))),
+    resp = c(34, 35, 34,   44, 43,      36, 33, 36, 32,   26, 25,   25, 24, 24)
+)
+cows.lm <- lm(resp ~ route + drug, data = cows)
+
+## ----message = FALSE-----------------------------------------------------
+cows.rg <- ref_grid(cows.lm)
+cows.rg
+
+## ------------------------------------------------------------------------
+route.emmGrid <- emmeans(cows.rg, "route")
+route.emmGrid
+
+## ------------------------------------------------------------------------
+drug.emmGrid <- emmeans(cows.rg, "drug")
+drug.emmGrid
+
+## ------------------------------------------------------------------------
+pairs(route.emmGrid, reverse = TRUE)
+
+pairs(drug.emmGrid, by = "route", reverse = TRUE)
+

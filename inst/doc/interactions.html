@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Russ Lenth" />
+
+<meta name="date" content="2017-10-19" />
+
+<title>Interaction analysis in emmeans</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Interaction analysis in emmeans</h1>
+<h4 class="author"><em>Russ Lenth</em></h4>
+<h4 class="date"><em>2017-10-19</em></h4>
+
+
+
+<p>Models in which predictors interact seem to create a lot of confusion concerning what kinds of <em>post hoc</em> methods should be used. It is hoped that this vignette will be helpful in shedding some light on how to use the <strong>emmeans</strong> package effectively in such situations.</p>
+<div id="contents" class="section level2">
+<h2>Contents</h2>
+<ol style="list-style-type: decimal">
+<li><a href="#factors">Interacting factors</a></li>
+<li><a href="#contrasts">Interaction contrasts</a></li>
+<li><a href="#covariates">Interactions with covariates</a></li>
+<li><a href="#summary">Summary</a></li>
+</ol>
+<p><a href="index.html">Vignette index</a></p>
+</div>
+<div id="factors" class="section level2">
+<h2>Interacting factors</h2>
+<p>As an example for this topic, consider the <code>auto.noise</code> dataset included with the package. This is a balanced 3x2x2 experiment with three replications. The response – noise level – is evaluated with different sizes of cars, types of anti-pollution filters, on each side of the car being measured.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p>
+<p>Let’s fit a model and obtain the ANOVA table:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">noise.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(noise ~<span class="st"> </span>size *<span class="st"> </span>type *<span class="st"> </span>side, <span class="dt">data =</span> auto.noise)
+<span class="kw">anova</span>(noise.lm)
+## Analysis of Variance Table
+## 
+## Response: noise
+##                Df  Sum Sq Mean Sq  F value    Pr(&gt;F)
+## size            2 26051.4 13025.7 893.1905 &lt; 2.2e-16
+## type            1  1056.3  1056.3  72.4286 1.038e-08
+## side            1     0.7     0.7   0.0476 0.8291042
+## size:type       2   804.2   402.1  27.5714 6.048e-07
+## size:side       2  1293.1   646.5  44.3333 8.730e-09
+## type:side       1    17.4    17.4   1.1905 0.2860667
+## size:type:side  2   301.4   150.7  10.3333 0.0005791
+## Residuals      24   350.0    14.6</code></pre></div>
+<p>There are statistically strong 2- and 3-way interactions.</p>
+<p>One mistake that a lot of people seem to make is to proceed too hastily to estimating marginal means (even in the face of all these interactions!). They would go straight to analyses like this:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(noise.lm, pairwise ~<span class="st"> </span>size)
+## NOTE: Results may be misleading due to involvement in interactions
+## $emmeans
+##  size   emmean       SE df lower.CL upper.CL
+##  S    824.1667 1.102396 24 821.8914 826.4419
+##  M    833.7500 1.102396 24 831.4748 836.0252
+##  L    772.5000 1.102396 24 770.2248 774.7752
+## 
+## Results are averaged over the levels of: type, side 
+## Confidence level used: 0.95 
+## 
+## $contrasts
+##  contrast  estimate       SE df t.ratio p.value
+##  S - M    -9.583333 1.559024 24  -6.147  &lt;.0001
+##  S - L    51.666667 1.559024 24  33.140  &lt;.0001
+##  M - L    61.250000 1.559024 24  39.287  &lt;.0001
+## 
+## Results are averaged over the levels of: type, side 
+## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre></div>
+<p>The hasty analyst would thus conclude that the noise level is significantly higher for medium-sized cars than for small or large ones.</p>
+<p>But as is seen in the message before the output, <code>emmeans()</code> valiantly tries to warn you that it may not be a good idea to average over factors that interact with the factor of interest. It isn’t always a bad idea to do this, but sometimes it definitely is.</p>
+<p>What about this time? I think a good first step is always to try to visualize the nature of the interactions before doing any statistical comparisons. The following plot helps.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmip</span>(noise.lm, type ~<span class="st"> </span>size |<span class="st"> </span>side)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Examining this plot, we see that the “medium” mean is not always higher; so the marginal means, and the way they compare, does not represent what is always the case. Moreover, what is evident in the plot is that the peak for medium-size cars occurs for only one of the two filter types. So it seems more useful to do the comparisons of size separately for each filter type. This is easily done, simply by conditioning on <code>type</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">emm_s.t &lt;-<span class="st"> </span><span class="kw">emmeans</span>(noise.lm, pairwise ~<span class="st"> </span>size |<span class="st"> </span>type)
+## NOTE: Results may be misleading due to involvement in interactions
+emm_s.t
+## $emmeans
+## type = Std:
+##  size   emmean       SE df lower.CL upper.CL
+##  S    825.8333 1.559024 24 822.6157 829.0510
+##  M    845.8333 1.559024 24 842.6157 849.0510
+##  L    775.0000 1.559024 24 771.7823 778.2177
+## 
+## type = Octel:
+##  size   emmean       SE df lower.CL upper.CL
+##  S    822.5000 1.559024 24 819.2823 825.7177
+##  M    821.6667 1.559024 24 818.4490 824.8843
+##  L    770.0000 1.559024 24 766.7823 773.2177
+## 
+## Results are averaged over the levels of: side 
+## Confidence level used: 0.95 
+## 
+## $contrasts
+## type = Std:
+##  contrast    estimate       SE df t.ratio p.value
+##  S - M    -20.0000000 2.204793 24  -9.071  &lt;.0001
+##  S - L     50.8333333 2.204793 24  23.056  &lt;.0001
+##  M - L     70.8333333 2.204793 24  32.127  &lt;.0001
+## 
+## type = Octel:
+##  contrast    estimate       SE df t.ratio p.value
+##  S - M      0.8333333 2.204793 24   0.378  0.9245
+##  S - L     52.5000000 2.204793 24  23.812  &lt;.0001
+##  M - L     51.6666667 2.204793 24  23.434  &lt;.0001
+## 
+## Results are averaged over the levels of: side 
+## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre></div>
+<p>Not too surprisingly, the statistical comparisons are all different for standard filters, but with Octel filters, there isn’t much of a difference between small and medium size.</p>
+<p>For comparing the levels of other factors, similar judgments must be made. It may help to construct other interaction plots with the factors in different roles. In my opinion, almost all meaningful statistical analysis should be grounded in evaluating <em>both</em> the statistical and practical significance of the estimated effects. Those who put all their attention on <em>P</em> values and asterisks are ignoring the fact that these don’t measure the sizes of the effects on a practical scale.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> An effect can be practically negligible but statistically significant, or vice versa, depending on sample size and error variance. Failure to describe what is actually going on in the data is a failure to do an adequate analysis. Use lots of plots, and think.</p>
+<p><a href="#contents">Back to Contents</a></p>
+</div>
+<div id="contrasts" class="section level2">
+<h2>Interaction contrasts</h2>
+<p>An interaction contrast is a contrast of contrasts. For instance, in the auto-noise example, we may want to obtain the linear and quadratic contrasts of <code>size</code> separately for each <code>type</code>, and compare them. Here are estimates of those contrasts:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">contrast</span>(emm_s.t[[<span class="dv">1</span>]], <span class="st">&quot;poly&quot;</span>)   ## 'by = &quot;type&quot;' already in previous result 
+## type = Std:
+##  contrast   estimate       SE df t.ratio p.value
+##  linear    -50.83333 2.204793 24 -23.056  &lt;.0001
+##  quadratic -90.83333 3.818813 24 -23.786  &lt;.0001
+## 
+## type = Octel:
+##  contrast   estimate       SE df t.ratio p.value
+##  linear    -52.50000 2.204793 24 -23.812  &lt;.0001
+##  quadratic -50.83333 3.818813 24 -13.311  &lt;.0001
+## 
+## Results are averaged over the levels of: side</code></pre></div>
+<p>The comparison of these contrasts may be done using the <code>interaction</code> argument in <code>contrast()</code> as follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">IC_st &lt;-<span class="st"> </span><span class="kw">contrast</span>(emm_s.t[[<span class="dv">1</span>]], <span class="dt">interaction =</span> <span class="kw">c</span>(<span class="st">&quot;poly&quot;</span>, <span class="st">&quot;consec&quot;</span>))
+IC_st
+##  size_poly type_consec  estimate       SE df t.ratio p.value
+##  linear    Octel - Std -1.666667 3.118048 24  -0.535  0.5979
+##  quadratic Octel - Std 40.000000 5.400617 24   7.407  &lt;.0001
+## 
+## Results are averaged over the levels of: side</code></pre></div>
+<p>The practical meaning of this is that there isn’t a statistical difference in the linear trends, but the quadratic trend for Octel is greater than for standard filter types. (Both quadratic trends are negative, so in fact it is the standard filters that have more pronounced <em>downward</em> curvature, as is seen in the plot.) In case you need to understand more clearly what contrasts are being estimated, the <code>coef()</code> method helps:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(IC_st)
+##   size  type c.1 c.2
+## 1    S   Std   1  -1
+## 2    M   Std   0   2
+## 3    L   Std  -1  -1
+## 4    S Octel  -1   1
+## 5    M Octel   0  -2
+## 6    L Octel   1   1</code></pre></div>
+<p>Note that the 4th through 6th contrast coefficients are the negatives of the 1st through 3rd – thus a comparison of two contrasts.</p>
+<p>By the way, “type III” tests of interaction effects can be obtained via interaction contrasts:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">test</span>(IC_st, <span class="dt">joint =</span> <span class="ot">TRUE</span>)
+##  df1 df2 F.ratio p.value
+##    2  24  27.571  &lt;.0001</code></pre></div>
+<p>This result is exactly the same as the <em>F</em> test of <code>size:type</code> in the <code>anova</code> output.</p>
+<p>The three-way interaction may be explored via interaction contrasts too:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">contrast</span>(<span class="kw">emmeans</span>(noise.lm, ~<span class="st"> </span>size*type*side),
+         <span class="dt">interaction =</span> <span class="kw">c</span>(<span class="st">&quot;poly&quot;</span>, <span class="st">&quot;consec&quot;</span>, <span class="st">&quot;consec&quot;</span>))
+##  size_poly type_consec side_consec  estimate        SE df t.ratio p.value
+##  linear    Octel - Std R - L       -26.66667  6.236096 24  -4.276  0.0003
+##  quadratic Octel - Std R - L       -16.66667 10.801234 24  -1.543  0.1359</code></pre></div>
+<p>One interpretation of this is that the comparison by <code>type</code> of the linear contrasts for <code>size</code> is different on the left side than on the right side; but the comparison of that comparison of the quadratic contrasts, not so much. Refer again to the plot, and this can be discerned as a comparison of the interaction in the left panel versus the interaction in the right panel.</p>
+<p><a href="#contents">Back to Contents</a></p>
+</div>
+<div id="covariates" class="section level2">
+<h2>Interactions with covariates</h2>
+<p>Consider the <code>oranges</code> dataset included with the package. These data concern the sales of two varieties of oranges. The prices (<code>price1</code> and <code>price2</code>) were experimentally varied in different stores and different days, and the responses <code>sales1</code> and <code>sales2</code> were observed. Let’s consider three multivariate models for these data, with additive effects for days and stores, and different levels of fitting on the prices:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">org.quad &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">cbind</span>(sales1, sales2) ~<span class="st"> </span><span class="kw">poly</span>(price1, price2, <span class="dt">degree =</span> <span class="dv">2</span>)
+                                       +<span class="st"> </span>day +<span class="st"> </span>store, <span class="dt">data =</span> oranges)
+org.int &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">cbind</span>(sales1, sales2) ~<span class="st"> </span>price1 *<span class="st"> </span>price2 +<span class="st"> </span>day +<span class="st"> </span>store, <span class="dt">data =</span> oranges)
+org.add &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">cbind</span>(sales1, sales2) ~<span class="st"> </span>price1 +<span class="st"> </span>price2 +<span class="st"> </span>day +<span class="st"> </span>store, <span class="dt">data =</span> oranges)</code></pre></div>
+<p>Being a multivariate model, <strong>emmeans</strong> methods will distinguish the responses as if they were levels of a factor, which we will name “variety”. An interesting way to view these models is to look at how they predict sales of each variety at each observed values of the prices:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmip</span>(org.quad, price2 ~<span class="st"> </span>price1 |<span class="st"> </span>variety, <span class="dt">mult.name =</span> <span class="st">&quot;variety&quot;</span>, <span class="dt">cov.reduce =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>The trends portrayed here are quite sensible: In the left panel, as we increase the price of variety 1, sales of that variety will tend to decrease – and the decrease will be faster when the other variety of oranges is low-priced. In the right panel, as price of variety 1 increases, sales of variety 2 will increase when it is low-priced, but could decrease also at high prices because oranges in general are just too expensive. A plot like this for <code>org.int</code> will be similar but all the curves will be straight lines; and the one for <code>plot.add</code> will have all lines parallel. In all models, though, there are implied <code>price1:variety</code> and <code>price2:variety</code> interactions, because we have different regression coefficients for the two responses.</p>
+<p>Which model should we use? They are nested models, so they can be compared by <code>anova()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">anova</span>(org.quad, org.int, org.add)
+## Analysis of Variance Table
+## 
+## Model 1: cbind(sales1, sales2) ~ poly(price1, price2, degree = 2) + day + 
+##     store
+## Model 2: cbind(sales1, sales2) ~ price1 * price2 + day + store
+## Model 3: cbind(sales1, sales2) ~ price1 + price2 + day + store
+##   Res.Df Df Gen.var.   Pillai approx F num Df den Df Pr(&gt;F)
+## 1     20      22.798                                       
+## 2     22  2   21.543 0.074438  0.38658      4     40 0.8169
+## 3     23  1   23.133 0.218004  2.64840      2     19 0.0967</code></pre></div>
+<p>It seems like the full-quadratic model has little advantage over the interaction model. Strict .05-significance people would, I suppose, settle on the additive model. I like <code>org.int</code>, but what follows could be done with any of them.</p>
+<p>To summarize and test the results compactly, it makes sense to obtain estimates of a representative trend in each of the left and right panels, and perhaps to compare them. In turn, that can be done by obtaining the slope of the curve (or line) at the average value of <code>price2</code>. The <code>emtrends()</code> function is designed for exactly this kind of purpose. It uses a difference quotient to estimate the slope of a line fitted to a given variable. It works just like <code>emmeans()</code> except for requiring the variable to use in the difference quotient. Using the <code>org.int</code> model:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emtrends</span>(org.int, pairwise ~<span class="st"> </span>variety, <span class="dt">var =</span> <span class="st">&quot;price1&quot;</span>, <span class="dt">mult.name =</span> <span class="st">&quot;variety&quot;</span>)
+## $emtrends
+##  variety price1.trend        SE df  lower.CL   upper.CL
+##  sales1    -0.7489343 0.1713333 22 -1.104258 -0.3936107
+##  sales2     0.1376322 0.2140952 22 -0.306374  0.5816384
+## 
+## Results are averaged over the levels of: day, store 
+## Confidence level used: 0.95 
+## 
+## $contrasts
+##  contrast          estimate        SE df t.ratio p.value
+##  sales1 - sales2 -0.8865665 0.2402569 22   -3.69  0.0013
+## 
+## Results are averaged over the levels of: day, store</code></pre></div>
+<p>From this, we can say that, starting with <code>price1</code> and <code>price2</code> both at their average values, we expect <code>sales1</code> to decrease by about .75 per unit increase in <code>price1</code> (statistically significant since the confidence interval excludes zero); meanwhile, a slight increase (but not significant) of <code>sales2</code> may occur. Marginally, the first variety has a .89 disadvantage relative to sales of the second variety.</p>
+<p>Other analyses (not shown) with <code>price2</code> set at a higher value will reduce these effects, while setting <code>price2</code> lower will exaggerate all these effects. If the same analysis is done with the quadratic model, the the trends are curved, and so the results will depend somewhat on the setting for <code>price1</code>. The graph above gives an indication of the nature of those changes.</p>
+<p>Similar results hold when we analyze the trends for <code>price2</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emtrends</span>(org.int, pairwise ~<span class="st"> </span>variety, <span class="dt">var =</span> <span class="st">&quot;price2&quot;</span>, <span class="dt">mult.name =</span> <span class="st">&quot;variety&quot;</span>)
+## $emtrends
+##  variety price2.trend        SE df    lower.CL   upper.CL
+##  sales1     0.1718250 0.1023334 22 -0.04040137  0.3840514
+##  sales2    -0.7447521 0.1278740 22 -1.00994656 -0.4795577
+## 
+## Results are averaged over the levels of: day, store 
+## Confidence level used: 0.95 
+## 
+## $contrasts
+##  contrast         estimate        SE df t.ratio p.value
+##  sales1 - sales2 0.9165772 0.1434998 22   6.387  &lt;.0001
+## 
+## Results are averaged over the levels of: day, store</code></pre></div>
+<p>At the averages, increasing the price of variety 2 has the effect of decreasing sales of variety 2 while slightly increasing sales of variety 1 – a marginal difference of about .92.</p>
+<p><a href="#contents">Back to Contents</a></p>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>Interaction, by nature, make things more complicated. One must resist pressures and inclinations to try to produce simple bottom-line conclusions. Interactions require more work and more patience; they require presenting more cases – more than are presented in the examples in this vignette – in order to provide a complete picture.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>I sure wish I could ask some questions about how how these data were collected; for example, are these independent experimental runs, or are some cars measured more than once? The model is based on the independence assumption, but I have my doubts.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>You may have noticed that there are no asterisks in the ANOVA table in this vignette. I habitually opt out of star-gazing via <code>options(show.signif.stars = FALSE)</code><a href="#fnref2">↩</a></p></li>
+</ol>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

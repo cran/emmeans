@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Russ Lenth" />
+
+<meta name="date" content="2017-10-19" />
+
+<title>Working with messy data</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Working with messy data</h1>
+<h4 class="author"><em>Russ Lenth</em></h4>
+<h4 class="date"><em>2017-10-19</em></h4>
+
+
+
+<div id="contents" class="section level2">
+<h2>Contents</h2>
+<ol style="list-style-type: decimal">
+<li><a href="#issues">Issues with observational data</a></li>
+<li><a href="#mediators">Mediating covariates</a></li>
+<li><a href="#weights">Mediating factors and weights</a></li>
+<li><a href="#nesting">Nested fixed effects</a>
+<ol style="list-style-type: lower-alpha">
+<li><a href="#nest-trap">Avoiding mis-identified nesting</a></li>
+</ol></li>
+</ol>
+<p><a href="index.html">Vignette index</a></p>
+</div>
+<div id="issues" class="section level2">
+<h2>Issues with observational data</h2>
+<p>In experiments, we control the conditions under which observations are made. Ideally, this leads to balanced datasets and clear inferences about the effects of those experimental conditions. In observational data, factor levels are observed rather than controlled, and in the analysis we control <em>for</em> those factors and covariates. It is possible that some factors and covariates lie in the causal path for other predictors. Observational studies can be designed in ways to mitigate some of these issues; but often we are left with a mess. Using EMMs does not solve the inherent problems in messy, undesigned studies; but they do give us ways to compensate for imbalance in the data, and allow us to estimate meaningful effects after carefully considering the ways in which they can be confounded.</p>
+<p>As an illustration, consider the <code>nutrition</code> dataset provided with the package. These data are used as an example in Milliken and Johnson (1992), <em>Analysis of Messy Data</em>, and contain the results of an observational study on nutrition education. Low-income mothers are classified by race, age category, and whether or not they received food stamps (the <code>group</code> factor); and the response variable is a gain score (post minus pre scores) after completing a nutrition training program. First, let’s fit a model than includes all main effects and 2-way interactions, and obtain its “type II” ANOVA:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nutr.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(gain ~<span class="st"> </span>(age +<span class="st"> </span>group +<span class="st"> </span>race)^<span class="dv">2</span>, <span class="dt">data =</span> nutrition) 
+car::<span class="kw">Anova</span>(nutr.lm)
+## Anova Table (Type II tests)
+## 
+## Response: gain
+##             Sum Sq Df F value    Pr(&gt;F)
+## age          82.37  3  0.9614    0.4145
+## group       658.13  1 23.0441 6.105e-06
+## race         11.17  2  0.1956    0.8227
+## age:group    91.58  3  1.0688    0.3663
+## age:race     87.30  3  1.0189    0.3880
+## group:race  113.70  2  1.9906    0.1424
+## Residuals  2627.47 92</code></pre></div>
+<p>There is definitely a <code>group</code> effect and a hint of and interaction with <code>race</code>. Here are the EMMs for those two factors:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(nutr.lm, ~<span class="st"> </span>group *<span class="st"> </span>race)
+##  group      race        emmean       SE df     lower.CL upper.CL
+##  FoodStamps Black     4.708257 2.368117 92  0.004971359 9.411542
+##  NoAid      Black    -2.190399 2.490576 92 -7.136898097 2.756099
+##  FoodStamps Hispanic    nonEst       NA NA           NA       NA
+##  NoAid      Hispanic    nonEst       NA NA           NA       NA
+##  FoodStamps White     3.607680 1.155619 92  1.312521470 5.902838
+##  NoAid      White     2.256336 2.389273 92 -2.488966678 7.001638
+## 
+## Results are averaged over the levels of: age 
+## Confidence level used: 0.95</code></pre></div>
+<p>Hmmmm. The EMMs when <code>race</code> is “Hispanic” are not given; instead they are flagged as non-estimable. What does that mean? Well, when using a model to make predictions, it is impossible to do that beyond the linear space of the data used to fit the model. And we have no data for three of the age groups in the Hispanic population:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">with</span>(nutrition, <span class="kw">table</span>(race, age))
+##           age
+## race        1  2  3  4
+##   Black     2  7 10  2
+##   Hispanic  0  0  3  0
+##   White     5 16 51 11</code></pre></div>
+<p>We can’t make predictions for all the cases we are averaging over in the above EMMs, and that is why some of them are non-estimable. The bottom line is that we simply cannot include Hispanics in the mix when comparing factor effects. That’s a limitation of this study that cannot be overcome without collecting additional data. Our choices for further analysis are to focus only on Black and White populations; or to focus only on age group 3. For example (the latter):</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(<span class="kw">emmeans</span>(nutr.lm, pairwise ~<span class="st"> </span>group |<span class="st"> </span>race, <span class="dt">at =</span> <span class="kw">list</span>(<span class="dt">age =</span> <span class="st">&quot;3&quot;</span>)), 
+    <span class="dt">by =</span> <span class="ot">NULL</span>)
+## $emmeans
+##  group      race            emmean       SE df   lower.CL   upper.CL
+##  FoodStamps Black     7.500000e+00 2.672054 92   2.193071 12.8069292
+##  NoAid      Black    -3.666667e+00 2.181723 92  -7.999756  0.6664229
+##  FoodStamps Hispanic  2.131628e-14 5.344107 92 -10.613858 10.6138584
+##  NoAid      Hispanic  2.500000e+00 3.778855 92  -5.005131 10.0051312
+##  FoodStamps White     5.419355e+00 0.959830 92   3.513050  7.3256601
+##  NoAid      White    -2.000000e-01 1.194979 92  -2.573331  2.1733309
+## 
+## Confidence level used: 0.95 
+## 
+## $contrasts
+##  contrast           race      estimate       SE df t.ratio p.value
+##  FoodStamps - NoAid Black    11.166667 3.449606 92   3.237  0.0017
+##  FoodStamps - NoAid Hispanic -2.500000 6.545168 92  -0.382  0.7034
+##  FoodStamps - NoAid White     5.619355 1.532726 92   3.666  0.0004</code></pre></div>
+<p>(We used trickery with providing a <code>by</code> variable, and then taking it away, to make the output more compact.) Evidently, the training program has been beneficial to the Black and White groups in that age category. There is no conclusion for the Hispanic group – for which we have very little data.</p>
+<p><a href="#contents">Back to Contents</a></p>
+</div>
+<div id="mediators" class="section level2">
+<h2>Mediating covariates</h2>
+<p>The <code>framing</code> data in the <strong>mediation</strong> package has the results of an experiment conducted by Brader et al. (2008) where subjects were given the opportunity to send a message to Congress regarding immigration. However, before being offered this, some subjects (<code>treat = 1</code>) were first shown a news story that portrays Latinos in a negative way. Besides the binary response (whether or not they elected to send a message), the experimenters also measured <code>emo</code>, the subjects’ emotional state after the treatment was applied. There are various demographic variables as well. Let’s a logistic regression model, after changing the labels for <code>educ</code> to shorter strings.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">framing &lt;-<span class="st"> </span>mediation::framing 
+<span class="kw">levels</span>(framing$educ) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;NA&quot;</span>,<span class="st">&quot;Ref&quot;</span>,<span class="st">&quot;&lt; HS&quot;</span>, <span class="st">&quot;HS&quot;</span>, <span class="st">&quot;&gt; HS&quot;</span>,<span class="st">&quot;Coll +&quot;</span>) 
+framing.glm &lt;-<span class="st"> </span><span class="kw">glm</span>(cong_mesg ~<span class="st"> </span>age +<span class="st"> </span>income +<span class="st"> </span>educ +<span class="st"> </span>emo +<span class="st"> </span>gender *<span class="st"> </span><span class="kw">factor</span>(treat), 
+    <span class="dt">family =</span> binomial, <span class="dt">data =</span> framing)</code></pre></div>
+<p>The conventional way to handle covariates like <code>emo</code> is to set them at their means and use those means for purposes of predictions and EMMs. These adjusted means are shown in the following plot.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmip</span>(framing.glm, treat ~<span class="st"> </span>educ |<span class="st"> </span>gender, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>) </code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>This plot gives the impression that the effect of <code>treat</code> is reversed between male and female subjects; and also that the effect of education is not monotone. Both of these are counter-intuitive.</p>
+<p>However, note that the covariate <code>emo</code> is measured <em>post</em>-treatment. That suggests that in fact <code>treat</code> (and perhaps other factors) could affect the value of <code>emo</code>; and if that is true (as is in fact established by mediation analysis techniques), we should not pretend that <code>emo</code> can be set independently of <code>treat</code> as was done to obtain the EMMs shown above. Instead, let <code>emo</code> depend on <code>treat</code> and the other predictors – easily done using <code>cov.reduce</code> – and we obtain an entirely different impression:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmip</span>(framing.glm, treat ~<span class="st"> </span>educ |<span class="st"> </span>gender, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, 
+    <span class="dt">cov.reduce =</span> emo ~<span class="st"> </span>treat*gender +<span class="st"> </span>age +<span class="st"> </span>educ +<span class="st"> </span>income)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>The reference grid underlying this plot has different <code>emo</code> values for each factor combination. The plot suggests that, after taking emotional response into account, male (but not female) subjects exposed to the negative news story are more likely to send the message than are females or those not seeing the negative news story. Also, the effect of <code>educ</code> is now nearly monotone.</p>
+<p>By the way, the results in this plot are the same is what you would obtain by refitting the model with an adjusted covariate</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">emo.adj &lt;-<span class="st"> </span><span class="kw">resid</span>(<span class="kw">lm</span>(emo ~<span class="st"> </span>treat*gender +<span class="st"> </span>age +<span class="st"> </span>educ +<span class="st"> </span>income, <span class="dt">data =</span> framing))</code></pre></div>
+<p>… and then using ordinary covariate-adjusted means at the means of <code>emo.adj</code>. This is a technique that is often recommended.</p>
+<p>If there is more than one mediating covariate, their settings may be defined in sequence; for example, if <code>x1</code>, <code>x2</code>, and <code>x3</code> are all mediating covariates, we might use</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(..., <span class="dt">cov.reduce =</span> <span class="kw">list</span>(x1 ~<span class="st"> </span>trt, x2 ~<span class="st"> </span>trt +<span class="st"> </span>x1, x3 ~<span class="st"> </span>trt +<span class="st"> </span>x1 +<span class="st"> </span>x2))</code></pre></div>
+<p>(or possibly with some interactions included as well).</p>
+<p><a href="#contents">Back to Contents</a></p>
+</div>
+<div id="weights" class="section level2">
+<h2>Mediating factors and weights</h2>
+<p>A mediating covariate is one that is in the causal path; likewise, it is possible to have a mediating <em>factor</em>. For mediating factors, the moral equivalent of the <code>cov.reduce</code> technique described above is to use <em>weighted</em> averages in lieu of equally-weighted ones in computing EMMs. The weights used in these averages should depend on the frequencies of mediating factor(s). Usually, the <code>&quot;cells&quot;</code> weighting scheme described later in this section is the right approach. In complex situations, it may be necessary to compute EMMs in stages.</p>
+<p>As described in <a href="basics.html#emmeans">the “basics” vignette</a>, EMMs are usually defined as <em>equally-weighted</em> means of reference-grid predictions. However, there are several built-in alternative weighting schemes that are available by specifying a character value for <code>weights</code> in a call to <code>emmeans()</code> or related function. The options are <code>&quot;equal&quot;</code> (the default), <code>&quot;proportional&quot;</code>, <code>&quot;outer&quot;</code>, <code>&quot;cells&quot;</code>, and <code>&quot;flat&quot;</code>.</p>
+<p>The <code>&quot;proportional&quot;</code> (or <code>&quot;prop&quot;</code> for short) method weights proportionally to the frequencies (or model weights) of each factor combination that is averaged over. The <code>&quot;outer&quot;</code> method uses the outer product of the marginal frequencies of each factor that is being averaged over. To explain the distinction, suppose the EMMs for <code>A</code> involve averaging over two factors <code>B</code> and <code>C</code>. With <code>&quot;prop&quot;</code>, we use the frequencies for each combination of <code>B</code> and <code>C</code>; whereas for <code>&quot;outer&quot;</code>, first obtain the marginal frequencies for <code>B</code> and for <code>C</code> and weight proportionally to the product of these for each combination of <code>B</code> and <code>C</code>. The latter weights are like the “expected” counts used in a chi-square test for independence. Put another way, outer weighting is the same as proportional weighting applied one factor at a time; the following two would yield the same results:</p>
+<pre><code>{r eval = FALSE} 
+emmeans(model, &quot;A&quot;, weights = &quot;outer&quot;) 
+emmeans(emmeans(model, c(&quot;A&quot;, &quot;B&quot;), weights = &quot;prop&quot;),  weights = &quot;prop&quot;) </code></pre>
+<p>Using <code>&quot;cells&quot;</code> weights gives each prediction the same weight as occurs in the model; applied to a reference grid for a model with all interactions, <code>&quot;cells&quot;</code>-weighted EMMs are the same as the ordinary marginal means of the data. With <code>&quot;flat&quot;</code> weights, equal weights are used, except zero weight is applied to any factor combination having no data. Usually, <code>&quot;cells&quot;</code> or <code>&quot;flat&quot;</code> weighting will <em>not</em> produce non-estimable results, because we exclude empty cells. (That said, if covariates are linearly dependent with factors, we may still encounter non-estimable cases.)</p>
+<p>Here is a comparison of predictions for <code>nutr.lm</code> defined <a href="#issues">above</a>, using different weighting schemes:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sapply</span>(<span class="kw">c</span>(<span class="st">&quot;equal&quot;</span>, <span class="st">&quot;prop&quot;</span>, <span class="st">&quot;outer&quot;</span>, <span class="st">&quot;cells&quot;</span>, <span class="st">&quot;flat&quot;</span>), function(w)
+    <span class="kw">predict</span>(<span class="kw">emmeans</span>(nutr.lm, ~<span class="st"> </span>race, <span class="dt">weights =</span> w)))
+##         equal     prop    outer     cells      flat
+## [1,] 1.258929 1.926554 2.546674 0.3809524 0.6865079
+## [2,]       NA       NA       NA 1.6666667 1.2500000
+## [3,] 2.932008 2.522821 3.142940 2.7951807 1.6103407</code></pre></div>
+<p>For <code>group * race</code> EMMs, the results for <code>&quot;prop&quot;</code> and <code>&quot;flat&quot;</code> are the same because only one factor (<code>age</code>) is averaged over.</p>
+<p><a href="#contents">Back to Contents</a></p>
+</div>
+<div id="nesting" class="section level2">
+<h2>Nested fixed effects</h2>
+<p>A factor <code>A</code> is nested in another factor <code>B</code> if the levels of <code>A</code> have a different meaning in one level of <code>B</code> than in another. Often, nested factors are random effects—for example, subjects in an experiment may be randomly assigned to treatments, in which case subjects are nested in treatments—and if we model them as random effects, these random nested effects are not among the fixed effects and are not an issue to <code>emmeans</code>. But sometimes we have fixed nested factors.</p>
+<p>Here is an example of a fictional study of five fictional treatments for some disease in cows. Two of the treatments are administered by injection, and the other three are administered orally. There are varying numbers of observations for each drug. The data and model follow:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cows &lt;-<span class="st"> </span><span class="kw">data.frame</span> (
+    <span class="dt">route =</span> <span class="kw">factor</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&quot;injection&quot;</span>, <span class="st">&quot;oral&quot;</span>), <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">9</span>))),
+    <span class="dt">drug =</span> <span class="kw">factor</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&quot;Bovineumab&quot;</span>, <span class="st">&quot;Charloisazepam&quot;</span>, 
+              <span class="st">&quot;Angustatin&quot;</span>, <span class="st">&quot;Herefordmycin&quot;</span>, <span class="st">&quot;Mollycoddle&quot;</span>), <span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">2</span>,  <span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">3</span>))),
+    <span class="dt">resp =</span> <span class="kw">c</span>(<span class="dv">34</span>, <span class="dv">35</span>, <span class="dv">34</span>,   <span class="dv">44</span>, <span class="dv">43</span>,      <span class="dv">36</span>, <span class="dv">33</span>, <span class="dv">36</span>, <span class="dv">32</span>,   <span class="dv">26</span>, <span class="dv">25</span>,   <span class="dv">25</span>, <span class="dv">24</span>, <span class="dv">24</span>)
+)
+cows.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(resp ~<span class="st"> </span>route +<span class="st"> </span>drug, <span class="dt">data =</span> cows)</code></pre></div>
+<p>The <code>ref_grid</code> function finds a nested structure in this model:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cows.rg &lt;-<span class="st"> </span><span class="kw">ref_grid</span>(cows.lm)
+cows.rg
+## 'emmGrid' object with variables:
+##     route = injection, oral
+##     drug = Angustatin, Bovineumab, Charloisazepam, Herefordmycin, Mollycoddle
+## Nesting structure:  drug %in% route</code></pre></div>
+<p>When there is nesting, <code>emmeans</code> computes averages separately in each group</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">route.emmGrid &lt;-<span class="st"> </span><span class="kw">emmeans</span>(cows.rg, <span class="st">&quot;route&quot;</span>)
+route.emmGrid
+##  route       emmean        SE df lower.CL upper.CL
+##  injection 38.91667 0.5908902  9 37.57998 40.25335
+##  oral      28.02778 0.4491457  9 27.01174 29.04382
+## 
+## Results are averaged over the levels of: drug 
+## Confidence level used: 0.95</code></pre></div>
+<p>… and insists on carrying along any grouping factors that a factor is nested in:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">drug.emmGrid &lt;-<span class="st"> </span><span class="kw">emmeans</span>(cows.rg, <span class="st">&quot;drug&quot;</span>)
+drug.emmGrid
+##  drug           route       emmean        SE df lower.CL upper.CL
+##  Bovineumab     injection 34.33333 0.7474236  9 32.64254 36.02412
+##  Charloisazepam injection 43.50000 0.9154032  9 41.42921 45.57079
+##  Angustatin     oral      34.25000 0.6472878  9 32.78573 35.71427
+##  Herefordmycin  oral      25.50000 0.9154032  9 23.42921 27.57079
+##  Mollycoddle    oral      24.33333 0.7474236  9 22.64254 26.02412
+## 
+## Confidence level used: 0.95</code></pre></div>
+<p>Here are the associated pairwise comparisons:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pairs</span>(route.emmGrid, <span class="dt">reverse =</span> <span class="ot">TRUE</span>)
+##  contrast          estimate       SE df t.ratio p.value
+##  oral - injection -10.88889 0.742215  9 -14.671  &lt;.0001
+## 
+## Results are averaged over the levels of: drug
+
+<span class="kw">pairs</span>(drug.emmGrid, <span class="dt">by =</span> <span class="st">&quot;route&quot;</span>, <span class="dt">reverse =</span> <span class="ot">TRUE</span>)
+## route = injection:
+##  contrast                     estimate        SE df t.ratio p.value
+##  Charloisazepam - Bovineumab  9.166667 1.1817804  9   7.757  &lt;.0001
+## 
+## route = oral:
+##  contrast                     estimate        SE df t.ratio p.value
+##  Herefordmycin - Angustatin  -8.750000 1.1211353  9  -7.805  0.0001
+##  Mollycoddle - Angustatin    -9.916667 0.9887484  9 -10.030  &lt;.0001
+##  Mollycoddle - Herefordmycin -1.166667 1.1817804  9  -0.987  0.6026
+## 
+## P value adjustment: tukey method for comparing a family of (varies) estimates</code></pre></div>
+<p>In the latter result, the contrast itself becomes a nested factor in the returned <code>emmGrid</code> object. That would not be the case if there had been no <code>by</code> variable.</p>
+<div id="nest-trap" class="section level3">
+<h3>Auto-identification of nested factors – avoid being trapped!</h3>
+<p><code>ref_grid()</code> and <code>emmeans()</code> tries to discover and accommodate nested structures in the fixed effects. It does this in two ways: first, by identifying factors whose levels appear in combination with only one level of another factor; and second, by examining the <code>terms</code> attribute of the fixed effects. In the latter approach, if an interaction <code>A:B</code> appears in the model but <code>A</code> is not present as a main effect, then <code>A</code> is deemed to be nested in <code>B</code>. Note that this can create a trap: some users take shortcuts by omitting some fixed effects, knowing that this won’t affect the fitted values. But such shortcuts <em>do</em> affect the interpretation of model parameters, ANOVA tables, etc., and I advise against ever taking such shortcuts. Here are some ways you may notice mistakenly-identified nesting:</p>
+<ul>
+<li>A message is displayed when nesting is detected</li>
+<li>A <code>str()</code> listing of the <code>emmGrid</code> object shows a nesting component</li>
+<li>An <code>emmeans()</code> summary unexpectedly includes one or more factors that you didn’t specify</li>
+<li>EMMs obtained using <code>by</code> factors don’t seem to behave right, or give the same results with different specifications</li>
+</ul>
+<p>To override the auto-detection of nested effects, use the <code>nesting</code> argument in <code>ref_grid()</code> or <code>emmeans()</code>. Specifying <code>nesting = NULL</code> will ignore all nesting. Incorrectly-discovered nesting can be overcome by specifying something akin to <code>nesting = &quot;A %in% B, C %in% (A * B)&quot;</code> or, equivalently, <code>nesting = list(A = &quot;B&quot;,  C = c(&quot;A&quot;, &quot;B&quot;))</code>.</p>
+<p><a href="#contents">Back to Contents</a></p>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
