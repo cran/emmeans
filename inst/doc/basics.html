@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2017-10-19" />
+<meta name="date" content="2017-11-04" />
 
 <title>Basics of estimated marginal means</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Basics of estimated marginal means</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2017-10-19</em></h4>
+<h4 class="date"><em>2017-11-04</em></h4>
 
 
 
@@ -214,7 +214,7 @@ pigs.pred1
 ## Results are averaged over the levels of: source 
 ## Results are given on the log (not the response) scale. 
 ## Confidence level used: 0.95</code></pre></div>
-<p>In these examples, all the results are presented on the <code>log(conc)</code> scale (and the annotations in the output warn of this). It is possible to convert them back to the <code>conc</code> scale by back-transforming. This topic is discussed in <a href="transformations">the vignette on transformations</a>.</p>
+<p>In these examples, all the results are presented on the <code>log(conc)</code> scale (and the annotations in the output warn of this). It is possible to convert them back to the <code>conc</code> scale by back-transforming. This topic is discussed in <a href="transformations.html">the vignette on transformations</a>.</p>
 <p>An additional note: There is an exception to the definition of EMMs given here. If the model has a nested structure in the fixed effects, then averaging is performed separately in each nesting group. See the <a href="messy-data.html#nesting">section on nesting in the “messy-data” vignette</a> for an example.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
@@ -255,7 +255,7 @@ pigs.pred1
 <p>The other graphics option offered is the <code>plot()</code> method for <code>emmGrid</code> objects. In the following, we display the estimates and 95% confidence intervals for <code>mtcars.rg</code> in separate panels for each <code>disp</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(mtcars.rg, <span class="dt">by =</span> <span class="st">&quot;disp&quot;</span>)</code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
-<p>This plot illistrates, as much as anything else, how silly it is to try to predict mileage for a 4-cylinder car having high displacement, or an 8-cylinder car having low displacement. The widths of the intervals give us a clue that we are extrapolating. A better idea is to acknowledge that displacement largely depends on the number of cylinders. So here is yet another way to use <code>cov.reduce</code> to modify the reference grid:</p>
+<p>This plot illustrates, as much as anything else, how silly it is to try to predict mileage for a 4-cylinder car having high displacement, or an 8-cylinder car having low displacement. The widths of the intervals give us a clue that we are extrapolating. A better idea is to acknowledge that displacement largely depends on the number of cylinders. So here is yet another way to use <code>cov.reduce</code> to modify the reference grid:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars.rg_d.c &lt;-<span class="st"> </span><span class="kw">ref_grid</span>(mtcars.lm, <span class="dt">at =</span> <span class="kw">list</span>(<span class="dt">cyl =</span> <span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">8</span>)),
                           <span class="dt">cov.reduce =</span> disp ~<span class="st"> </span>cyl)
 mtcars.rg_d.c @<span class="st"> </span>grid
@@ -322,7 +322,7 @@ mtcars.rg_d.c @<span class="st"> </span>grid
 <li>For purposes of defining the reference grid, dimensions of a multivariate response are treated as levels of a factor.</li>
 <li>EMMs are then predictions on this reference grid, or marginal averages thereof (equally weighted by default).</li>
 <li>Reference grids may be modified using <code>at</code> or <code>cov.reduce</code>; the latter may be logical, a function, or a formula.</li>
-<li>Refernce grids and <code>emmeans()</code> results may be plotted via <code>plot()</code> (for parallel confidence intervals) or <code>emmip()</code> (for an interaction-style plot).</li>
+<li>Reference grids and <code>emmeans()</code> results may be plotted via <code>plot()</code> (for parallel confidence intervals) or <code>emmip()</code> (for an interaction-style plot).</li>
 </ul>
 </div>
 <div id="more" class="section level2">

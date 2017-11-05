@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2017-10-19" />
+<meta name="date" content="2017-11-04" />
 
 <title>Utilities and options for emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Utilities and options for emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2017-10-19</em></h4>
+<h4 class="date"><em>2017-11-04</em></h4>
 
 
 
@@ -132,7 +132,7 @@ pigs.emmGrid.s
 ## $infer
 ## [1] FALSE FALSE</code></pre></div>
 <p>The default is to display neither intervals nor tests when summarizing. In addition, the flag <code>is.new.rg</code> is set to <code>TRUE</code>, and that is why one sees a <code>str()</code> listing rather than a summary as the default when the object is simply shown by typing its name at the console.</p>
-<p>The user may have other preferences. She may want to see both intervals and tests whenever contrasts are produced; and perhaps she also wants to alweays default to the response scale when transformations or links are present. We can change the defaults by setting the corresponding options; and that is done via the <code>emm_options()</code> function:</p>
+<p>The user may have other preferences. She may want to see both intervals and tests whenever contrasts are produced; and perhaps she also wants to always default to the response scale when transformations or links are present. We can change the defaults by setting the corresponding options; and that is done via the <code>emm_options()</code> function:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emm_options</span>(<span class="dt">emmeans =</span> <span class="kw">list</span>(<span class="dt">type =</span> <span class="st">&quot;response&quot;</span>),
             <span class="dt">contrast =</span> <span class="kw">list</span>(<span class="dt">infer =</span> <span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">TRUE</span>)))</code></pre></div>
 <p>Now, new <code>emmeans()</code> results and contrasts follow the new defaults:</p>
@@ -151,9 +151,9 @@ pigs.anal.p
 ## 
 ## $contrasts
 ##  contrast    ratio         SE df  lower.CL upper.CL t.ratio p.value
-##  12 / 9   1.196684 0.06710564 23 1.0656147 1.343875   3.202  0.0112
+##  12 / 9   1.196684 0.06710564 23 1.0656147 1.343875   3.202  0.0113
 ##  15 / 12  1.038570 0.06042501 23 0.9208004 1.171402   0.650  0.8613
-##  18 / 15  1.085945 0.07499759 23 0.9413733 1.252719   1.194  0.5201
+##  18 / 15  1.085945 0.07499759 23 0.9413733 1.252719   1.194  0.5200
 ## 
 ## Results are averaged over the levels of: source 
 ## Confidence level used: 0.95 
@@ -185,12 +185,12 @@ pigs.anal.p
 <p>The default adjustment is <code>&quot;bonferroni&quot;</code>; we could have specified something different via the <code>adjust</code> argument. An equivalent way to combine <code>emmGrid</code>s is via the addition operator. Any options may be provided by <code>update()</code>. Below, we combine the same results into a family but ask for the “exact” multiplicity adjustment.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">update</span>(pigs.anal.p[[<span class="dv">2</span>]] +<span class="st"> </span><span class="kw">pairs</span>(pigs.emmGrid.s), <span class="dt">adjust =</span> <span class="st">&quot;mvt&quot;</span>)
 ##  contrast        ratio         SE df  lower.CL  upper.CL t.ratio p.value
-##  12 / 9      1.1966841 0.06710564 23 1.0656147 1.3438750   3.202  0.0214
-##  15 / 12     1.0385697 0.06042501 23 0.9208004 1.1714017   0.650  0.9681
+##  12 / 9      1.1966841 0.06710564 23 1.0656147 1.3438750   3.202  0.0212
+##  15 / 12     1.0385697 0.06042501 23 0.9208004 1.1714017   0.650  0.9680
 ##  18 / 15     1.0859446 0.07499759 23 0.9413733 1.2527186   1.194  0.7305
 ##  fish / soy  0.7612695 0.04029742 23 0.6823100 0.8493665  -5.153  0.0002
 ##  fish / skim 0.6687950 0.03622146 23 0.5979102 0.7480835  -7.428  &lt;.0001
-##  soy / skim  0.8785259 0.04659947 23 0.7872281 0.9804119  -2.442  0.1110
+##  soy / skim  0.8785259 0.04659947 23 0.7872281 0.9804119  -2.442  0.1109
 ## 
 ## Results are averaged over some or all of the levels of: source, percent 
 ## Confidence level used: 0.95 
@@ -212,7 +212,7 @@ pigs.anal.p
 </div>
 <div id="groups" class="section level2">
 <h2>Adding grouping factors</h2>
-<p>Sometimes, users want to group levels of a factor into a smaller number of groups. Those groups may then be, say, averaged esparately and compared, or used as a <code>by</code> factor. The <code>add_grouping()</code> function serves this purpose. The function takes four arguments: the object, the name of the grouping factor to be created, the name of the reference factor that is being grouped, and a vector of level names of the grouping factor corresponding to levels of the reference factor. Suppose for example that we want to distinguish animal and non-animal sources of protein in the <code>pigs</code> example:</p>
+<p>Sometimes, users want to group levels of a factor into a smaller number of groups. Those groups may then be, say, averaged separately and compared, or used as a <code>by</code> factor. The <code>add_grouping()</code> function serves this purpose. The function takes four arguments: the object, the name of the grouping factor to be created, the name of the reference factor that is being grouped, and a vector of level names of the grouping factor corresponding to levels of the reference factor. Suppose for example that we want to distinguish animal and non-animal sources of protein in the <code>pigs</code> example:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.emmGrid.ss &lt;-<span class="st"> </span><span class="kw">add_grouping</span>(pigs.emmGrid.s, <span class="st">&quot;type&quot;</span>, <span class="st">&quot;source&quot;</span>,
                             <span class="kw">c</span>(<span class="st">&quot;animal&quot;</span>, <span class="st">&quot;vegetable&quot;</span>, <span class="st">&quot;animal&quot;</span>))
 <span class="kw">str</span>(pigs.emmGrid.ss)

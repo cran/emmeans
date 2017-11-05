@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2017-10-19" />
+<meta name="date" content="2017-11-04" />
 
 <title>Transitioning to emmeans from lsmeans</title>
 
@@ -32,7 +32,7 @@
 
 <h1 class="title toc-ignore">Transitioning to emmeans from lsmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2017-10-19</em></h4>
+<h4 class="date"><em>2017-11-04</em></h4>
 
 
 
@@ -96,14 +96,14 @@
 <ol style="list-style-type: decimal">
 <li>Currently, your package provides methods <code>recover.data.xyz()</code> and <code>lsm.basis.xyz()</code>, where <code>xyz</code> stands in for the class of your object. Rename these functions <code>recover_data.xyz()</code> and <code>emm_basis.xyz()</code>.</li>
 <li>Any calls to <code>lsmeans::</code> functions in the above methods should be changed to the corresponding <code>emmeans::</code> functions.</li>
-<li>For a period of time, you may want to continue support for <strong>lsmeans</strong> as well. So write new functions <code>ref.grid.xyz()</code> and <code>lsm.basis.xyz()</code> that just call their counterparts.</li>
+<li>For a period of time, you may want to continue support for <strong>lsmeans</strong> as well. So write new functions <code>recover.data.xyz()</code> and <code>lsm.basis.xyz()</code> that just call their counterparts.</li>
 <li>In your <code>DESCRIPTION</code> file, add <code>emmeans</code> to <code>Imports</code>, and make sure that <code>lsmeans</code> is <em>not</em> in <code>Imports</code>.</li>
 <li>In your <code>NAMESPACE</code> file,
 <ol style="list-style-type: lower-alpha">
 <li>add <code>importFrom(emmeans, recover_data, emm_basis)</code></li>
 <li>add <code>S3method(recover_data, xyz)</code></li>
 <li>add <code>S3method(emm_basis, xyz)</code></li>
-<li>add <code>export(ref.grid.xyz, lsm.basis.xyz)</code>. That is, export them as <em>functions</em>, and <em>not</em> as S3 methods</li>
+<li>add <code>export(recover.data.xyz, lsm.basis.xyz)</code>. That is, export them as <em>functions</em>, and <em>not</em> as S3 methods</li>
 <li>In lieu of (a)-(c) above, you could just export the functions <code>recover_data.xyz</code> and <code>emm_basis.xyz</code>.</li>
 </ol></li>
 </ol>

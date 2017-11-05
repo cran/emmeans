@@ -539,10 +539,10 @@ emm_basis.glmmadmb = function (object, trms, xlev, grid, ...)
 # --------------------------------------------------------------
 ### Explicit non-support for 'gam' objects (runs, but results are wrong)
 
-emm_basis.gam = function(object, trms, xlev, grid, ...) {
-    stop("Can't handle an object of class", dQuote(class(object)[1]), "\n",
-         .show_supported())
-}
+# emm_basis.gam = function(object, trms, xlev, grid, ...) {
+#     stop("Can't handle an object of class ", dQuote(class(object)[1]), "\n",
+#          .show_supported())
+# }
 
 
 
@@ -552,8 +552,11 @@ emm_basis.gam = function(object, trms, xlev, grid, ...) {
 ### ----- Auxiliary routines -------------------------
 # Provide for vcov. argument in ref_grid call, which could be a function or a matrix
 
+.statsvcov = function(object, ...)
+    stats::vcov(object, complete = FALSE, ...)
+
 #' @export
-.my.vcov = function(object, vcov. = stats::vcov, ...) {
+.my.vcov = function(object, vcov. = .statsvcov, ...) {
     if (is.function(vcov.))
         vcov. = vcov.(object)
     else if (!is.matrix(vcov.))
@@ -564,7 +567,7 @@ emm_basis.gam = function(object, trms, xlev, grid, ...) {
 # Call this to do the standard stuff with link labels
 # Returns a modified misc
 .std.link.labels = function(fam, misc) {
-    if (is.null(fam))
+    if (is.null(fam) || !is.list(fam))
         return(misc)
     if (fam$link == "identity")
         return(misc)

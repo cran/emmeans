@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2017-10-19" />
+<meta name="date" content="2017-11-04" />
 
 <title>Models supported by emmeans</title>
 
@@ -32,13 +32,14 @@
 
 <h1 class="title toc-ignore">Models supported by emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2017-10-19</em></h4>
+<h4 class="date"><em>2017-11-04</em></h4>
 
 
 
 <p>Here we document what model objects may be used with <strong>emmeans</strong>, and some special features of some of them that may be accessed by passing additional arguments through <code>ref_grid</code> or <code>emmeans()</code>.</p>
 <p>Certain objects are affected by optional arguments to functions that construct <code>emmGrid</code> objects, including <code>ref_grid()</code>, <code>emmeans()</code>, <code>emtrends()</code>, and <code>emmip()</code>. When “<em>arguments</em>” are mentioned in the subsequent quick reference and object-by-object documentation, we are talking about arguments in these constructors.</p>
 <p>Additional models can be supported by writing appropriate <code>recover_data</code> and <code>emm_basis</code> methods. See the package documentation for <code>extending-emmeans</code> and <code>vignette(&quot;extending&quot;)</code> for details.</p>
+<p><a href="index.html">Vignette index</a></p>
 <div id="quick-reference-for-supported-objects-and-options" class="section level2">
 <h2>Quick reference for supported objects and options</h2>
 <p>Here is an alphabetical list of model classes that are supported, and the arguments that apply. Detailed documentation follows, with objects grouped by the code in the “Group” column. Scroll down or follow the links to those groups for more information.</p>
@@ -113,228 +114,234 @@
 <td align="left"></td>
 </tr>
 <tr class="odd">
+<td align="left">gam</td>
+<td align="left">gam</td>
+<td align="center"><a href="#G">G</a></td>
+<td align="left"><code>nboot = 800</code></td>
+</tr>
+<tr class="even">
 <td align="left">gee</td>
 <td align="left">gee</td>
 <td align="center"><a href="#E">E</a></td>
 <td align="left"><code>vcov.method = c(&quot;naive&quot;, &quot;robust&quot;)</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">geeglm</td>
 <td align="left">geepack</td>
 <td align="center"><a href="#E">E</a></td>
 <td align="left"><code>vcov.method = c(&quot;vbeta&quot;, &quot;vbeta.naiv&quot;, &quot;vbeta.j1s&quot;,</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"></td>
 <td align="left"></td>
 <td align="center"></td>
 <td align="left"><code>&quot;vbeta.fij&quot;, &quot;robust&quot;, &quot;naive&quot;)</code> or a matrix</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">geese</td>
 <td align="left">geepack</td>
 <td align="center"><a href="#E">E</a></td>
 <td align="left">Like <code>geeglm</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">glm</td>
 <td align="left">stats</td>
 <td align="center"><a href="#G">G</a></td>
 <td align="left"></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">glm.nb</td>
 <td align="left">MASS</td>
 <td align="center"><a href="#G">G</a></td>
 <td align="left">Requires <code>data</code> argument</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">glmmadmb</td>
 <td align="left">glmmADMB</td>
 <td align="center"><a href="#G">G</a></td>
 <td align="left"></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">glmerMod</td>
 <td align="left">lme4</td>
 <td align="center"><a href="#G">G</a></td>
 <td align="left"></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">glmmPQL</td>
 <td align="left">MASS</td>
 <td align="center"><a href="#G">G</a></td>
 <td align="left">inherits <code>lm</code> support</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">gls</td>
 <td align="left">nlme</td>
 <td align="center"><a href="#G">G</a></td>
 <td align="left"></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">hurdle</td>
 <td align="left">pscl</td>
 <td align="center"><a href="#C">C</a></td>
 <td align="left"><code>mode = c(&quot;response&quot;, &quot;count&quot;, &quot;zero&quot;, &quot;prob0&quot;),</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"></td>
 <td align="left"></td>
 <td align="center"></td>
 <td align="left"><code>lin.pred = c(FALSE, TRUE)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">lm</td>
 <td align="left">stats</td>
 <td align="center"><a href="#A">A</a></td>
 <td align="left">Several other classes inherit from this and may be supported</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">lme</td>
 <td align="left">nlme</td>
 <td align="center"><a href="#A">A</a></td>
 <td align="left"><code>sigmaAdjust = c(TRUE, FALSE)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">lmerMod</td>
 <td align="left">lme4</td>
 <td align="center"><a href="#L">L</a></td>
 <td align="left"><code>lmer.df = c(&quot;kenward-roger&quot;, &quot;satterthwaite&quot;, &quot;asymptotic&quot;)</code>,</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"></td>
 <td align="left"></td>
 <td align="center"></td>
 <td align="left"><code>pbkrtest.limit = 3000</code>, <code>disable.pbkrtest = FALSE</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"></td>
 <td align="left"></td>
 <td align="center"></td>
 <td align="left"><code>emm_options(lmer.df =, pbkrtest.limit =, disable.pbkrtest =)</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">manova</td>
 <td align="left">stats</td>
 <td align="center"><a href="#M">M</a></td>
 <td align="left"><code>mult.name</code>, <code>mult.levs</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">maov</td>
 <td align="left">stats</td>
 <td align="center"><a href="#M">M</a></td>
 <td align="left"><code>mult.name</code>, <code>mult.levs</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">mcmc</td>
 <td align="left">mcmc</td>
 <td align="center"><a href="#S">S</a></td>
 <td align="left">May require <code>formula</code>, <code>data</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">MCMCglmm</td>
 <td align="left">MCMCglmm</td>
 <td align="center"><a href="#M">M</a>,<a href="#S">S</a></td>
 <td align="left"><code>mult.name</code>, <code>mult.levs</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"></td>
 <td align="left"></td>
 <td align="center"></td>
 <td align="left"><code>data</code> is required</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">mixed</td>
 <td align="left">afex</td>
 <td align="center"><a href="#P">P</a></td>
 <td align="left">Supported in <strong>afex</strong> package</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">mlm</td>
 <td align="left">stats</td>
 <td align="center"><a href="#M">M</a></td>
 <td align="left"><code>mult.name</code>, <code>mult.levs</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">multinom</td>
 <td align="left">nnet</td>
 <td align="center"><a href="#N">N</a></td>
 <td align="left"><code>mode = c(&quot;prob&quot;, &quot;latent&quot;)</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"></td>
 <td align="left"></td>
 <td align="center"></td>
 <td align="left">Always include response in specs for <code>emmeans()</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">nauf</td>
 <td align="left"></td>
 <td align="center"><a href="#P">P</a></td>
 <td align="left">Supported in <strong>nauf</strong> package</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">nlme</td>
 <td align="left">nlme</td>
 <td align="center"><a href="#A">A</a></td>
 <td align="left">Supports fixed part. Requires <code>param</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">polr</td>
 <td align="left">MASS</td>
 <td align="center"><a href="#O">O</a></td>
 <td align="left"><code>mode = c(&quot;latent&quot;, &quot;linear.predictor&quot;, &quot;cum.prob&quot;,</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"></td>
 <td align="left"></td>
 <td align="center"></td>
 <td align="left"><code>&quot;exc.prob&quot;, &quot;prob&quot;, &quot;mean.class&quot;)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">rlm</td>
 <td align="left">MASS</td>
 <td align="center"><a href="#A">A</a></td>
 <td align="left">inherits <code>lm</code> support</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">rms</td>
 <td align="left">rms</td>
 <td align="center"><a href="#O">O</a></td>
 <td align="left"><code>mode = (&quot;middle&quot;, &quot;latent&quot;, &quot;linear.predictor&quot;,</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"></td>
 <td align="left"></td>
 <td align="center"></td>
 <td align="left"><code>&quot;cum.prob&quot;, &quot;exc.prob&quot;, &quot;prob&quot;, &quot;mean.class&quot;)</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">rsm</td>
 <td align="left">rsm</td>
 <td align="center"><a href="#P">P</a></td>
 <td align="left">Supported in <strong>rsm</strong> package</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">stanreg</td>
 <td align="left">rstanarm</td>
 <td align="center"><a href="#S">S</a></td>
 <td align="left">Args for <code>stanreg_</code><em>xxx</em> similar to those for <em>xxx</em></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">survreg</td>
 <td align="left">survival</td>
 <td align="center"><a href="#A">A</a></td>
 <td align="left"></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">zeroinfl</td>
 <td align="left">pscl</td>
 <td align="center"><a href="#C">C</a></td>
 <td align="left"><code>mode = c(&quot;response&quot;, &quot;count&quot;, &quot;zero&quot;, &quot;prob0&quot;)</code>,</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"></td>
 <td align="left"></td>
 <td align="center"></td>
@@ -366,6 +373,7 @@
 <div id="G" class="section level2">
 <h2>Group G – Generalized linear models and relatives</h2>
 <p>Models in this group receive only standard support as in <a href="#A">Group A</a>, but typically the tests and confidence intervals are asymptotic. Thus the <code>df</code> column for tabular results will be <code>NA</code>.</p>
+<p>In the case of <code>gam::gam</code> objects, there is an optional <code>nboot</code> argument that sets the number of bootstrap replications used to estimate the variances and covariances of the smoothing portions of the model.</p>
 </div>
 <div id="L" class="section level2">
 <h2>Group L – <code>lmerMod</code> models</h2>
