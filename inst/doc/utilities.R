@@ -5,12 +5,12 @@ fig.width = 4.5)
 
 ## ------------------------------------------------------------------------
 pigs.lm <- lm(log(conc) ~ source + factor(percent), data = pigs)
-pigs.emmGrid.s <- emmeans(pigs.lm, "source")
-pigs.emmGrid.s
+pigs.emm.s <- emmeans(pigs.lm, "source")
+pigs.emm.s
 
 ## ------------------------------------------------------------------------
-pigs.emmGrid.s <- update(pigs.emmGrid.s, infer = c(TRUE, TRUE), null = log(35))
-pigs.emmGrid.s
+pigs.emm.s <- update(pigs.emm.s, infer = c(TRUE, TRUE), null = log(35))
+pigs.emm.s
 
 ## ----eval = FALSE--------------------------------------------------------
 #  emmeans(pigs.lm, "source", options = list(infer = c(TRUE, TRUE), null = log(35)))
@@ -36,19 +36,19 @@ pigs.anal.p
 options(emmeans = NULL)
 
 ## ------------------------------------------------------------------------
-rbind(pairs(pigs.emmGrid.s), pigs.anal.p[[2]])
+rbind(pairs(pigs.emm.s), pigs.anal.p[[2]])
 
 ## ------------------------------------------------------------------------
-update(pigs.anal.p[[2]] + pairs(pigs.emmGrid.s), adjust = "mvt")
+update(pigs.anal.p[[2]] + pairs(pigs.emm.s), adjust = "mvt")
 
 ## ------------------------------------------------------------------------
-pigs.emmGrid.s[2:3]
+pigs.emm.s[2:3]
 
 ## ------------------------------------------------------------------------
-pigs.emmGrid.ss <- add_grouping(pigs.emmGrid.s, "type", "source",
+pigs.emm.ss <- add_grouping(pigs.emm.s, "type", "source",
                             c("animal", "vegetable", "animal"))
-str(pigs.emmGrid.ss)
+str(pigs.emm.ss)
 
 ## ------------------------------------------------------------------------
-emmeans(pigs.emmGrid.ss, pairwise ~ type)
+emmeans(pigs.emm.ss, pairwise ~ type)
 

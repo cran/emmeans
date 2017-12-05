@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2017-11-04" />
+<meta name="date" content="2017-12-05" />
 
 <title>Transformations and link functions in emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Transformations and link functions in emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2017-11-04</em></h4>
+<h4 class="date"><em>2017-12-05</em></h4>
 
 
 
@@ -93,13 +93,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Consider the same example with the <code>pigs</code> dataset that is used in many of these vignettes:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(conc) ~<span class="st"> </span>source +<span class="st"> </span><span class="kw">factor</span>(percent), <span class="dt">data =</span> pigs)</code></pre></div>
 <p>This model has two factors, <code>source</code> and <code>percent</code> (coerced to a factor), as predictors; and log-transformed <code>conc</code> as the response. Here we obtain the EMMs for <code>source</code>, examine its structure, and finally produce a summary, including a test against a null value of log(35):</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.emmGrid.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.lm, <span class="st">&quot;source&quot;</span>)
-<span class="kw">str</span>(pigs.emmGrid.s)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.emm.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.lm, <span class="st">&quot;source&quot;</span>)
+<span class="kw">str</span>(pigs.emm.s)
 ## 'emmGrid' object with variables:
 ##     source = fish, soy, skim
 ## Transformation: &quot;log&quot;
 
-<span class="kw">summary</span>(pigs.emmGrid.s, <span class="dt">infer =</span> <span class="ot">TRUE</span>, <span class="dt">null =</span> <span class="kw">log</span>(<span class="dv">35</span>))
+<span class="kw">summary</span>(pigs.emm.s, <span class="dt">infer =</span> <span class="ot">TRUE</span>, <span class="dt">null =</span> <span class="kw">log</span>(<span class="dv">35</span>))
 ##  source   emmean         SE df lower.CL upper.CL     null t.ratio p.value
 ##  fish   3.394492 0.03668122 23 3.318612 3.470373 3.555348  -4.385  0.0002
 ##  soy    3.667260 0.03744798 23 3.589793 3.744727 3.555348   2.988  0.0066
@@ -109,7 +109,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## Results are given on the log (not the response) scale. 
 ## Confidence level used: 0.95</code></pre></div>
 <p>Now suppose that we want the EMMs expressed on the same scale as <code>conc</code>. This can be done by adding <code>type = &quot;response&quot;</code> to the <code>summary()</code> call:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(pigs.emmGrid.s, <span class="dt">infer =</span> <span class="ot">TRUE</span>, <span class="dt">null =</span> <span class="kw">log</span>(<span class="dv">35</span>), <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(pigs.emm.s, <span class="dt">infer =</span> <span class="ot">TRUE</span>, <span class="dt">null =</span> <span class="kw">log</span>(<span class="dv">35</span>), <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
 ##  source response       SE df lower.CL upper.CL null t.ratio p.value
 ##  fish   29.79952 1.093083 23 27.62197 32.14874   35  -4.385  0.0002
 ##  soy    39.14451 1.465883 23 36.22658 42.29747   35   2.988  0.0066
@@ -144,11 +144,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="regrid" class="section level2">
 <h2>Re-gridding</h2>
 <p>As well-advised as it is, some users may not want the default timing of things. The tool for changing when back-transformation is performed is the <code>regrid()</code> function – which, with default settings of its arguments, back-transforms an <code>emmGrid</code> object and adjusts everything in it appropriately. For example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(<span class="kw">regrid</span>(pigs.emmGrid.s))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(<span class="kw">regrid</span>(pigs.emm.s))
 ## 'emmGrid' object with variables:
 ##     source = fish, soy, skim
 
-<span class="kw">summary</span>(<span class="kw">regrid</span>(pigs.emmGrid.s), <span class="dt">infer =</span> <span class="ot">TRUE</span>, <span class="dt">null =</span> <span class="dv">35</span>)
+<span class="kw">summary</span>(<span class="kw">regrid</span>(pigs.emm.s), <span class="dt">infer =</span> <span class="ot">TRUE</span>, <span class="dt">null =</span> <span class="dv">35</span>)
 ##  source response       SE df lower.CL upper.CL null t.ratio p.value
 ##  fish   29.79952 1.093083 23 27.53831 32.06074   35  -4.758  0.0001
 ##  soy    39.14451 1.465883 23 36.11210 42.17692   35   2.827  0.0096
@@ -162,7 +162,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>The estimates and SEs are identical.</li>
 <li>The confidence intervals, <em>t</em> ratios, and <em>P</em> values are <em>not</em> identical. This is because, this time, the SEs shown in the table are the ones actually used to construct the tests and intervals.</li>
 </ul>
-<p>Understood, right? But think carefully about how these EMMs were obtained. They are back-transformed from <code>pigs.emmGrid.s</code>, in which <em>the marginal averaging was done on the log scale</em>. If we want to back-transform <em>before</em> doing the averaging, we need to call <code>regrid()</code> after the reference grid is constructed but before the averaging takes place:</p>
+<p>Understood, right? But think carefully about how these EMMs were obtained. They are back-transformed from <code>pigs.emm.s</code>, in which <em>the marginal averaging was done on the log scale</em>. If we want to back-transform <em>before</em> doing the averaging, we need to call <code>regrid()</code> after the reference grid is constructed but before the averaging takes place:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.rg &lt;-<span class="st"> </span><span class="kw">ref_grid</span>(pigs.lm)
 pigs.remm.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(<span class="kw">regrid</span>(pigs.rg), <span class="st">&quot;source&quot;</span>)
 <span class="kw">summary</span>(pigs.remm.s, <span class="dt">infer =</span> <span class="ot">TRUE</span>, <span class="dt">null =</span> <span class="dv">35</span>)
@@ -178,7 +178,7 @@ pigs.remm.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(<span 
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.remm.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.lm, <span class="st">&quot;source&quot;</span>, <span class="dt">transform =</span> <span class="st">&quot;response&quot;</span>)</code></pre></div>
 <p>But don’t get <code>transform</code> and <code>type</code> confused. The <code>transform</code> argument is passed to <code>regrid()</code> after the reference grid is constructed, whereas the <code>type</code> argument is simply remembered and used by <code>summary()</code>. So a similar-looking call:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(pigs.lm, <span class="st">&quot;source&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)</code></pre></div>
-<p>will compute the results we have seen for <code>pigs.emmGrid.s</code> – back-transformed <em>after</em> averaging on the log scale.</p>
+<p>will compute the results we have seen for <code>pigs.emm.s</code> – back-transformed <em>after</em> averaging on the log scale.</p>
 <p>Remember again: When it comes to transformations, timing is everything.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
@@ -189,29 +189,29 @@ pigs.remm.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(<span 
 <p>Exactly the same ideas we have presented for response transformations apply to generalized linear models having non-identity link functions. As far as <strong>emmeans</strong> is concerned, there is no difference at all.</p>
 <p>To illustrate, consider the <code>neuralgia</code> dataset provided in the package. These data come from an experiment reported in a SAS technical report where different treatments for neuralgia are compared. The patient’s sex is an additional factor, and their age is a covariate. The response is <code>Pain</code>, a binary variable on whether or not the patient reports neuralgia pain after treatment. The model suggested in the SAS report is equivalent to the following. We use it to obtain estimated probabilities of experiencing pain:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">neuralgia.glm &lt;-<span class="st"> </span><span class="kw">glm</span>(Pain ~<span class="st"> </span>Treatment *<span class="st"> </span>Sex +<span class="st"> </span>Age, <span class="dt">family =</span> <span class="kw">binomial</span>(), <span class="dt">data =</span> neuralgia)
-neuralgia.emmGrid &lt;-<span class="st"> </span><span class="kw">emmeans</span>(neuralgia.glm, <span class="st">&quot;Treatment&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
+neuralgia.emm &lt;-<span class="st"> </span><span class="kw">emmeans</span>(neuralgia.glm, <span class="st">&quot;Treatment&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
 ## NOTE: Results may be misleading due to involvement in interactions
-neuralgia.emmGrid
-##  Treatment      prob         SE df  asymp.LCL asymp.UCL
-##  A         0.2109015 0.11090460 NA 0.06750694 0.4966578
-##  B         0.1206362 0.08352179 NA 0.02848317 0.3909567
-##  P         0.8662555 0.08827173 NA 0.59265359 0.9664811
+neuralgia.emm
+##  Treatment      prob         SE  df  asymp.LCL asymp.UCL
+##  A         0.2109015 0.11090460 Inf 0.06750694 0.4966578
+##  B         0.1206362 0.08352179 Inf 0.02848317 0.3909567
+##  P         0.8662555 0.08827173 Inf 0.59265359 0.9664811
 ## 
 ## Results are averaged over the levels of: Sex 
 ## Confidence level used: 0.95 
 ## Intervals are back-transformed from the logit scale</code></pre></div>
 <p>(The note about the interaction is discussed shortly.) Note that the averaging over <code>Sex</code> is done on the logit scale, <em>before</em> the results are back-transformed for the summary. We may use <code>pairs()</code> to compare these estimates; note that logits are logs of odds; so this is another instance where log-differences are back-transformed – in this case to odds ratios:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pairs</span>(neuralgia.emmGrid, <span class="dt">reverse =</span> <span class="ot">TRUE</span>)
-##  contrast odds.ratio         SE df z.ratio p.value
-##  B / A     0.5132877  0.5146063 NA  -0.665  0.7837
-##  P / A    24.2338121 25.1423051 NA   3.073  0.0060
-##  P / B    47.2129213 57.2422531 NA   3.179  0.0042
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pairs</span>(neuralgia.emm, <span class="dt">reverse =</span> <span class="ot">TRUE</span>)
+##  contrast odds.ratio         SE  df z.ratio p.value
+##  B / A     0.5132877  0.5146063 Inf  -0.665  0.7837
+##  P / A    24.2338121 25.1423051 Inf   3.073  0.0060
+##  P / B    47.2129213 57.2422531 Inf   3.179  0.0042
 ## 
 ## Results are averaged over the levels of: Sex 
 ## P value adjustment: tukey method for comparing a family of 3 estimates 
 ## Tests are performed on the log odds ratio scale</code></pre></div>
 <p>So there is evidence of considerably more pain being reported with placebo (treatment <code>P</code>) than with either of the other two treatments. The estimated odds of pain with <code>B</code> are about half that for <code>A</code>, but this finding is not statistically significant. (The odds that this is a made-up dataset seem quite high, but that finding is strictly this author’s impression.)</p>
-<p>Observe that there is a note in the output for <code>neuralgia.emmGrid</code> that the results may be misleading. It is important to take it seriously, because if two factors interact, it may be the case that marginal averages of predictions don’t reflect what is happening at any level of the factors being averaged over. To find out, look at an interaction plot of the fitted model:</p>
+<p>Observe that there is a note in the output for <code>neuralgia.emm</code> that the results may be misleading. It is important to take it seriously, because if two factors interact, it may be the case that marginal averages of predictions don’t reflect what is happening at any level of the factors being averaged over. To find out, look at an interaction plot of the fitted model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmip</span>(neuralgia.glm, Sex ~<span class="st"> </span>Treatment)</code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
 <p>There is no practical difference between females and males in the patterns of response to <code>Treatment</code>; so I think most people would be quite comfortable with the marginal results that are reported earlier.</p>
@@ -230,32 +230,32 @@ neuralgia.emmGrid
 <p>The canonical link for a gamma model is the reciprocal (or inverse); and there is the square-root response transformation besides. If we choose <code>type = &quot;response&quot;</code> in summarizing, we undo <em>both</em> transformations:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(warp.glm, ~<span class="st"> </span>tension |<span class="st"> </span>wool, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
 ## wool = A:
-##  tension response       SE df asymp.LCL asymp.UCL
-##  L       42.87080 5.237067 NA  33.22074  53.74966
-##  M       23.28978 2.845066 NA  18.04733  29.19978
-##  H       23.58442 2.881055 NA  18.27566  29.56919
+##  tension response       SE  df asymp.LCL asymp.UCL
+##  L       42.87080 5.237067 Inf  33.22074  53.74966
+##  M       23.28978 2.845066 Inf  18.04733  29.19978
+##  H       23.58442 2.881055 Inf  18.27566  29.56919
 ## 
 ## wool = B:
-##  tension response       SE df asymp.LCL asymp.UCL
-##  L       27.43817 3.351832 NA  21.26193  34.40087
-##  M       28.07575 3.429719 NA  21.75599  35.20024
-##  H       18.50894 2.261044 NA  14.34264  23.20577
+##  tension response       SE  df asymp.LCL asymp.UCL
+##  L       27.43817 3.351832 Inf  21.26193  34.40087
+##  M       28.07575 3.429719 Inf  21.75599  35.20024
+##  H       18.50894 2.261044 Inf  14.34264  23.20577
 ## 
 ## Confidence level used: 0.95 
 ## Intervals are back-transformed from the sqrt scale</code></pre></div>
 <p>What happened here is first the linear predictor was back-transformed from the link scale (inverse); then the squares were obtained to back-transform the rest of the way. It is possible to undo the link, and not the response transformation:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(warp.glm, ~<span class="st"> </span>tension |<span class="st"> </span>wool, <span class="dt">type =</span> <span class="st">&quot;unlink&quot;</span>)
 ## wool = A:
-##  tension response        SE df asymp.LCL asymp.UCL
-##  L       6.547580 0.3999238 NA  5.847547  7.438013
-##  M       4.825948 0.2947676 NA  4.309983  5.482251
-##  H       4.856380 0.2966258 NA  4.337161  5.516819
+##  tension response        SE  df asymp.LCL asymp.UCL
+##  L       6.547580 0.3999238 Inf  5.847547  7.438013
+##  M       4.825948 0.2947676 Inf  4.309983  5.482251
+##  H       4.856380 0.2966258 Inf  4.337161  5.516819
 ## 
 ## wool = B:
-##  tension response        SE df asymp.LCL asymp.UCL
-##  L       5.238146 0.3199445 NA  4.678110  5.950505
-##  M       5.298655 0.3236405 NA  4.732150  6.019244
-##  H       4.302202 0.2627775 NA  3.842232  4.887278
+##  tension response        SE  df asymp.LCL asymp.UCL
+##  L       5.238146 0.3199445 Inf  4.678110  5.950505
+##  M       5.298655 0.3236405 Inf  4.732150  6.019244
+##  H       4.302202 0.2627775 Inf  3.842232  4.887278
 ## 
 ## Confidence level used: 0.95 
 ## Intervals are back-transformed from the inverse scale</code></pre></div>
@@ -291,8 +291,8 @@ my.model &lt;-<span class="st"> </span><span class="kw">lmer</span>(logy<span cl
 <p>The <code>regrid()</code> function makes it possible to fake a log transformation of the response. Why would you want to do this? So that you can make comparisons using ratios instead of differences.</p>
 <p>Consider the <code>pigs</code> example once again, but suppose we had fitted a model with a square-root transformation instead of a log:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigroot.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">sqrt</span>(conc) ~<span class="st"> </span>source +<span class="st"> </span><span class="kw">factor</span>(percent), <span class="dt">data =</span> pigs)
-piglog.emmGrid.s &lt;-<span class="st"> </span><span class="kw">regrid</span>(<span class="kw">emmeans</span>(pigroot.lm, <span class="st">&quot;source&quot;</span>), <span class="dt">transform =</span> <span class="st">&quot;log&quot;</span>)
-<span class="kw">confint</span>(piglog.emmGrid.s, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
+piglog.emm.s &lt;-<span class="st"> </span><span class="kw">regrid</span>(<span class="kw">emmeans</span>(pigroot.lm, <span class="st">&quot;source&quot;</span>), <span class="dt">transform =</span> <span class="st">&quot;log&quot;</span>)
+<span class="kw">confint</span>(piglog.emm.s, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
 ##  source response       SE df lower.CL upper.CL
 ##  fish   29.84382 1.316416 23 27.24115 32.69514
 ##  soy    39.24300 1.541103 23 36.18104 42.56408
@@ -301,7 +301,7 @@ piglog.emmGrid.s &lt;-<span class="st"> </span><span class="kw">regrid</span>(<s
 ## Results are averaged over the levels of: percent 
 ## Confidence level used: 0.95 
 ## Intervals are back-transformed from the log scale
-<span class="kw">pairs</span>(piglog.emmGrid.s, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
+<span class="kw">pairs</span>(piglog.emm.s, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
 ##  contrast        ratio         SE df t.ratio p.value
 ##  fish / soy  0.7604877 0.04535114 23  -4.591  0.0004
 ##  fish / skim 0.6632114 0.03910379 23  -6.965  &lt;.0001

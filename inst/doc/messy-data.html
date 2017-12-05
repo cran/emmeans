@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2017-11-04" />
+<meta name="date" content="2017-12-05" />
 
 <title>Working with messy data</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Working with messy data</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2017-11-04</em></h4>
+<h4 class="date"><em>2017-12-05</em></h4>
 
 
 
@@ -93,17 +93,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>As an illustration, consider the <code>nutrition</code> dataset provided with the package. These data are used as an example in Milliken and Johnson (1992), <em>Analysis of Messy Data</em>, and contain the results of an observational study on nutrition education. Low-income mothers are classified by race, age category, and whether or not they received food stamps (the <code>group</code> factor); and the response variable is a gain score (post minus pre scores) after completing a nutrition training program. First, let’s fit a model than includes all main effects and 2-way interactions, and obtain its “type II” ANOVA:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nutr.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(gain ~<span class="st"> </span>(age +<span class="st"> </span>group +<span class="st"> </span>race)^<span class="dv">2</span>, <span class="dt">data =</span> nutrition) 
 car::<span class="kw">Anova</span>(nutr.lm)
-## Anova Table (Type II tests)
+## Analysis of Deviance Table (Type II tests)
 ## 
 ## Response: gain
-##             Sum Sq Df F value    Pr(&gt;F)
-## age          82.37  3  0.9614    0.4145
-## group       658.13  1 23.0441 6.105e-06
-## race         11.17  2  0.1956    0.8227
-## age:group    91.58  3  1.0688    0.3663
-## age:race     87.30  3  1.0189    0.3880
-## group:race  113.70  2  1.9906    0.1424
-## Residuals  2627.47 92</code></pre></div>
+##            Df       F    Pr(&gt;F)
+## age         3  0.9614    0.4145
+## group       1 23.0441 6.105e-06
+## race        2  0.1956    0.8227
+## age:group   3  1.0688    0.3663
+## age:race    3  1.0189    0.3880
+## group:race  2  1.9906    0.1424
+## Residuals  92</code></pre></div>
 <p>There is definitely a <code>group</code> effect and a hint of and interaction with <code>race</code>. Here are the EMMs for those two factors:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(nutr.lm, ~<span class="st"> </span>group *<span class="st"> </span>race)
 ##  group      race        emmean       SE df     lower.CL upper.CL
@@ -207,8 +207,8 @@ cows.rg
 ##     drug = Angustatin, Bovineumab, Charloisazepam, Herefordmycin, Mollycoddle
 ## Nesting structure:  drug %in% route</code></pre></div>
 <p>When there is nesting, <code>emmeans</code> computes averages separately in each group</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">route.emmGrid &lt;-<span class="st"> </span><span class="kw">emmeans</span>(cows.rg, <span class="st">&quot;route&quot;</span>)
-route.emmGrid
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">route.emm &lt;-<span class="st"> </span><span class="kw">emmeans</span>(cows.rg, <span class="st">&quot;route&quot;</span>)
+route.emm
 ##  route       emmean        SE df lower.CL upper.CL
 ##  injection 38.91667 0.5908902  9 37.57998 40.25335
 ##  oral      28.02778 0.4491457  9 27.01174 29.04382
@@ -216,8 +216,8 @@ route.emmGrid
 ## Results are averaged over the levels of: drug 
 ## Confidence level used: 0.95</code></pre></div>
 <p>… and insists on carrying along any grouping factors that a factor is nested in:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">drug.emmGrid &lt;-<span class="st"> </span><span class="kw">emmeans</span>(cows.rg, <span class="st">&quot;drug&quot;</span>)
-drug.emmGrid
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">drug.emm &lt;-<span class="st"> </span><span class="kw">emmeans</span>(cows.rg, <span class="st">&quot;drug&quot;</span>)
+drug.emm
 ##  drug           route       emmean        SE df lower.CL upper.CL
 ##  Bovineumab     injection 34.33333 0.7474236  9 32.64254 36.02412
 ##  Charloisazepam injection 43.50000 0.9154032  9 41.42921 45.57079
@@ -227,13 +227,13 @@ drug.emmGrid
 ## 
 ## Confidence level used: 0.95</code></pre></div>
 <p>Here are the associated pairwise comparisons:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pairs</span>(route.emmGrid, <span class="dt">reverse =</span> <span class="ot">TRUE</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pairs</span>(route.emm, <span class="dt">reverse =</span> <span class="ot">TRUE</span>)
 ##  contrast          estimate       SE df t.ratio p.value
 ##  oral - injection -10.88889 0.742215  9 -14.671  &lt;.0001
 ## 
 ## Results are averaged over the levels of: drug
 
-<span class="kw">pairs</span>(drug.emmGrid, <span class="dt">by =</span> <span class="st">&quot;route&quot;</span>, <span class="dt">reverse =</span> <span class="ot">TRUE</span>)
+<span class="kw">pairs</span>(drug.emm, <span class="dt">by =</span> <span class="st">&quot;route&quot;</span>, <span class="dt">reverse =</span> <span class="ot">TRUE</span>)
 ## route = injection:
 ##  contrast                     estimate        SE df t.ratio p.value
 ##  Charloisazepam - Bovineumab  9.166667 1.1817804  9   7.757  &lt;.0001

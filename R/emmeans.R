@@ -22,49 +22,7 @@
 # emmeans and related functions
 
 
-### emmeans S3 generics ...
-### I am opting to use S3 methods, cascaded for two arguments
-### rather than messing with S4 methods
-
-# emmeans = function(object, specs, ...)
-#     UseMethod("emmeans", specs)
-# 
-# # 
-# emmeans.default = function(object, specs, nesting, ...) {
-#     rgargs = list(object = object, ...)
-#     rgargs$options = NULL  # don't pass options to ref_grid
-#     if (!missing(nesting))
-#         rgargs$nesting = nesting
-#     RG = do.call("ref_grid", rgargs)
-#     lsargs = list(object = RG, specs = specs, ...)
-#     #for (nm in names(rgargs)[-1]) lsargs[[nm]] = NULL
-#     do.call("emmeans", lsargs)###emmeans(RG, specs, ...)
-# }
-# 
-# emmeans.formula =
-# function(object, specs, contr.list, trend, ...) {
-#     if (!missing(trend))
-#         return(lstrends(object, specs, var=trend, ...))
-#     
-#     if(length(specs) == 2) { # just a rhs
-#         by = .find.by(as.character(specs[2]))
-#         emmeans(object, .all.vars(specs), by = by, ...)
-#     }
-#     else {
-#         contr.spec = .all.vars(specs[-3])[1]
-#         by = .find.by(as.character(specs[3]))
-#         # Handle old-style case where contr is a list of lists
-#         if (!missing(contr.list)) {
-#             cmat = contr.list[[contr.spec]]
-#             if (!is.null(cmat))
-#                 contr.spec = cmat
-#         }
-#         emmeans(object, specs = .all.vars(specs[-2]), 
-#                 by = by, contr = contr.spec, ...)
-#     }
-# }
-
-# List of specs
+# emmeans utility for a list of specs
 emmeans.list = function(object, specs, ...) {
     result = list()
     nms = names(specs)
@@ -173,10 +131,8 @@ emmeans.list = function(object, specs, ...) {
 #'   \code{\link{pairs.emmGrid}}, and \code{\link{cld.emmGrid}}.
 
 #' When \code{specs} is a \code{list} or a \code{formula} having a left-hand
-#' side, the return value is an \code{emm_list} object, which is simply a
-#' \code{list} of \code{emmGrid} objects. Methods for \code{emm_list} objects are
-#' the same as those for \code{emmGrid}, but they apply to only one member of the
-#' list, determined by its \code{which} argument.
+#' side, the return value is an \code{\link{emm_list}} object, which is simply a
+#' \code{list} of \code{emmGrid} objects. 
 #' 
 #' @section Details:
 #' Estimated marginal means or EMMs (sometimes called least-squares means) are
@@ -251,7 +207,8 @@ emmeans.list = function(object, specs, ...) {
 #' emmeans (warp.lm, poly ~ tension | wool)
 emmeans = function(object, specs, by = NULL, 
                    fac.reduce = function(coefs) apply(coefs, 2, mean), 
-                   contr, options = get_emm_option("emmeans"), weights, trend, ...) {
+                   contr, options = get_emm_option("emmeans"), 
+                   weights, trend, ...) {
     
     if(!is(object, "emmGrid")) {
         object = ref_grid(object, ...)
@@ -260,17 +217,12 @@ emmeans = function(object, specs, by = NULL,
         return (emmeans.list(object, specs, by = by, contr = contr, ...))
     }
     if (inherits(specs, "formula")) {
-        if(length(specs) == 2) { # just a rhs
-            if (!is.null(byv <- .find.by(as.character(specs[2]))))
-                by = byv
-            specs = .all.vars(specs)
-        }
-        else {
-            if (!is.null(byv <- .find.by(as.character(specs[3]))))
-                by = byv
-            contr = .all.vars(specs[-3])[1]
-            specs = .all.vars(specs[-2])
-        }
+        spc = .parse.by.formula(specs)
+        specs = spc$rhs
+        by = if (length(spc$by) == 0) NULL
+             else spc$by
+        if (length(spc$lhs) > 0) 
+            contr = spc$lhs
     }
     
     if (!missing(trend)) {
@@ -430,7 +382,12 @@ emmeans = function(object, specs, by = NULL,
         # TO DO: provide for passing dots to cld                
             return(cld(result, by = by))
         }
-        ctrs = contrast(result, method = contr, by = by, ...)
+        args = list(...)
+        args$data = NULL   # ensure 'data' not passed
+        args$object = result
+        args$method = contr
+        args$by = by
+        ctrs = do.call(contrast, args)
         result = .cls.list("emm_list", emmeans = result, contrasts = ctrs)
         if(!is.null(lbl <- object@misc$methDesc))
             names(result)[1] = lbl
@@ -498,10 +455,10 @@ emmeans = function(object, specs, by = NULL,
 #'     df = Satt.df, dfargs = list(v = se2, n = n), estName = "mean")
 #' plot(expt.rg)
 #' 
-#' ( trt.emmGrid <- emmeans(expt.rg, "trt") )
-#' ( dose.emmGrid <- emmeans(expt.rg, "dose") )
+#' ( trt.emm <- emmeans(expt.rg, "trt") )
+#' ( dose.emm <- emmeans(expt.rg, "dose") )
 #' 
-#' rbind(pairs(trt.emmGrid), pairs(dose.emmGrid), adjust = "mvt")
+#' rbind(pairs(trt.emm), pairs(dose.emm), adjust = "mvt")
 emmobj = function(bhat, V, levels, linfct, df = NA, dffun, dfargs = list(), 
                   post.beta = matrix(NA), ...) {
     if ((nrow(V) != ncol(V)) || (nrow(V) != ncol(linfct)) || (length(bhat) != ncol(linfct)))
@@ -626,15 +583,6 @@ as.list.emmGrid = function(x, ...) {
                 return(TRUE)
     }
     return(FALSE)
-}
-
-
-# utility to parse 'by' part of a formula
-.find.by = function(rhs) {
-    b = strsplit(rhs, "\\|")[[1]]
-    if (length(b) > 1) 
-        .all.vars(as.formula(paste("~",b[2])))
-    else NULL
 }
 
 

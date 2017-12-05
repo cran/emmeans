@@ -9,8 +9,8 @@ Oats.lmer <- lme4::lmer(yield ~ Variety + factor(nitro) + (1|Block/Variety),
                         data = nlme::Oats, subset = -c(1,2,3,5,8,13,21,34,55))
 
 ## ------------------------------------------------------------------------
-Oats.emmGrid.n <- emmeans(Oats.lmer, "nitro")
-Oats.emmGrid.n
+Oats.emm.n <- emmeans(Oats.lmer, "nitro")
+Oats.emm.n
 
 ## ------------------------------------------------------------------------
 emmeans(Oats.lmer, "nitro", lmer.df = "satterthwaite")
@@ -19,7 +19,7 @@ emmeans(Oats.lmer, "nitro", lmer.df = "satterthwaite")
 emmeans(Oats.lmer, "nitro", lmer.df = "asymptotic")
 
 ## ------------------------------------------------------------------------
-contrast(Oats.emmGrid.n, "poly")
+contrast(Oats.emm.n, "poly")
 
 ## ------------------------------------------------------------------------
 emmeans(Oats.lmer, pairwise ~ Variety)
@@ -66,17 +66,17 @@ rst_ex.rg <- do.call(emmobj, rstex)
 rst_ex.rg
 
 ## ------------------------------------------------------------------------
-period.emmGrid <- emmeans(rst_ex.rg, "period")
-period.emmGrid
+period.emm <- emmeans(rst_ex.rg, "period")
+period.emm
 
 ## ------------------------------------------------------------------------
 require("coda")  ### needed to access generic for as.mcmc()
-summary(as.mcmc(period.emmGrid))
+summary(as.mcmc(period.emm))
 
 ## ------------------------------------------------------------------------
-bayesplot::mcmc_areas(as.mcmc(regrid(period.emmGrid)))
+bayesplot::mcmc_areas(as.mcmc(regrid(period.emm)))
 
 ## ------------------------------------------------------------------------
 HPDinterval(as.mcmc(as.matrix(
-    as.mcmc(contrast(period.emmGrid, "consec", reverse = TRUE), names = FALSE))))
+    as.mcmc(contrast(period.emm, "consec", reverse = TRUE), names = FALSE))))
 

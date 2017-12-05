@@ -55,15 +55,15 @@ cows.rg <- ref_grid(cows.lm)
 cows.rg
 
 ## ------------------------------------------------------------------------
-route.emmGrid <- emmeans(cows.rg, "route")
-route.emmGrid
+route.emm <- emmeans(cows.rg, "route")
+route.emm
 
 ## ------------------------------------------------------------------------
-drug.emmGrid <- emmeans(cows.rg, "drug")
-drug.emmGrid
+drug.emm <- emmeans(cows.rg, "drug")
+drug.emm
 
 ## ------------------------------------------------------------------------
-pairs(route.emmGrid, reverse = TRUE)
+pairs(route.emm, reverse = TRUE)
 
-pairs(drug.emmGrid, by = "route", reverse = TRUE)
+pairs(drug.emm, by = "route", reverse = TRUE)
 

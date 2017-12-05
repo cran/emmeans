@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2017-11-04" />
+<meta name="date" content="2017-12-05" />
 
 <title>Comparisons and contrasts in emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Comparisons and contrasts in emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2017-11-04</em></h4>
+<h4 class="date"><em>2017-12-05</em></h4>
 
 
 
@@ -91,8 +91,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2>Pairwise comparisons</h2>
 <p>The most common follow-up analysis for models having factors as predictors is to compare the EMMs with one another. This may be done simply via the <code>pairs()</code> method for <code>emmGrid</code> objects. In the code below, we obtain the EMMs for <code>source</code> for the <code>pigs</code> data, and then compare the sources pairwise.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(conc) ~<span class="st"> </span>source +<span class="st"> </span><span class="kw">factor</span>(percent), <span class="dt">data =</span> pigs)
-pigs.emmGrid.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.lm, <span class="st">&quot;source&quot;</span>)
-<span class="kw">pairs</span>(pigs.emmGrid.s)
+pigs.emm.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.lm, <span class="st">&quot;source&quot;</span>)
+<span class="kw">pairs</span>(pigs.emm.s)
 ##  contrast      estimate         SE df t.ratio p.value
 ##  fish - soy  -0.2727678 0.05293450 23  -5.153  0.0001
 ##  fish - skim -0.4022777 0.05415929 23  -7.428  &lt;.0001
@@ -102,13 +102,13 @@ pigs.emmGrid.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pig
 ## Results are given on the log (not the response) scale. 
 ## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre></div>
 <p>In its out-of-the-box configuration, <code>pairs()</code> sets two defaults for <a href="confidence-intervals.html#summary"><code>summary()</code></a>: <code>adjust = &quot;tukey&quot;</code> (multiplicity adjustment), and <code>infer = c(FALSE, TRUE)</code> (test statistics, not confidence intervals). You may override these, of course, by calling <code>summary()</code> on the result with different values for these.</p>
-<p>In the example above, EMMs for later factor levels are subtracted from those for earlier levels; if you want the comparisons to go in the other direction, use <code>pairs(pigs.emmGrid.s, reverse = TRUE)</code>. Also, in multi-factor situations, you may specify <code>by</code> factor(s) to perform the comparisons separately at the levels of those factors.</p>
-<p>Comparisons may be summarized graphically via the <code>comparisons</code> argument in <code>plot.emmGrid()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(pigs.emmGrid.s, <span class="dt">comparisons =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<p>In the example above, EMMs for later factor levels are subtracted from those for earlier levels; if you want the comparisons to go in the other direction, use <code>pairs(pigs.emm.s, reverse = TRUE)</code>. Also, in multi-factor situations, you may specify <code>by</code> factor(s) to perform the comparisons separately at the levels of those factors.</p>
+<p>Comparisons may be summarized graphically via the <code>comparisons</code> argument in <code>plot.emm()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(pigs.emm.s, <span class="dt">comparisons =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
 <p>The blue bars are confidence intervals for the EMMs, and the red arrows are for the comparisons among them. If an arrow from one mean overlaps an arrow from another group, the difference is not significant, based on the <code>adjust</code> setting (which defaults to <code>&quot;tukey&quot;</code>). (Note: Don’t ever use confidence intervals for EMMs to perform comparisons; they can be very misleading.)</p>
 <p>Another way to depict comparisons is by compact-letter displays:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cld</span>(pigs.emmGrid.s)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cld</span>(pigs.emm.s)
 ##  source   emmean         SE df lower.CL upper.CL .group
 ##  fish   3.394492 0.03668122 23 3.318612 3.470373  1    
 ##  soy    3.667260 0.03744798 23 3.589793 3.744727   2   
@@ -125,15 +125,15 @@ pigs.emmGrid.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pig
 <div id="contrasts" class="section level2">
 <h2>Other contrasts</h2>
 <p>Pairwise comparisons are an example of linear functions of EMMs. You may use <code>coef()</code> to see the coefficients of these linear functions:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(<span class="kw">pairs</span>(pigs.emmGrid.s))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(<span class="kw">pairs</span>(pigs.emm.s))
 ##      source c.1 c.2 c.3
 ## fish   fish   1   1   0
 ## soy     soy  -1   0   1
 ## skim   skim   0  -1  -1</code></pre></div>
 <p>The pairwise comparisons correspond to columns of the above results. For example, the first pairwise comparison, <code>fish - soy</code>, gives coefficients of 1, -1, and 0 to fish, soy, and skim, respectively. In cases, such as this one, where each column of coefficients sums to zero, the linear functions are termed <em>contrasts</em></p>
 <p>The <code>contrast()</code> function provides for general contrasts (and linear functions, as well) of factor levels. Its second argument, <code>method</code>, is used to specify what method is to be used. In this section we describe the built-in ones, where we simply provide the name of the built-in method. Consider, for example, the factor <code>percent</code> in the model <code>pigs.lm</code> . It is treated as a factor in the model, but it corresponds to equally-spaced values of a numeric variable. In such cases, users often want to compute orthogonal polynomial contrasts:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.emmGrid.p &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.lm, <span class="st">&quot;percent&quot;</span>)
-ply &lt;-<span class="st"> </span><span class="kw">contrast</span>(pigs.emmGrid.p, <span class="st">&quot;poly&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.emm.p &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.lm, <span class="st">&quot;percent&quot;</span>)
+ply &lt;-<span class="st"> </span><span class="kw">contrast</span>(pigs.emm.p, <span class="st">&quot;poly&quot;</span>)
 ply
 ##  contrast     estimate         SE df t.ratio p.value
 ##  linear     0.93739228 0.21055597 23   4.452  0.0002
@@ -174,15 +174,15 @@ org.emml
 ## $contrasts
 ##  contrast  estimate       SE df t.ratio p.value
 ##  2 - 1    -0.772150 3.776875 25  -0.204  0.9997
-##  3 - 2     6.658000 3.776875 25   1.763  0.3243
-##  4 - 3    -5.716133 3.776875 25  -1.513  0.4682
-##  5 - 4     4.882133 3.776875 25   1.293  0.6128
+##  3 - 2     6.658000 3.776875 25   1.763  0.3244
+##  4 - 3    -5.716133 3.776875 25  -1.513  0.4681
+##  5 - 4     4.882133 3.776875 25   1.293  0.6127
 ##  6 - 5    -1.320950 3.776875 25  -0.350  0.9965
 ## 
 ## P value adjustment: mvt method for 5 tests</code></pre></div>
 <p>The contrasts shown are the day-to-day changes.</p>
 <p>This two-sided formula technique is quite convenient, but it can also create confusion. For one thing, the result is not an <code>emmGrid</code> object anymore; it is a <code>list</code> of <code>emmGrid</code> objects, called an <code>emm_list</code>. You may need to be cognizant of that if you are to do further contrasts or other analyzes. For example if you want <code>&quot;eff&quot;</code> contrasts as well, you need to do <code>contrast(org.emml[[1]], &quot;eff&quot;)</code> or <code>contrast(org.emml, &quot;eff&quot;, which = 1)</code>.</p>
-<p>Another issue is that it may be unclear which part of the results is affected by certain options. For example, if you were to add <code>adjust = &quot;bonf&quot;</code> to the <code>org.emmGrid</code> call above, would the Bonferroni adjustment be applied to the EMMs, or to the contrasts? (See the documentation if interested; but the best practice is to avoid such dilemmas.)</p>
+<p>Another issue is that it may be unclear which part of the results is affected by certain options. For example, if you were to add <code>adjust = &quot;bonf&quot;</code> to the <code>org.emm</code> call above, would the Bonferroni adjustment be applied to the EMMs, or to the contrasts? (See the documentation if interested; but the best practice is to avoid such dilemmas.)</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="linfcns" class="section level2">
@@ -226,7 +226,7 @@ org.emml
 ## 
 ## P value adjustment: fdr method for 3 tests</code></pre></div>
 <p>The <code>contrast()</code> function may in fact be used to compute arbitrary linear functions of EMMs. Suppose for some reason we want to estimate the quantities <span class="math inline">\(\lambda_1 = \mu_1+2\mu_2-7\)</span> and <span class="math inline">\(\lambda_2 = 3\mu_2-2\mu_3+1\)</span>, where the <span class="math inline">\(\mu_j\)</span> are the population values of the <code>source</code> EMMs in the <code>pigs</code> example. This may be done by providing the coefficients in a list, and the added constants in the <code>offset</code> argument:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LF &lt;-<span class="st"> </span><span class="kw">contrast</span>(pigs.emmGrid.s, 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LF &lt;-<span class="st"> </span><span class="kw">contrast</span>(pigs.emm.s, 
                <span class="kw">list</span>(<span class="dt">lambda1 =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">0</span>), <span class="dt">lambda2 =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">3</span>, -<span class="dv">2</span>)),
                <span class="dt">offset =</span> <span class="kw">c</span>(-<span class="dv">7</span>, <span class="dv">1</span>))
 <span class="kw">confint</span>(LF, <span class="dt">adjust =</span> <span class="st">&quot;bonferroni&quot;</span>)
@@ -243,7 +243,7 @@ org.emml
 <h2>Special properties of log (and logit) transformations</h2>
 <p>Suppose we obtain EMMs for a model having a response transformation or link function. In most cases, when we compute contrasts of those EMMs, there is no natural way to express those contrasts on anything other than the transformed scale. For example, in a model fitted using <code>glm()</code> with the <code>gamma()</code> family, the default link function is the inverse. Predictions on such a model are estimates of <span class="math inline">\(1/\mu_j\)</span> for various <span class="math inline">\(j\)</span>. Comparisons of predictions will be estimates of <span class="math inline">\(1/\mu_j - 1/\mu_{k}\)</span> for <span class="math inline">\(j \ne k\)</span>. There is no natural way to back-transform these differences to some other interpretable scale.</p>
 <p>However, logs are an exception, in that <span class="math inline">\(\log\mu_j - \log\mu_k = \log(\mu_j/\mu_k)\)</span>. Accordingly, when <code>contrast()</code> (or <code>pairs()</code>) notices that the response is on the log scale, it back-transforms contrasts to ratios when results are to be of <code>response</code> type. For example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pairs</span>(pigs.emmGrid.s, <span class="dt">type =</span> <span class="st">&quot;lp&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pairs</span>(pigs.emm.s, <span class="dt">type =</span> <span class="st">&quot;lp&quot;</span>)
 ##  contrast      estimate         SE df t.ratio p.value
 ##  fish - soy  -0.2727678 0.05293450 23  -5.153  0.0001
 ##  fish - skim -0.4022777 0.05415929 23  -7.428  &lt;.0001
@@ -253,7 +253,7 @@ org.emml
 ## Results are given on the log (not the response) scale. 
 ## P value adjustment: tukey method for comparing a family of 3 estimates
 
-<span class="kw">pairs</span>(pigs.emmGrid.s, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
+<span class="kw">pairs</span>(pigs.emm.s, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
 ##  contrast        ratio         SE df t.ratio p.value
 ##  fish / soy  0.7612695 0.04029742 23  -5.153  0.0001
 ##  fish / skim 0.6687950 0.03622146 23  -7.428  &lt;.0001

@@ -4,21 +4,21 @@ knitr::opts_chunk$set(collapse = TRUE, fig.width = 4.5)
 
 ## ------------------------------------------------------------------------
 pigs.lm <- lm(log(conc) ~ source + factor(percent), data = pigs)
-pigs.emmGrid.s <- emmeans(pigs.lm, "source")
-pairs(pigs.emmGrid.s)
+pigs.emm.s <- emmeans(pigs.lm, "source")
+pairs(pigs.emm.s)
 
 ## ----fig.height = 1.5----------------------------------------------------
-plot(pigs.emmGrid.s, comparisons = TRUE)
+plot(pigs.emm.s, comparisons = TRUE)
 
 ## ------------------------------------------------------------------------
-cld(pigs.emmGrid.s)
+cld(pigs.emm.s)
 
 ## ------------------------------------------------------------------------
-coef(pairs(pigs.emmGrid.s))
+coef(pairs(pigs.emm.s))
 
 ## ------------------------------------------------------------------------
-pigs.emmGrid.p <- emmeans(pigs.lm, "percent")
-ply <- contrast(pigs.emmGrid.p, "poly")
+pigs.emm.p <- emmeans(pigs.lm, "percent")
+ply <- contrast(pigs.emm.p, "poly")
 ply
 
 coef(ply)
@@ -53,13 +53,13 @@ skip_comp.emmc(1:5, skip = 0, reverse = TRUE)
 contrast(org.emml[[1]], "skip_comp", skip = 2, reverse = TRUE)
 
 ## ------------------------------------------------------------------------
-LF <- contrast(pigs.emmGrid.s, 
+LF <- contrast(pigs.emm.s, 
                list(lambda1 = c(1, 2, 0), lambda2 = c(0, 3, -2)),
                offset = c(-7, 1))
 confint(LF, adjust = "bonferroni")
 
 ## ------------------------------------------------------------------------
-pairs(pigs.emmGrid.s, type = "lp")
+pairs(pigs.emm.s, type = "lp")
 
-pairs(pigs.emmGrid.s, type = "response")
+pairs(pigs.emm.s, type = "response")
 

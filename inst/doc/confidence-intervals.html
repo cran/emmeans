@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2017-11-04" />
+<meta name="date" content="2017-12-05" />
 
 <title>Confidence intervals and tests in emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Confidence intervals and tests in emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2017-11-04</em></h4>
+<h4 class="date"><em>2017-12-05</em></h4>
 
 
 
@@ -99,8 +99,8 @@ pigs.rg &lt;-<span class="st"> </span><span class="kw">ref_grid</span>(pigs.lm)
 ## attr(,&quot;package&quot;)
 ## [1] &quot;emmeans&quot;
 
-pigs.emmGrid.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.rg, <span class="st">&quot;source&quot;</span>)
-<span class="kw">class</span>(pigs.emmGrid.s)
+pigs.emm.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.rg, <span class="st">&quot;source&quot;</span>)
+<span class="kw">class</span>(pigs.emm.s)
 ## [1] &quot;emmGrid&quot;
 ## attr(,&quot;package&quot;)
 ## [1] &quot;emmeans&quot;</code></pre></div>
@@ -111,7 +111,7 @@ pigs.emmGrid.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pig
 ##     percent =  9, 12, 15, 18
 ## Transformation: &quot;log&quot;
 
-pigs.emmGrid.s
+pigs.emm.s
 ##  source   emmean         SE df lower.CL upper.CL
 ##  fish   3.394492 0.03668122 23 3.318612 3.470373
 ##  soy    3.667260 0.03744798 23 3.589793 3.744727
@@ -121,21 +121,21 @@ pigs.emmGrid.s
 ## Results are given on the log (not the response) scale. 
 ## Confidence level used: 0.95</code></pre></div>
 <p>This is based on guessing what users most need to see when displaying the object. You can override these defaults; for example,</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(pigs.emmGrid.s)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(pigs.emm.s)
 ## 'emmGrid' object with variables:
 ##     source = fish, soy, skim
 ## Transformation: &quot;log&quot;</code></pre></div>
-<p>The most important method for <code>emmGrid</code> objects is <code>summary()</code>. It is used as the default for displaying an <code>emmeans()</code> result like <code>pigs.emmGrid.s</code>. This <code>summary()</code> method for <code>emmGrid</code> objects) actually produces a <code>data.frame</code>, but with extra bells and whistles:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">class</span>(<span class="kw">summary</span>(pigs.emmGrid.s))
+<p>The most important method for <code>emmGrid</code> objects is <code>summary()</code>. It is used as the default for displaying an <code>emmeans()</code> result like <code>pigs.emm.s</code>. This <code>summary()</code> method for <code>emmGrid</code> objects) actually produces a <code>data.frame</code>, but with extra bells and whistles:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">class</span>(<span class="kw">summary</span>(pigs.emm.s))
 ## [1] &quot;summary_emm&quot; &quot;data.frame&quot;</code></pre></div>
 <p>This can be useful to know because if you want to actually <em>use</em> <code>emmeans()</code> results in other computations, you should save its summary, and then you can access those results just like you would access data in a data frame. The <code>emmGrid</code> object itself is not so accessible. There is a <code>print.summary_emm()</code> function that is what actually produces the output you see above – a data frame with extra annotations.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="summary" class="section level2">
 <h2><code>summary()</code> and its relatives</h2>
-<p>As you may have gathered, the most important method for <code>emmGrid</code> objects is <code>summary()</code>. It has a lot of options, and the detailed documentation via <a href="../html/summary.emmGrid.html"><code>help(&quot;summary.emmGrid&quot;)</code></a> is worth a look.</p>
+<p>As you may have gathered, the most important method for <code>emmGrid</code> objects is <code>summary()</code>. It has a lot of options, and the detailed documentation via <a href="../html/summary.emm.html"><code>help(&quot;summary.emm&quot;)</code></a> is worth a look.</p>
 <p>Just <code>summary(&lt;object&gt;)</code> by itself will produce a summary that varies somewhat according to context. It does this by setting different defaults for the <code>infer</code> argument, which consists of two logical values, specifying confidence intervals and tests, respectively. The summary of a newly made reference grid will show just estimates and standard errors, but not confidence intervals or tests (that is, <code>infer = c(FALSE, FALSE)</code>). The summary of an <code>emmeans()</code> result, as we see above, will have intervals, but no tests (i.e., <code>infer = c(TRUE, FALSE)</code>); and the result of a <code>contrast()</code> call (see <a href="comparisons.html">comparisons and contrasts</a>) will show test statistics and <em>P</em> values, but not intervals (i.e., <code>infer = c(FALSE, TRUE)</code>). There are courtesy methods <code>confint()</code> and <code>test()</code> that just call <code>summary()</code> with the appropriate <code>infer</code> setting; for example,</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">test</span>(pigs.emmGrid.s)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">test</span>(pigs.emm.s)
 ##  source   emmean         SE df t.ratio p.value
 ##  fish   3.394492 0.03668122 23  92.540  &lt;.0001
 ##  soy    3.667260 0.03744798 23  97.929  &lt;.0001
@@ -144,7 +144,7 @@ pigs.emmGrid.s
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale.</code></pre></div>
 <p>It is not particularly useful, though, to test these EMMs against the default of zero – which is why tests are not usually shown. It makes a lot more sense to test them against some target concentration, say 40. And suppose we want to do a one-sided test to see if the concentration is greater than 40. Remembering that the response is log-transformed in this model,</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">test</span>(pigs.emmGrid.s, <span class="dt">null =</span> <span class="kw">log</span>(<span class="dv">40</span>), <span class="dt">side =</span> <span class="st">&quot;&gt;&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">test</span>(pigs.emm.s, <span class="dt">null =</span> <span class="kw">log</span>(<span class="dv">40</span>), <span class="dt">side =</span> <span class="st">&quot;&gt;&quot;</span>)
 ##  source   emmean         SE df     null t.ratio p.value
 ##  fish   3.394492 0.03668122 23 3.688879  -8.026  1.0000
 ##  soy    3.667260 0.03744798 23 3.688879  -0.577  0.7153
@@ -158,7 +158,7 @@ pigs.emmGrid.s
 <div id="tran" class="section level2">
 <h2>Back-transforming</h2>
 <p>Transformations and link functions are supported an several ways in <strong>emmeans</strong>, making this a complex topic worthy of <a href="transformations.html">its own vignette</a>. Here, we show just the most basic approach. Namely, specifying the argument <code>type = &quot;response&quot;</code> will cause the displayed results to be back-transformed to the response scale, when a transformation or link function is incorporated in the model. For example, let’s try the preceding <code>test()</code> call again:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">test</span>(pigs.emmGrid.s, <span class="dt">null =</span> <span class="kw">log</span>(<span class="dv">40</span>), <span class="dt">side =</span> <span class="st">&quot;&gt;&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">test</span>(pigs.emm.s, <span class="dt">null =</span> <span class="kw">log</span>(<span class="dv">40</span>), <span class="dt">side =</span> <span class="st">&quot;&gt;&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
 ##  source response       SE df null t.ratio p.value
 ##  fish   29.79952 1.093083 23   40  -8.026  1.0000
 ##  soy    39.14451 1.465883 23   40  -0.577  0.7153
@@ -169,7 +169,7 @@ pigs.emmGrid.s
 ## Tests are performed on the log scale</code></pre></div>
 <p>Note what changes and what doesn’t change. In the <code>test()</code> call, we <em>still</em> use the log of 40 as the null value; <code>null</code> must always be specified on the linear-prediction scale, in this case the log. In the output, the displayed estimates, as well as the <code>null</code> value, are shown back-transformed. As well, the standard errors are altered (using the delta method). However, the <em>t</em> ratios and <em>P</em> values are identical to the preceding results. That is, the tests themselves are still conducted on the linear-predictor scale (as is noted in the output).</p>
 <p>Similar statements apply to confidence intervals on the response scale:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(pigs.emmGrid.s, <span class="dt">side =</span> <span class="st">&quot;&gt;&quot;</span>, <span class="dt">level =</span> .<span class="dv">90</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(pigs.emm.s, <span class="dt">side =</span> <span class="st">&quot;&gt;&quot;</span>, <span class="dt">level =</span> .<span class="dv">90</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
 ##  source response       SE df lower.CL upper.CL
 ##  fish   29.79952 1.093083 23 28.39159      Inf
 ##  soy    39.14451 1.465883 23 37.25735      Inf
@@ -184,7 +184,7 @@ pigs.emmGrid.s
 <div id="adjust" class="section level2">
 <h2>Multiplicity adjustments</h2>
 <p>Both tests and confidence intervals may be adjusted for simultaneous inference. Such adjustments ensure that the confidence coefficient for a whole set of intervals is at least the specified level, or to control the overall significance level for a whole family of tests. This is done via the <code>adjust</code> argument. For <code>ref_grid()</code> and <code>emmeans()</code> results, the default is <code>adjust = &quot;none&quot;</code>. For most <code>contrast()</code> results, <code>adjust</code> is often something else, depending on what type of contrasts are created. For example, pairwise comparisons default to <code>adjust = &quot;tukey&quot;</code>, i.e., the Tukey HSD method. The <code>summary()</code> function sometimes <em>changes</em> <code>adjust</code> if it is inappropriate. For example, with</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(pigs.emmGrid.s, <span class="dt">adjust =</span> <span class="st">&quot;tukey&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(pigs.emm.s, <span class="dt">adjust =</span> <span class="st">&quot;tukey&quot;</span>)
 ##  source   emmean         SE df lower.CL upper.CL
 ##  fish   3.394492 0.03668122 23 3.300060 3.488925
 ##  soy    3.667260 0.03744798 23 3.570854 3.763666
@@ -197,7 +197,7 @@ pigs.emmGrid.s
 <p>the adjustment is changed to the Sidak method because the Tukey adjustment is inappropriate unless you are doing pairwise comparisons.</p>
 <p>The adjustment method that is <em>never</em> inappropriate is Bonferroni; however, it can be quite conservative. Using <code>adjust = &quot;mvt&quot;</code> is the closest to being the “exact” all-around method, as it uses the multivariate <em>t</em> distribution (and the <strong>mvtnorm</strong> package) with the same covariance structure as the estimates to determine the adjustment. However, this comes at high computational expense as the computations are done using simulation techniques. For a large set of tests (and especially confidence intervals), the computational lag becomes noticeable if not intolerable.</p>
 <p>For tests, <code>adjust</code> increases the <em>P</em> values over those otherwise obtained with <code>adjust = &quot;none&quot;</code>, making it harder to declare an individual test as “significant.” Compare the following adjusted tests with the unadjusted ones previously computed.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">test</span>(pigs.emmGrid.s, <span class="dt">null =</span> <span class="kw">log</span>(<span class="dv">40</span>), <span class="dt">side =</span> <span class="st">&quot;&gt;&quot;</span>, <span class="dt">adjust =</span> <span class="st">&quot;bonferroni&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">test</span>(pigs.emm.s, <span class="dt">null =</span> <span class="kw">log</span>(<span class="dv">40</span>), <span class="dt">side =</span> <span class="st">&quot;&gt;&quot;</span>, <span class="dt">adjust =</span> <span class="st">&quot;bonferroni&quot;</span>)
 ##  source   emmean         SE df     null t.ratio p.value
 ##  fish   3.394492 0.03668122 23 3.688879  -8.026  1.0000
 ##  soy    3.667260 0.03744798 23 3.688879  -0.577  1.0000
@@ -246,7 +246,7 @@ pigs.emmGrid.s
 <div id="joint" class="section level2">
 <h2>Joint tests</h2>
 <p>From the above, we already know how to test individual results. For pairwise comparisons (details in <a href="comparisons.html">the “comparisons” vignette</a>), we might do</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.prs.s &lt;-<span class="st"> </span><span class="kw">pairs</span>(pigs.emmGrid.s)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.prs.s &lt;-<span class="st"> </span><span class="kw">pairs</span>(pigs.emm.s)
 pigs.prs.s
 ##  contrast      estimate         SE df t.ratio p.value
 ##  fish - soy  -0.2727678 0.05293450 23  -5.153  0.0001

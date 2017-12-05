@@ -7,37 +7,37 @@ pigs.lm <- lm(log(conc) ~ source + factor(percent), data = pigs)
 pigs.rg <- ref_grid(pigs.lm)
 class(pigs.rg)
 
-pigs.emmGrid.s <- emmeans(pigs.rg, "source")
-class(pigs.emmGrid.s)
+pigs.emm.s <- emmeans(pigs.rg, "source")
+class(pigs.emm.s)
 
 ## ------------------------------------------------------------------------
 pigs.rg
 
-pigs.emmGrid.s
+pigs.emm.s
 
 ## ------------------------------------------------------------------------
-str(pigs.emmGrid.s)
+str(pigs.emm.s)
 
 ## ------------------------------------------------------------------------
-class(summary(pigs.emmGrid.s))
+class(summary(pigs.emm.s))
 
 ## ------------------------------------------------------------------------
-test(pigs.emmGrid.s)
+test(pigs.emm.s)
 
 ## ------------------------------------------------------------------------
-test(pigs.emmGrid.s, null = log(40), side = ">")
+test(pigs.emm.s, null = log(40), side = ">")
 
 ## ------------------------------------------------------------------------
-test(pigs.emmGrid.s, null = log(40), side = ">", type = "response")
+test(pigs.emm.s, null = log(40), side = ">", type = "response")
 
 ## ------------------------------------------------------------------------
-confint(pigs.emmGrid.s, side = ">", level = .90, type = "response")
+confint(pigs.emm.s, side = ">", level = .90, type = "response")
 
 ## ------------------------------------------------------------------------
-confint(pigs.emmGrid.s, adjust = "tukey")
+confint(pigs.emm.s, adjust = "tukey")
 
 ## ------------------------------------------------------------------------
-test(pigs.emmGrid.s, null = log(40), side = ">", adjust = "bonferroni")
+test(pigs.emm.s, null = log(40), side = ">", adjust = "bonferroni")
 
 ## ------------------------------------------------------------------------
 confint(pigs.rg, by = "source")
@@ -47,7 +47,7 @@ confint(pigs.rg, by = "source")
 #  summary(.Last.value, by = percent)       ### grouped the other way
 
 ## ------------------------------------------------------------------------
-pigs.prs.s <- pairs(pigs.emmGrid.s)
+pigs.prs.s <- pairs(pigs.emm.s)
 pigs.prs.s
 
 ## ------------------------------------------------------------------------

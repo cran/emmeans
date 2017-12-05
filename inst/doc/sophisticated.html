@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2017-11-04" />
+<meta name="date" content="2017-12-05" />
 
 <title>Sophisticated models in emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Sophisticated models in emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2017-11-04</em></h4>
+<h4 class="date"><em>2017-12-05</em></h4>
 
 
 
@@ -95,13 +95,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Oats.lmer &lt;-<span class="st"> </span>lme4::<span class="kw">lmer</span>(yield ~<span class="st"> </span>Variety +<span class="st"> </span><span class="kw">factor</span>(nitro) +<span class="st"> </span>(<span class="dv">1</span>|Block/Variety),
                         <span class="dt">data =</span> nlme::Oats, <span class="dt">subset =</span> -<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">8</span>,<span class="dv">13</span>,<span class="dv">21</span>,<span class="dv">34</span>,<span class="dv">55</span>))</code></pre></div>
 <p>Let’s look at the EMMs for <code>nitro</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Oats.emmGrid.n &lt;-<span class="st"> </span><span class="kw">emmeans</span>(Oats.lmer, <span class="st">&quot;nitro&quot;</span>)
-Oats.emmGrid.n
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Oats.emm.n &lt;-<span class="st"> </span><span class="kw">emmeans</span>(Oats.lmer, <span class="st">&quot;nitro&quot;</span>)
+Oats.emm.n
 ##  nitro    emmean       SE   df  lower.CL  upper.CL
 ##    0.0  78.89207 7.294379 7.78  61.98930  95.79484
-##    0.2  97.03425 7.136271 7.19  80.49785 113.57065
-##    0.4 114.19816 7.136186 7.19  97.66196 130.73437
-##    0.6 124.06857 7.070235 6.95 107.68519 140.45195
+##    0.2  97.03425 7.136271 7.19  80.25029 113.81822
+##    0.4 114.19816 7.136186 7.19  97.41454 130.98179
+##    0.6 124.06857 7.070235 6.95 107.32795 140.80919
 ## 
 ## Results are averaged over the levels of: Variety 
 ## Degrees-of-freedom method: kenward-roger 
@@ -111,27 +111,27 @@ Oats.emmGrid.n
 ## Loading required namespace: lmerTest
 ##  nitro    emmean       SE   df  lower.CL  upper.CL
 ##    0.0  78.89207 7.280608 7.28  61.81122  95.97292
-##    0.2  97.03425 7.128706 6.72  80.30977 113.75873
-##    0.4 114.19816 7.128885 6.72  97.47326 130.92306
-##    0.6 124.06857 7.067304 6.49 107.48815 140.64899
+##    0.2  97.03425 7.128706 6.72  80.03161 114.03690
+##    0.4 114.19816 7.128885 6.72  97.19535 131.20098
+##    0.6 124.06857 7.067304 6.49 107.08857 141.04857
 ## 
 ## Results are averaged over the levels of: Variety 
 ## Degrees-of-freedom method: satterthwaite 
 ## Confidence level used: 0.95</code></pre></div>
 <p>This latest result uses the Satterthwaite method, which is implemented in the <strong>lmerTest</strong> package. Note that, with this method, not only are the degrees of freedom slightly different, but so are the standard errors. That is because the Kenward-Roger method also entails making a bias adjustment to the covariance matrix of the fixed effects; that is the principal difference between the methods. A third possibility is <code>&quot;asymptotic&quot;</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(Oats.lmer, <span class="st">&quot;nitro&quot;</span>, <span class="dt">lmer.df =</span> <span class="st">&quot;asymptotic&quot;</span>)
-##  nitro    emmean       SE df asymp.LCL asymp.UCL
-##    0.0  78.89207 7.280608 NA  64.62234   93.1618
-##    0.2  97.03425 7.128706 NA  83.06225  111.0063
-##    0.4 114.19816 7.128885 NA 100.22580  128.1705
-##    0.6 124.06857 7.067304 NA 110.21691  137.9202
+##  nitro    emmean       SE  df asymp.LCL asymp.UCL
+##    0.0  78.89207 7.280608 Inf  64.62234   93.1618
+##    0.2  97.03425 7.128706 Inf  83.06225  111.0063
+##    0.4 114.19816 7.128885 Inf 100.22580  128.1705
+##    0.6 124.06857 7.067304 Inf 110.21691  137.9202
 ## 
 ## Results are averaged over the levels of: Variety 
 ## Degrees-of-freedom method: asymptotic 
 ## Confidence level used: 0.95</code></pre></div>
 <p>This just sets all the degrees of freedom to <code>NA</code> – that’s <strong>emmeans</strong>’s way of using <em>z</em> statistics rather than <em>t</em> statistics. The asymptotic methods tend to make confidence intervals a bit too narrow and P values a bit too low; but they involve much, much less computation. Note that the SEs are the same as obtained using the Satterthwaite method.</p>
 <p>Comparisons and contrasts are pretty much the same as with other models. As <code>nitro</code> has quantitative levels, we might want to test polynomial contrasts:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">contrast</span>(Oats.emmGrid.n, <span class="st">&quot;poly&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">contrast</span>(Oats.emm.n, <span class="st">&quot;poly&quot;</span>)
 ##  contrast    estimate        SE    df t.ratio p.value
 ##  linear    152.693407 15.577738 43.23   9.802  &lt;.0001
 ##  quadratic  -8.271775  6.948552 44.19  -1.190  0.2402
@@ -143,8 +143,8 @@ Oats.emmGrid.n
 ## $emmeans
 ##  Variety        emmean       SE   df lower.CL upper.CL
 ##  Golden Rain 105.24081 7.531718 8.46 88.03704 122.4446
-##  Marvellous  108.46951 7.482632 8.28 91.37786 125.5612
-##  Victory      96.93446 7.641645 8.81 79.47960 114.3893
+##  Marvellous  108.46951 7.482632 8.28 91.31571 125.6233
+##  Victory      96.93446 7.641645 8.81 79.59011 114.2788
 ## 
 ## Results are averaged over the levels of: nitro 
 ## Degrees-of-freedom method: kenward-roger 
@@ -175,30 +175,30 @@ wine.clm &lt;-<span class="st"> </span><span class="kw">clm</span>(rating ~<span
 <p>(in earlier modeling, we found little interaction between the factors.) Here are the EMMs for each factor using default options:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(wine.clm, <span class="kw">list</span>(pairwise ~<span class="st"> </span>temp, pairwise ~<span class="st"> </span>contact))
 ## $`emmeans of temp`
-##  temp     emmean        SE df  asymp.LCL  asymp.UCL
-##  cold -0.8838870 0.2898157 NA -1.4519155 -0.3158586
-##  warm  0.6011128 0.2246028 NA  0.1608993  1.0413263
+##  temp     emmean        SE  df  asymp.LCL  asymp.UCL
+##  cold -0.8838870 0.2898157 Inf -1.4519155 -0.3158586
+##  warm  0.6011128 0.2246028 Inf  0.1608993  1.0413263
 ## 
 ## Results are averaged over the levels of: contact, judge 
 ## Confidence level used: 0.95 
 ## 
 ## $`pairwise differences of temp`
-##  contrast     estimate        SE df z.ratio p.value
-##  cold - warm -1.073545 0.4215306 NA  -2.547  0.0109
+##  contrast     estimate        SE  df z.ratio p.value
+##  cold - warm -1.073545 0.4215306 Inf  -2.547  0.0109
 ## 
 ## Results are averaged over the levels of: contact, judge 
 ## 
 ## $`emmeans of contact`
-##  contact     emmean        SE df   asymp.LCL   asymp.UCL
-##  no      -0.6143569 0.2983133 NA -1.19904027 -0.02967357
-##  yes      0.3315827 0.2014363 NA -0.06322522  0.72639062
+##  contact     emmean        SE  df   asymp.LCL   asymp.UCL
+##  no      -0.6143569 0.2983133 Inf -1.19904027 -0.02967357
+##  yes      0.3315827 0.2014363 Inf -0.06322522  0.72639062
 ## 
 ## Results are averaged over the levels of: temp, judge 
 ## Confidence level used: 0.95 
 ## 
 ## $`pairwise differences of contact`
-##  contrast   estimate        SE df z.ratio p.value
-##  no - yes -0.6838446 0.3038508 NA  -2.251  0.0244
+##  contrast   estimate        SE  df z.ratio p.value
+##  no - yes -0.6838446 0.3038508 Inf  -2.251  0.0244
 ## 
 ## Results are averaged over the levels of: temp, judge</code></pre></div>
 <p>These results are on the “latent” scale; the idea is that there is a continuous random variable (in this case normal, due to the probit link) having a mean that depends on the predictors; and that the ratings are a discretization of the latent variable based on a fixed set of cut points (which are estimated). In this particular example, we also have a scale model that says that the variance of the latent variable depends on the judges. The latent results are quite a bit like those for measurement data, making them easy to interpret. The only catch is that they are not uniquely defined: we could apply a linear transformation to them, and the same linear transformation to the cut points, and the results would be the same.</p>
@@ -213,61 +213,61 @@ tmp
 ## Transformation: &quot;probit&quot;</code></pre></div>
 <p>Note that this reference grid involves an additional constructed predictor named <code>cut</code> that accounts for the different intercepts in the model. Let’s obtain EMMs for <code>temp</code> on the linear-predictor scale:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(tmp, <span class="st">&quot;temp&quot;</span>)
-##  temp     emmean        SE df  asymp.LCL  asymp.UCL
-##  cold  0.8838870 0.2898157 NA  0.3158586  1.4519155
-##  warm -0.6011128 0.2246028 NA -1.0413263 -0.1608993
+##  temp     emmean        SE  df  asymp.LCL  asymp.UCL
+##  cold  0.8838870 0.2898157 Inf  0.3158586  1.4519155
+##  warm -0.6011128 0.2246028 Inf -1.0413263 -0.1608993
 ## 
 ## Results are averaged over the levels of: contact, judge, cut 
 ## Results are given on the probit (not the response) scale. 
 ## Confidence level used: 0.95</code></pre></div>
 <p>These are just the negatives of the latent results obtained earlier (the sign is changed to make the comparisons go the right direction). Closely related to this is <code>mode = &quot;cum.prob&quot;</code> and <code>mode = &quot;exc.prob&quot;</code>, which simply transform the linear predictor to cumulative probabilities and exceedance (1 - cumulative) probabilities. These modes give us access to the details of the fitted model but are cumbersome to use for describing results. When they can become useful is when you want to work in terms of a particular cut point. Let’s look at <code>temp</code> again in terms of the probability that the rating will be at least 4:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(wine.clm, ~<span class="st"> </span>temp, <span class="dt">mode =</span> <span class="st">&quot;exc.prob&quot;</span>, <span class="dt">at =</span> <span class="kw">list</span>(<span class="dt">cut =</span> <span class="st">&quot;3|4&quot;</span>))
-##  temp   exc.prob         SE df  asymp.LCL asymp.UCL
-##  cold 0.07477754 0.03183196 NA 0.01238804 0.1371670
-##  warm 0.40688371 0.07056873 NA 0.26857154 0.5451959
+##  temp   exc.prob         SE  df  asymp.LCL asymp.UCL
+##  cold 0.07477754 0.03183196 Inf 0.01238804 0.1371670
+##  warm 0.40688371 0.07056873 Inf 0.26857154 0.5451959
 ## 
 ## Results are averaged over the levels of: contact, judge 
 ## Confidence level used: 0.95</code></pre></div>
 <p>There are yet more modes! With <code>mode = &quot;prob&quot;</code>, we obtain estimates of the probability distribution of each rating. Its reference grid includes a factor with the same name as the model response – in this case <code>rating</code>. We usually want to use that as the primary factor, and the factors of interest as <code>by</code> variables:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(wine.clm, ~<span class="st"> </span>rating |<span class="st"> </span>temp, <span class="dt">mode =</span> <span class="st">&quot;prob&quot;</span>)
 ## temp = cold:
-##  rating       prob         SE df    asymp.LCL  asymp.UCL
-##  1      0.12922075 0.06252864 NA  0.006666872 0.25177462
-##  2      0.48768408 0.07051118 NA  0.349484709 0.62588345
-##  3      0.30831763 0.05942035 NA  0.191855896 0.42477937
-##  4      0.05766120 0.02378461 NA  0.011044211 0.10427818
-##  5      0.01711634 0.01265193 NA -0.007680992 0.04191368
+##  rating       prob         SE  df    asymp.LCL  asymp.UCL
+##  1      0.12922075 0.06252864 Inf  0.006666872 0.25177462
+##  2      0.48768408 0.07051118 Inf  0.349484709 0.62588345
+##  3      0.30831763 0.05942035 Inf  0.191855896 0.42477937
+##  4      0.05766120 0.02378461 Inf  0.011044211 0.10427818
+##  5      0.01711634 0.01265193 Inf -0.007680992 0.04191368
 ## 
 ## temp = warm:
-##  rating       prob         SE df    asymp.LCL  asymp.UCL
-##  1      0.01561393 0.01287141 NA -0.009613574 0.04084144
-##  2      0.14730458 0.04475283 NA  0.059590654 0.23501851
-##  3      0.43019777 0.06274049 NA  0.307228674 0.55316687
-##  4      0.26845558 0.06251632 NA  0.145925842 0.39098532
-##  5      0.13842813 0.05061119 NA  0.039232030 0.23762424
+##  rating       prob         SE  df    asymp.LCL  asymp.UCL
+##  1      0.01561393 0.01287141 Inf -0.009613574 0.04084144
+##  2      0.14730458 0.04475283 Inf  0.059590654 0.23501851
+##  3      0.43019777 0.06274049 Inf  0.307228674 0.55316687
+##  4      0.26845558 0.06251632 Inf  0.145925842 0.39098532
+##  5      0.13842813 0.05061119 Inf  0.039232030 0.23762424
 ## 
 ## Results are averaged over the levels of: contact, judge 
 ## Confidence level used: 0.95</code></pre></div>
 <p>Using <code>mode = &quot;mean.class&quot;</code> obtains the average of these probability distributions as probabilities of the integers 1–5:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(wine.clm, <span class="st">&quot;temp&quot;</span>, <span class="dt">mode =</span> <span class="st">&quot;mean.class&quot;</span>)
-##  temp mean.class        SE df asymp.LCL asymp.UCL
-##  cold   2.345768 0.1438341 NA  2.063859  2.627678
-##  warm   3.366779 0.1462579 NA  3.080119  3.653440
+##  temp mean.class        SE  df asymp.LCL asymp.UCL
+##  cold   2.345768 0.1438341 Inf  2.063859  2.627678
+##  warm   3.366779 0.1462579 Inf  3.080119  3.653440
 ## 
 ## Results are averaged over the levels of: contact, judge 
 ## Confidence level used: 0.95</code></pre></div>
 <p>And there is a mode for the scale model too. In this example, the scale model involves only judges, and that is the only factor in the grid:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(<span class="kw">ref_grid</span>(wine.clm, <span class="dt">mode =</span> <span class="st">&quot;scale&quot;</span>), <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
-##  judge  response        SE df
-##  1     1.0000000 0.0000000 NA
-##  2     1.0429804 0.5696650 NA
-##  3     1.0526798 0.4811605 NA
-##  4     0.7103256 0.3356562 NA
-##  5     0.6632397 0.3009780 NA
-##  6     0.7582403 0.3411929 NA
-##  7     1.0707070 0.5861427 NA
-##  8     0.2409019 0.1791135 NA
-##  9     0.5331235 0.3110024 NA</code></pre></div>
+##  judge  response        SE  df
+##  1     1.0000000 0.0000000 Inf
+##  2     1.0429804 0.5696650 Inf
+##  3     1.0526798 0.4811605 Inf
+##  4     0.7103256 0.3356562 Inf
+##  5     0.6632397 0.3009780 Inf
+##  6     0.7582403 0.3411929 Inf
+##  7     1.0707070 0.5861427 Inf
+##  8     0.2409019 0.1791135 Inf
+##  9     0.5331235 0.3110024 Inf</code></pre></div>
 <p>Judge 8’s ratings don’t vary much, relative to the others. The scale model is in terms of log(SD). Again, these are not uniquely identifiable, and the first level’s estimate is set to log(1) = 0. so, actually, each estimate shown is a comparison with judge 1.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
@@ -287,8 +287,8 @@ rst_ex.rg &lt;-<span class="st"> </span><span class="kw">ref_grid</span>(example
 ##     period = 1, 2, 3, 4
 ## Transformation: &quot;logit&quot;</code></pre></div>
 <p>And, again in the usual way, we can obtain EMMs:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">period.emmGrid &lt;-<span class="st"> </span><span class="kw">emmeans</span>(rst_ex.rg, <span class="st">&quot;period&quot;</span>)
-period.emmGrid
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">period.emm &lt;-<span class="st"> </span><span class="kw">emmeans</span>(rst_ex.rg, <span class="st">&quot;period&quot;</span>)
+period.emm
 ## This is a frequentist summary. See `?as.mcmc.emmGrid' for more on what you can do.
 ##  period    emmean        SE df asymp.LCL asymp.UCL
 ##  1      -1.450956 0.2825317 NA -2.004708 -0.897204
@@ -302,7 +302,7 @@ period.emmGrid
 <p>We can access these posterior results via the <code>as.mcmc</code> method for <code>emmGrid</code> objects. This gives us an object of class <code>mcmc</code> (defined in the <strong>coda</strong> package), which can be summarized and explored as we please.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">require</span>(<span class="st">&quot;coda&quot;</span>)  ### needed to access generic for as.mcmc()
 ## Loading required package: coda
-<span class="kw">summary</span>(<span class="kw">as.mcmc</span>(period.emmGrid))
+<span class="kw">summary</span>(<span class="kw">as.mcmc</span>(period.emm))
 ## 
 ## Iterations = 1:250
 ## Thinning interval = 1 
@@ -326,11 +326,11 @@ period.emmGrid
 ## period 3 -3.199 -2.739 -2.516 -2.286 -1.870
 ## period 4 -3.890 -3.254 -2.968 -2.698 -2.003</code></pre></div>
 <p>Note that <code>as.mcmc</code> will actually produce an <code>mcmc.list</code> when there is more than one chain present, as in this example. The 2.5th and 97.5th quantiles are similar, but not identical, to the 95% confidence intervals in the frequentist summary. Here is a plot of the posterior EMMs, back-transformed:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bayesplot::<span class="kw">mcmc_areas</span>(<span class="kw">as.mcmc</span>(<span class="kw">regrid</span>(period.emmGrid)))</code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bayesplot::<span class="kw">mcmc_areas</span>(<span class="kw">as.mcmc</span>(<span class="kw">regrid</span>(period.emm)))</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 <p>… and here are intervals for each period compared with its neighbor; we wrap the important part of the call in an extra <code>as.mcmc(as.matrix(...))</code> so as to combine the two chains into one.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">HPDinterval</span>(<span class="kw">as.mcmc</span>(<span class="kw">as.matrix</span>(
-    <span class="kw">as.mcmc</span>(<span class="kw">contrast</span>(period.emmGrid, <span class="st">&quot;consec&quot;</span>, <span class="dt">reverse =</span> <span class="ot">TRUE</span>), <span class="dt">names =</span> <span class="ot">FALSE</span>))))
+    <span class="kw">as.mcmc</span>(<span class="kw">contrast</span>(period.emm, <span class="st">&quot;consec&quot;</span>, <span class="dt">reverse =</span> <span class="ot">TRUE</span>), <span class="dt">names =</span> <span class="ot">FALSE</span>))))
 ##            lower     upper
 ## 1 - 2  0.3749803 1.5329574
 ## 2 - 3 -0.5813314 0.9415829

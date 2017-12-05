@@ -98,7 +98,7 @@ emmeans(fake.lts, ~ B | A)
 
 
 ###################################################
-### code chunk number 14: extending.rnw:176-179
+### code chunk number 14: extending.rnw:177-180
 ###################################################
 form = ~ data$x + data[[5]]
 base::all.vars(form)
@@ -106,13 +106,13 @@ emmeans::.all.vars(form)
 
 
 ###################################################
-### code chunk number 15: extending.rnw:186-187
+### code chunk number 15: extending.rnw:187-188
 ###################################################
 .get.offset(terms(~ speed + offset(.03*breaks)), head(warpbreaks))
 
 
 ###################################################
-### code chunk number 16: extending.rnw:204-228
+### code chunk number 16: extending.rnw:205-229
 ###################################################
 recover_data.rsm = function(object, data, mode = c("asis", "coded", "decoded"), ...) {
     mode = match.arg(mode)
@@ -141,7 +141,7 @@ recover_data.rsm = function(object, data, mode = c("asis", "coded", "decoded"), 
 
 
 ###################################################
-### code chunk number 17: extending.rnw:240-264
+### code chunk number 17: extending.rnw:241-265
 ###################################################
 emm_basis.rsm = function(object, trms, xlev, grid, 
                          mode = c("asis", "coded", "decoded"), ...) {
@@ -170,7 +170,7 @@ emm_basis.rsm = function(object, trms, xlev, grid,
 
 
 ###################################################
-### code chunk number 18: extending.rnw:273-279 (eval = FALSE)
+### code chunk number 18: extending.rnw:274-280 (eval = FALSE)
 ###################################################
 ## if (requireNamespace("emmeans", quietly = TRUE)) {
 ##     importFrom("emmeans", "recover_data", "emm_basis")
@@ -181,27 +181,27 @@ emm_basis.rsm = function(object, trms, xlev, grid,
 
 
 ###################################################
-### code chunk number 19: extending.rnw:289-291
+### code chunk number 19: extending.rnw:290-292
 ###################################################
 library("rsm")
 example("rsm")   ### (output is not shown) ###
 
 
 ###################################################
-### code chunk number 20: extending.rnw:295-297
+### code chunk number 20: extending.rnw:296-298
 ###################################################
 emmeans(CR.rs2, ~ x1 * x2, mode = "coded", 
         at = list(x1 = c(-1, 0, 1), x2 = c(-2, 2)))
 
 
 ###################################################
-### code chunk number 21: extending.rnw:300-301
+### code chunk number 21: extending.rnw:301-302
 ###################################################
 codings(CR.rs1)
 
 
 ###################################################
-### code chunk number 22: extending.rnw:304-306
+### code chunk number 22: extending.rnw:305-307
 ###################################################
 emmeans(CR.rs2, ~ Time * Temp, mode = "decoded", 
         at = list(Time = c(80, 85, 90), Temp = c(165, 185)))

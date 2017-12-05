@@ -6,18 +6,18 @@ knitr::opts_chunk$set(collapse = TRUE, fig.width = 4.5)
 pigs.lm <- lm(log(conc) ~ source + factor(percent), data = pigs)
 
 ## ------------------------------------------------------------------------
-pigs.emmGrid.s <- emmeans(pigs.lm, "source")
-str(pigs.emmGrid.s)
+pigs.emm.s <- emmeans(pigs.lm, "source")
+str(pigs.emm.s)
 
-summary(pigs.emmGrid.s, infer = TRUE, null = log(35))
-
-## ------------------------------------------------------------------------
-summary(pigs.emmGrid.s, infer = TRUE, null = log(35), type = "response")
+summary(pigs.emm.s, infer = TRUE, null = log(35))
 
 ## ------------------------------------------------------------------------
-str(regrid(pigs.emmGrid.s))
+summary(pigs.emm.s, infer = TRUE, null = log(35), type = "response")
 
-summary(regrid(pigs.emmGrid.s), infer = TRUE, null = 35)
+## ------------------------------------------------------------------------
+str(regrid(pigs.emm.s))
+
+summary(regrid(pigs.emm.s), infer = TRUE, null = 35)
 
 ## ------------------------------------------------------------------------
 pigs.rg <- ref_grid(pigs.lm)
@@ -32,11 +32,11 @@ summary(pigs.remm.s, infer = TRUE, null = 35)
 
 ## ------------------------------------------------------------------------
 neuralgia.glm <- glm(Pain ~ Treatment * Sex + Age, family = binomial(), data = neuralgia)
-neuralgia.emmGrid <- emmeans(neuralgia.glm, "Treatment", type = "response")
-neuralgia.emmGrid
+neuralgia.emm <- emmeans(neuralgia.glm, "Treatment", type = "response")
+neuralgia.emm
 
 ## ------------------------------------------------------------------------
-pairs(neuralgia.emmGrid, reverse = TRUE)
+pairs(neuralgia.emm, reverse = TRUE)
 
 ## ------------------------------------------------------------------------
 emmip(neuralgia.glm, Sex ~ Treatment)
@@ -68,7 +68,7 @@ emmeans(warp.glm, ~ tension | wool, type = "unlink")
 
 ## ------------------------------------------------------------------------
 pigroot.lm <- lm(sqrt(conc) ~ source + factor(percent), data = pigs)
-piglog.emmGrid.s <- regrid(emmeans(pigroot.lm, "source"), transform = "log")
-confint(piglog.emmGrid.s, type = "response")
-pairs(piglog.emmGrid.s, type = "response")
+piglog.emm.s <- regrid(emmeans(pigroot.lm, "source"), transform = "log")
+confint(piglog.emm.s, type = "response")
+pairs(piglog.emm.s, type = "response")
 
