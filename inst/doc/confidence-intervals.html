@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2017-12-05" />
+<meta name="date" content="2018-01-09" />
 
 <title>Confidence intervals and tests in emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Confidence intervals and tests in emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2017-12-05</em></h4>
+<h4 class="date"><em>2018-01-09</em></h4>
 
 
 
@@ -92,7 +92,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="emmobj" class="section level2">
 <h2>Objects, structures, and methods</h2>
 <p>The <code>ref_grid()</code> and <code>emmeans()</code> functions are introduced in <a href="basics.html">the “Basics” vignette</a>. These functions, and a few related ones, return an object of class <code>emmGrid</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(conc) ~<span class="st"> </span>source +<span class="st"> </span><span class="kw">factor</span>(percent), <span class="dt">data =</span> pigs)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(conc) <span class="op">~</span><span class="st"> </span>source <span class="op">+</span><span class="st"> </span><span class="kw">factor</span>(percent), <span class="dt">data =</span> pigs)
 pigs.rg &lt;-<span class="st"> </span><span class="kw">ref_grid</span>(pigs.lm)
 <span class="kw">class</span>(pigs.rg)
 ## [1] &quot;emmGrid&quot;
@@ -238,7 +238,7 @@ pigs.emm.s
 ## Confidence level used: 0.95</code></pre></div>
 <p>If there is also an <code>adjust</code> in force when <code>by</code> variables are used, the adjustment is made <em>separately</em> on each <code>by</code> group; e.g., in the above, we would be adjusting for sets of 4 intervals, not all 12 together.</p>
 <p>There can be a <code>by</code> specification in <code>emmeans()</code> (or equivalently, a <code>|</code> in the formula); and if so, it is passed on to <code>summary()</code> and used unless overridden by another <code>by</code>. Here are examples, not run:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(pigs.lm, ~<span class="st"> </span>percent |<span class="st"> </span>source)     ### same results as above
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(pigs.lm, <span class="op">~</span><span class="st"> </span>percent <span class="op">|</span><span class="st"> </span>source)     ### same results as above
 <span class="kw">summary</span>(.Last.value, <span class="dt">by =</span> percent)       ### grouped the other way</code></pre></div>
 <p>Specifying <code>by = NULL</code> will remove all grouping.</p>
 <p><a href="#contents">Back to Contents</a></p>
@@ -258,10 +258,12 @@ pigs.prs.s
 ## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre></div>
 <p>But suppose we want an <em>omnibus</em> test that all these comparisons are zero. Easy enough, using the <code>joint</code> argument in <code>test</code> (note: <em>not</em> available in <code>summary()</code>):</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">test</span>(pigs.prs.s, <span class="dt">joint =</span> <span class="ot">TRUE</span>)
-## There are linearly dependent rows - df are reduced accordingly
-##  df1 df2 F.ratio p.value
-##    2  23  28.849  &lt;.0001</code></pre></div>
+##  df1 df2 F.ratio p.value note
+##    2  23  28.849  &lt;.0001  d  
+## 
+## d: df1 reduced due to linear dependence</code></pre></div>
 <p>Notice that there are three comparisons, but only 2 d.f. for the test, as cautioned in the message.</p>
+<p>The test produced with <code>joint = TRUE</code> is a “type III” test (assuming the default equal weights are used to obtain the EMMs). See more on these types of tests for higher-order effects in the <a href="interactions.html#contrasts">“interactions” vignette section on contrasts</a>.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="equiv" class="section level2">

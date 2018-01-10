@@ -3,6 +3,7 @@
 \name{summary.emmGrid}
 \alias{summary.emmGrid}
 \alias{predict.emmGrid}
+\alias{as.data.frame.emmGrid}
 \alias{confint.emmGrid}
 \alias{test}
 \alias{test.emmGrid}
@@ -13,12 +14,14 @@
 
 \method{predict}{emmGrid}(object, type, ...)
 
+\method{as.data.frame}{emmGrid}(x, row.names = NULL, optional = FALSE, ...)
+
 \method{confint}{emmGrid}(object, parm, level = 0.95, ...)
 
 test(object, null, ...)
 
 \method{test}{emmGrid}(object, null = 0, joint = FALSE, verbose = FALSE,
-  rows, by, ...)
+  rows, by, status = FALSE, ...)
 }
 \arguments{
 \item{object}{An object of class \code{"emmGrid"} (see \link{emmGrid-class})}
@@ -74,9 +77,16 @@ left-tailed (\code{-1}, \code{"-"}, code{"<"}, \code{"left"}, or
 \code{"equivalence"}, or \code{"="}). See the special section below for
 more details.}
 
-\item{...}{Not used by \code{summary.emmGrid} or \code{predict.emmGrid}. In
-\code{confint.emmGrid} and \code{test.emmGrid}, these arguments are passed to
+\item{...}{(Not used by \code{summary.emmGrid} or \code{predict.emmGrid}.) In
+\code{as.data.frame.emmGrid}, \code{confint.emmGrid}, and 
+\code{test.emmGrid}, these arguments are passed to
 \code{summary.emmGrid}.}
+
+\item{x}{emmGrid object}
+
+\item{row.names}{passed to \code{\link{as.data.frame}}}
+
+\item{optional}{passed to \code{\link{as.data.frame}}}
 
 \item{parm}{(Required argument for \code{confint} methods, but not used)}
 
@@ -86,7 +96,7 @@ TRUE}, a joint test of the hypothesis L beta = null is performed, where L
 is \code{object@linfct} and beta is the vector of fixed effects estimated 
 by \code{object@betahat}. This will be either an \emph{F} test or a 
 chi-square (Wald) test depending on whether degrees of freedom are 
-available.}
+available. See also \code{\link{joint_tests}}.}
 
 \item{verbose}{Logical value. If \code{TRUE} and \code{joint = TRUE}, a table
 of the effects being tested is printed.}
@@ -94,18 +104,26 @@ of the effects being tested is printed.}
 \item{rows}{Integer values. The rows of L to be tested in the joint test. If
 missing, all rows of L are used. If not missing, \code{by} variables are
 ignored.}
+
+\item{status}{logical. If \code{TRUE}, a \code{note} column showing status
+flags (for rank deficiencies and estimability issues) is displayed even 
+when empty. If \code{FALSE}, the column is included only if there are 
+such issues.}
 }
 \value{
-\code{summary.emmGrid}, \code{confint.emmGrid}, and \code{test.emmGrid} 
-  return an object of class \code{"summary_emm"}, which is an extension of 
-  \code{\link{data.frame}} but with a special \code{print} method that with 
-  custom formatting. For models fitted using MCMC methods, the result is 
-  typically a frequentist summary, based on the empirical mean and covariance
-  matrix of the \code{post.beta} slot. A Bayesian summary may be obtained 
-  using \code{\link{as.mcmc.emmGrid}} and summarizing that result using tools
-  for Bayesian estimation.
+\code{summary.emmGrid}, \code{confint.emmGrid}, and
+  \code{test.emmGrid} return an object of class \code{"summary_emm"}, which
+  is an extension of \code{\link{data.frame}} but with a special \code{print}
+  method that displays it with custom formatting. For models fitted using
+  MCMC methods, the result is typically a frequentist summary, based on the
+  empirical mean and covariance matrix of the \code{post.beta} slot. A
+  Bayesian summary may be obtained using \code{\link{as.mcmc.emmGrid}} and
+  summarizing that result using tools for Bayesian estimation.
 
 \code{predict} returns a vector of predictions for each row of \code{object@grid}.
+
+The \code{as.data.frame} method returns a plain data frame,
+  equivalent to \code{as.data.frame(summary(.))}.
 }
 \description{
 These are the primary methods for obtaining numerical or tabular results 
@@ -196,7 +214,7 @@ The default \code{show} method for \code{emmGrid} objects (with the
     with a control, this produces \dQuote{exact} Tukey or Dunnett adjustments,
     respectively. However, the algorithm (from the \pkg{mvtnorm} package) uses a
     Monte Carlo method, so results are not exactly repeatable unless the same
-    random-number seed is used (see \code{\link[base]{set.seed}}). As the family
+    random-number seed is used (see \code{\link[base:Random]{set.seed}}). As the family
     size increases, the required computation time will become noticeable or even
     intolerable, making the \code{"tukey"}, \code{"dunnettx"}, or others more
     attractive.}

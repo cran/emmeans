@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2017-12-05" />
+<meta name="date" content="2018-01-09" />
 
 <title>FAQs for emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">FAQs for emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2017-12-05</em></h4>
+<h4 class="date"><em>2018-01-09</em></h4>
 
 
 
@@ -155,7 +155,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="namespace" class="section level2">
 <h2>I get annoying messages about namespaces</h2>
 <p>This probably happens because somehow the <strong>lsmeans</strong> package or its namespace has been loaded – possibly because some old objects from that package are still in your workspace. Try this:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">emmeans:::<span class="kw">convert_workspace</span>()</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">emmeans<span class="op">:::</span><span class="kw">convert_workspace</span>()</code></pre></div>
 <p>This non-exported function removes <code>Last.ref.grid</code> if it exists, converts every <code>ref.grid</code> or <code>lsmobj</code> object to class <code>emmGrid</code>, and unloads any vestige of the <strong>lsmeans</strong> package. [Note: You may get an error message if there are other packages loaded that depend on <strong>lsmeans</strong>. If so, <code>detach(package:</code><em>pkg</em><code>, unload = TRUE)</code> any that are in <code>search()</code> and use <code>unloadNamespace(&quot;pkg&quot;)</code> for others; then re-run <code>emmeans:::convert_workspace()</code>.]</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2017-12-05" />
+<meta name="date" content="2018-01-09" />
 
 <title>Utilities and options for emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Utilities and options for emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2017-12-05</em></h4>
+<h4 class="date"><em>2018-01-09</em></h4>
 
 
 
@@ -87,7 +87,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="update" class="section level2">
 <h2>Updating an <code>emmGrid</code> object</h2>
 <p>Several internal settings are saved when functions like <code>ref_grid()</code>, <code>emmeans()</code>, <code>contrast()</code>, etc. are run. Those settings can be manipulated via the <code>update()</code> method for <code>emmGrid</code>s. To illustrate, consider the <code>pigs</code> dataset and model yet again:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(conc) ~<span class="st"> </span>source +<span class="st"> </span><span class="kw">factor</span>(percent), <span class="dt">data =</span> pigs)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(conc) <span class="op">~</span><span class="st"> </span>source <span class="op">+</span><span class="st"> </span><span class="kw">factor</span>(percent), <span class="dt">data =</span> pigs)
 pigs.emm.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.lm, <span class="st">&quot;source&quot;</span>)
 pigs.emm.s
 ##  source   emmean         SE df lower.CL upper.CL
@@ -136,7 +136,7 @@ pigs.emm.s
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emm_options</span>(<span class="dt">emmeans =</span> <span class="kw">list</span>(<span class="dt">type =</span> <span class="st">&quot;response&quot;</span>),
             <span class="dt">contrast =</span> <span class="kw">list</span>(<span class="dt">infer =</span> <span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">TRUE</span>)))</code></pre></div>
 <p>Now, new <code>emmeans()</code> results and contrasts follow the new defaults:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.anal.p &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.lm, consec ~<span class="st"> </span>percent)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.anal.p &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.lm, consec <span class="op">~</span><span class="st"> </span>percent)
 pigs.anal.p
 ## $emmeans
 ##  percent response       SE df lower.CL upper.CL
@@ -151,9 +151,9 @@ pigs.anal.p
 ## 
 ## $contrasts
 ##  contrast    ratio         SE df  lower.CL upper.CL t.ratio p.value
-##  12 / 9   1.196684 0.06710564 23 1.0381974 1.379365   3.202  0.0112
-##  15 / 12  1.038570 0.06042501 23 0.8962318 1.203514   0.650  0.8613
-##  18 / 15  1.085945 0.07499759 23 0.9116332 1.293586   1.194  0.5201
+##  12 / 9   1.196684 0.06710564 23 1.0379600 1.379680   3.202  0.0113
+##  15 / 12  1.038570 0.06042501 23 0.8960192 1.203799   0.650  0.8613
+##  18 / 15  1.085945 0.07499759 23 0.9113765 1.293950   1.194  0.5199
 ## 
 ## Results are averaged over the levels of: source 
 ## Confidence level used: 0.95 
@@ -184,14 +184,14 @@ pigs.anal.p
 ## Results are given on the log (not the response) scale. 
 ## P value adjustment: bonferroni method for 6 tests</code></pre></div>
 <p>The default adjustment is <code>&quot;bonferroni&quot;</code>; we could have specified something different via the <code>adjust</code> argument. An equivalent way to combine <code>emmGrid</code>s is via the addition operator. Any options may be provided by <code>update()</code>. Below, we combine the same results into a family but ask for the “exact” multiplicity adjustment.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">update</span>(pigs.anal.p[[<span class="dv">2</span>]] +<span class="st"> </span><span class="kw">pairs</span>(pigs.emm.s), <span class="dt">adjust =</span> <span class="st">&quot;mvt&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">update</span>(pigs.anal.p[[<span class="dv">2</span>]] <span class="op">+</span><span class="st"> </span><span class="kw">pairs</span>(pigs.emm.s), <span class="dt">adjust =</span> <span class="st">&quot;mvt&quot;</span>)
 ##  contrast        ratio         SE df  lower.CL  upper.CL t.ratio p.value
-##  12 / 9      1.1966841 0.06710564 23 1.0214560 1.4019722   3.202  0.0211
-##  15 / 12     1.0385697 0.06042501 23 0.8812418 1.2239854   0.650  0.9680
-##  18 / 15     1.0859446 0.07499759 23 0.8935624 1.3197464   1.194  0.7305
-##  fish / soy  0.7612695 0.04029742 23 0.6555880 0.8839870  -5.153  0.0002
-##  fish / skim 0.6687950 0.03622146 23 0.5739628 0.7792957  -7.428  &lt;.0001
-##  soy / skim  0.8785259 0.04659947 23 0.7563353 1.0204573  -2.442  0.1110
+##  12 / 9      1.1966841 0.06710564 23 1.0215876 1.4017916   3.202  0.0213
+##  15 / 12     1.0385697 0.06042501 23 0.8813596 1.2238218   0.650  0.9681
+##  18 / 15     1.0859446 0.07499759 23 0.8937042 1.3195371   1.194  0.7305
+##  fish / soy  0.7612695 0.04029742 23 0.6556677 0.8838795  -5.153  0.0002
+##  fish / skim 0.6687950 0.03622146 23 0.5740343 0.7791987  -7.428  &lt;.0001
+##  soy / skim  0.8785259 0.04659947 23 0.7564275 1.0203329  -2.442  0.1111
 ## 
 ## Results are averaged over some or all of the levels of: source, percent 
 ## Confidence level used: 0.95 
@@ -201,7 +201,7 @@ pigs.anal.p
 ## Tests are performed on the log scale</code></pre></div>
 <p>Also evident in comparing these results is that settings are obtained from the first object combined. So in the second output, where they are combined in reverse order, we get both confidence intervals and tests, and transformation to the response scale.</p>
 <p>To subset an <code>emmGrid</code> object, just use the subscripting operator <code>[]</code>. For instance,</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.emm.s[<span class="dv">2</span>:<span class="dv">3</span>]
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.emm.s[<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>]
 ##  source  emmean         SE df lower.CL upper.CL     null t.ratio p.value
 ##  soy    3.66726 0.03744798 23 3.589793 3.744727 3.555348   2.988  0.0066
 ##  skim   3.79677 0.03938283 23 3.715300 3.878240 3.555348   6.130  &lt;.0001
@@ -223,7 +223,7 @@ pigs.anal.p
 ## Nesting structure:  source %in% type
 ## Transformation: &quot;log&quot;</code></pre></div>
 <p>Note that the new object has a nesting structure (see more about this in the <a href="messy-data.html#nesting">“messy-data” vignette</a>), with the reference factor nested in the new grouping factor. Now we can obtain means and comparisons for each group</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(pigs.emm.ss, pairwise ~<span class="st"> </span>type)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(pigs.emm.ss, pairwise <span class="op">~</span><span class="st"> </span>type)
 ## $emmeans
 ##  type        emmean         SE df lower.CL upper.CL
 ##  animal    3.595631 0.02673860 23 3.540318 3.650944

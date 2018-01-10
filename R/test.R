@@ -43,16 +43,20 @@ test = function(object, null, ...) {
 #'   is \code{object@linfct} and beta is the vector of fixed effects estimated 
 #'   by \code{object@betahat}. This will be either an \emph{F} test or a 
 #'   chi-square (Wald) test depending on whether degrees of freedom are 
-#'   available.
+#'   available. See also \code{\link{joint_tests}}.
 #' @param verbose Logical value. If \code{TRUE} and \code{joint = TRUE}, a table
 #'   of the effects being tested is printed.
 #' @param rows Integer values. The rows of L to be tested in the joint test. If
 #'   missing, all rows of L are used. If not missing, \code{by} variables are
 #'   ignored.
+#' @param status logical. If \code{TRUE}, a \code{note} column showing status
+#'   flags (for rank deficiencies and estimability issues) is displayed even 
+#'   when empty. If \code{FALSE}, the column is included only if there are 
+#'   such issues.
 #' @method test emmGrid
 #' @export
 test.emmGrid = function(object, null = 0, 
-                    joint = FALSE, verbose = FALSE, rows, by, ...) {
+                    joint = FALSE, verbose = FALSE, rows, by, status = FALSE, ...) {
     # if joint = FALSE, this is a courtesy method for 'contrast'
     # else it computes the F test or Wald test of H0: L*beta = null
     # where L = object@linfct    
@@ -72,8 +76,7 @@ test.emmGrid = function(object, null = 0,
         estble.idx = which(!is.na(object@bhat))
         bhat = bhat[estble.idx]
         est.flag = !is.na(object@nbasis[1])
-        
-        ### L = L[, estble.idx, drop = FALSE]
+
         if (!missing(rows))
             by.rows = list(sel.rows = rows)
         else {
@@ -84,39 +87,48 @@ test.emmGrid = function(object, null = 0,
                 by.rows = .find.by.rows(object@grid, by)
         }
         
-        lindep = nonest = FALSE
-        
         result = lapply(by.rows, function(rows) {
             LL = L[rows, , drop = FALSE]
-            # estract est'ble rows
-            if(est.flag) {
-                erows = estimability::is.estble(LL, object@nbasis)
-                nonest <<- nonest || (sum(erows) < nrow(LL))
-                LL = LL[erows, estble.idx, drop = FALSE]
+
+            # discard any rows that have NAs
+            narows = apply(LL, 1, function(x) any(is.na(x)))
+            LL = LL[!narows, , drop = FALSE]
+            rrflag = 0 + 2 * any(narows)  ## flag for estimability issue
+            
+            if(est.flag)  { 
+                
+                if (any(!estimability::is.estble(LL, object@nbasis)))
+                    rrflag = bitwOr(rrflag, 2)
+                LL = LL[, estble.idx, drop = FALSE]
             }
             # Check rank
             qrLt = qr(t(LL)) # this will work even if LL has 0 rows
             r = qrLt$rank
             if (r == 0)
-                return(c(df1 = 0, df2 = NA, F.ratio = NA, p.value = NA))
+                return(c(df1 = 0, df2 = NA, F.ratio = NA, p.value = NA, note = 3))
+            
             if (r < nrow(LL)) {
                 if(!all(null == 0))
                     stop("Rows are linearly dependent - cannot do the test when 'null' != 0")
-                else 
-                    lindep <<- TRUE
+                rrflag = bitwOr(rrflag, 1)
             }
             tR = t(qr.R(qrLt))[1:r, 1:r, drop = FALSE]
             tQ = t(qr.Q(qrLt))[1:r, , drop = FALSE]
             if(length(null) < r) null = rep(null, r)
             z = tQ %*% bhat - solve(tR, null[1:r])
             zcov = tQ %*% object@V %*% t(tQ)
-            F = sum(z * solve(zcov, z)) / r
-            df2 = object@dffun(tQ, object@dfargs)
-            if (is.na(df2))
-                p.value = pchisq(F*r, r, lower.tail = FALSE)
-            else
-                p.value = pf(F, r, df2, lower.tail = FALSE)
-            c(round(c(df1 = r, df2 = df2), 2), F.ratio = round(F, 3), p.value = p.value)
+            F = try(sum(z * solve(zcov, z)) / r)
+            if (inherits(F, "try-error"))
+                c(df1 = r, df2 = NA,  F.ratio = NA, p.value = NA, note = 1)
+            else {
+                df2 = object@dffun(tQ, object@dfargs)
+                if (is.na(df2))
+                    p.value = pchisq(F*r, r, lower.tail = FALSE)
+                else
+                    p.value = pf(F, r, df2, lower.tail = FALSE)
+                c(round(c(df1 = r, df2 = df2), 2), 
+                  F.ratio = round(F, 3), p.value = p.value, note = rrflag)
+            }
         })
         
         result = as.data.frame(t(as.data.frame(result)))
@@ -126,11 +138,147 @@ test.emmGrid = function(object, null = 0,
         }
         class(result) = c("summary_emm", "data.frame")
         attr(result, "estName") = "F.ratio"
-        if (lindep)
-            message("There are linearly dependent rows - df are reduced accordingly")
-        if (nonest)
-            message("Some rows are non-estimable and were excluded")
-        
+        if (!status && all(result$note == 0))
+            result$note = NULL
+        else {
+            if (any(result$note %in% c(1,3)))
+                attr(result, "mesg") = .dep.msg
+            if (any(result$note %in% c(2,3)))
+                attr(result, "mesg") = c(attr(result, "mesg"), .est.msg)
+            result$note = sapply(result$note, function(x) 
+                switch(x + 1, "", " d", "   e", " d e"))
+        }
         result
     }
 }
+
+# messages (also needed by joint_tests())
+.dep.msg = "d: df1 reduced due to linear dependence"
+.est.msg = "e: estimability issue may distort result"
+
+# Do all joint tests of contrasts. by, ... passed to emmeans() calls
+
+#' Compute joint tests of the terms in a model
+#'
+#' This function produces an analysis-of-variance-like table based on linear
+#' functions of predictors in a model or \code{emmGrid} object. Specifically,
+#' the function constructs, for each combination of factors (or covariates
+#' reduced to two or more levels), a set of (interaction) contrasts via
+#' \code{\link{contrast}}, and then tests them using \code{\link{test}} with
+#' \code{joint = TRUE}. Optionally, one or more of the predictors may be used as
+#' \code{by} variable(s), so that separate tables of tests are produced for
+#' each combination of them.
+#' 
+#' In models with only factors, no covariates, we believe these tests correspond
+#' to \dQuote{type III} tests a la \pkg{SAS}, as long as equal-weighted
+#' averaging is used and there are no estimability issues. When covariates are
+#' present and interact with factors, the results depend on how the covariate is
+#' handled in constructing the reference grid. See the example at the end of
+#' this documentation. The point that one must always remember is that
+#' \code{joint_tests} always tests contrasts among EMMs, in the context of the
+#' reference grid, whereas type III tests are tests of model coefficients --
+#' which may or may not have anything to do with EMMs or contrasts.
+#' 
+#' @param object a fitted model or an \code{emmGrid}. If a fitted model, it is
+#'    replaced by \code{ref_grid(object, cov.reduce = range, ...)}
+#' @param by character names of \code{by} variables. Separate sets of tests are
+#'    run for each combination of these.
+#' @param ... additional arguments passed to \code{ref_grid} and \code{emmeans}
+#'
+#' @return a \code{summary_emm} object (same as is produced by 
+#'   \code{\link{summary.emmGrid}}). All effects for which there are no
+#'   estimable contrasts are omitted from the results.
+#'   
+#' @seealso \code{\link{test}}
+#' @export
+#'
+#' @examples
+#' pigs.lm <- lm(log(conc) ~ source * factor(percent), data = pigs)
+#' 
+#' joint_tests(pigs.lm)                     ## will be same as type III ANOVA
+#' 
+#' joint_tests(pigs.lm, weights = "outer")  ## differently weighted
+#' 
+#' joint_tests(pigs.lm, by = "source")      ## separate joint tests of 'percent'
+#' 
+#' ### Comparisons with type III tests
+#' toy = data.frame(
+#'     treat = rep(c("A", "B"), c(4, 6)),
+#'     female = c(1, 0, 0, 1,   0, 0, 0, 1, 1, 0 ),
+#'     resp = c(17, 12, 14, 19, 28, 26, 26, 34, 33, 27))
+#' toy.fac = lm(resp ~ treat * factor(female), data = toy)
+#' toy.cov = lm(resp ~ treat * female, data = toy)
+#' # (These two models have identical fitted values and residuals)
+#' 
+#' joint_tests(toy.fac)
+#' 
+#' joint_tests(toy.cov)                      # ref grid uses mean(female) = 0.4
+#' joint_tests(toy.cov, cov.reduce = FALSE)  # ref grid uses female = c(0, 1) 
+#' joint_tests(toy.cov, at = list(female = c(-1, 1)))  # center on intercept
+#' 
+#' # -- Compare with SAS output -- female as factor --
+#' ## Source          DF    Type III SS    Mean Square   F Value   Pr > F
+#' ## treat            1    488.8928571    488.8928571    404.60   <.0001
+#' ## female           1     78.8928571     78.8928571     65.29   0.0002
+#' ## treat*female     1      1.7500000      1.7500000      1.45   0.2741
+#' # 
+#' # -- Compare with SAS output -- female as covariate --
+#' ## Source          DF    Type III SS    Mean Square   F Value   Pr > F
+#' ## treat            1    252.0833333    252.0833333    208.62   <.0001
+#' ## female           1     78.8928571     78.8928571     65.29   0.0002
+#' ## female*treat     1      1.7500000      1.7500000      1.45   0.2741
+joint_tests = function(object, by = NULL, ...) {
+    if (!inherits(object, "emmGrid"))
+        object = ref_grid(object, ...)
+    facs = setdiff(names(object@levels), by)
+    do.test = function(these, facs, result, ...) {
+        if ((k <- length(these)) > 0) {
+            emm = emmeans(object, these, by = by, ...)
+            tst = test(contrast(emm, interaction = "consec"), 
+                       joint = TRUE, status = TRUE)
+            tst = cbind(ord = k, `model term` = paste(these, collapse = ":"), tst)
+            result = rbind(result, tst)
+            last = max(match(these, facs))
+        }
+        else
+            last = 0
+        if (last < (n <- length(facs)))
+            for (i in last + seq_len(n - last))
+                result = do.test(c(these, facs[i]), facs, result, ...)
+        result
+    }
+    result = suppressMessages(do.test(character(0), facs, NULL, ...))
+    result = result[order(result[[1]]), -1, drop = FALSE]
+    result = result[result$df1 > 0, , drop = FALSE]
+    class(result) = c("summary_emm", "data.frame")
+    attr(result, "estName") = "F.ratio"
+    attr(result, "by.vars") = by
+    if (any(result$note != "")) {
+        if (any(result$note %in% c("d", "d e")))  
+            msg = .dep.msg
+        else 
+            msg = character(0)
+        if (any(result$note %in% c("  e", "d e")))
+            msg = c(msg, .est.msg)
+        attr(result, "mesg") = msg
+    }
+    else
+        result$note = NULL
+    result
+}
+
+# provide for displaying in standard 'anova' format (with astars etc.)
+# I'm not going there now. Maybe later, probably not
+
+#' #' @export
+#' as.anova = function(object, ...)
+#'     UseMethod("as.anova")
+#' 
+#' as.anova.summary_emm = function(object, ...) {
+#'     class(object) = c("anova", "data.frame")
+#'     row.names(object) = as.character(object[[1]])
+#'     names(object) = gsub("p.value", "Pr(>F)", names(object))
+#'     object[-1]
+#' }
+
+

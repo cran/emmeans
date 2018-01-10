@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2017-12-05" />
+<meta name="date" content="2018-01-09" />
 
 <title>Transformations and link functions in emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Transformations and link functions in emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2017-12-05</em></h4>
+<h4 class="date"><em>2018-01-09</em></h4>
 
 
 
@@ -91,7 +91,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="timing" class="section level2">
 <h2>Overview</h2>
 <p>Consider the same example with the <code>pigs</code> dataset that is used in many of these vignettes:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(conc) ~<span class="st"> </span>source +<span class="st"> </span><span class="kw">factor</span>(percent), <span class="dt">data =</span> pigs)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(conc) <span class="op">~</span><span class="st"> </span>source <span class="op">+</span><span class="st"> </span><span class="kw">factor</span>(percent), <span class="dt">data =</span> pigs)</code></pre></div>
 <p>This model has two factors, <code>source</code> and <code>percent</code> (coerced to a factor), as predictors; and log-transformed <code>conc</code> as the response. Here we obtain the EMMs for <code>source</code>, examine its structure, and finally produce a summary, including a test against a null value of log(35):</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.emm.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.lm, <span class="st">&quot;source&quot;</span>)
 <span class="kw">str</span>(pigs.emm.s)
@@ -188,9 +188,9 @@ pigs.remm.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(<span 
 <h2>Link functions</h2>
 <p>Exactly the same ideas we have presented for response transformations apply to generalized linear models having non-identity link functions. As far as <strong>emmeans</strong> is concerned, there is no difference at all.</p>
 <p>To illustrate, consider the <code>neuralgia</code> dataset provided in the package. These data come from an experiment reported in a SAS technical report where different treatments for neuralgia are compared. The patient’s sex is an additional factor, and their age is a covariate. The response is <code>Pain</code>, a binary variable on whether or not the patient reports neuralgia pain after treatment. The model suggested in the SAS report is equivalent to the following. We use it to obtain estimated probabilities of experiencing pain:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">neuralgia.glm &lt;-<span class="st"> </span><span class="kw">glm</span>(Pain ~<span class="st"> </span>Treatment *<span class="st"> </span>Sex +<span class="st"> </span>Age, <span class="dt">family =</span> <span class="kw">binomial</span>(), <span class="dt">data =</span> neuralgia)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">neuralgia.glm &lt;-<span class="st"> </span><span class="kw">glm</span>(Pain <span class="op">~</span><span class="st"> </span>Treatment <span class="op">*</span><span class="st"> </span>Sex <span class="op">+</span><span class="st"> </span>Age, <span class="dt">family =</span> <span class="kw">binomial</span>(), <span class="dt">data =</span> neuralgia)
 neuralgia.emm &lt;-<span class="st"> </span><span class="kw">emmeans</span>(neuralgia.glm, <span class="st">&quot;Treatment&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
-## NOTE: Results may be misleading due to involvement in interactions
+## <span class="al">NOTE</span>: Results may be misleading due to involvement in interactions
 neuralgia.emm
 ##  Treatment      prob         SE  df  asymp.LCL asymp.UCL
 ##  A         0.2109015 0.11090460 Inf 0.06750694 0.4966578
@@ -212,7 +212,7 @@ neuralgia.emm
 ## Tests are performed on the log odds ratio scale</code></pre></div>
 <p>So there is evidence of considerably more pain being reported with placebo (treatment <code>P</code>) than with either of the other two treatments. The estimated odds of pain with <code>B</code> are about half that for <code>A</code>, but this finding is not statistically significant. (The odds that this is a made-up dataset seem quite high, but that finding is strictly this author’s impression.)</p>
 <p>Observe that there is a note in the output for <code>neuralgia.emm</code> that the results may be misleading. It is important to take it seriously, because if two factors interact, it may be the case that marginal averages of predictions don’t reflect what is happening at any level of the factors being averaged over. To find out, look at an interaction plot of the fitted model:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmip</span>(neuralgia.glm, Sex ~<span class="st"> </span>Treatment)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmip</span>(neuralgia.glm, Sex <span class="op">~</span><span class="st"> </span>Treatment)</code></pre></div>
 <p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAbAAAAEgCAMAAADi9tZbAAAA81BMVEUAAAAAADoAAGYAOpAAZrYAv8QzMzM6AAA6ADo6AGY6ZpA6ZrY6kNtNTU1NTW5NTY5NbqtNjshmAABmADpmOjpmZjpmZmZmZrZmtv9uTU1uTW5uTY5ubqtuq+SOTU2OTW6OTY6ObquOjo6OyP+QOgCQOmaQZpCQkDqQkGaQtpCQ27aQ2/+rbk2rbm6rbo6ryKur5Mir5P+2ZgC2Zjq2tma225C22/+2/7a2/9u2///Ijk3I///bkDrbkGbb/7bb/9vb///kq27k///r6+vy8vL4dm3/tmb/yI7/25D/27b/29v/5Kv//7b//8j//9v//+T///8Yb/lEAAAACXBIWXMAAA7DAAAOwwHHb6hkAAANYElEQVR4nO2dCXvbuBGG5diq7dZKHfeSt0nart0jlbeH2m0bR93aViVrKx/8/7+mBG+KFwjMQDPEfE8im7LAD+SrAUHiGgUiVhrtOwOifhJgzCTAmEmAMZMAYyYBxkx9gS2NZZGUioPN0QuwPTgIMFgJMAEGZiDA9uHABNjjZPLjLwLMzsAhsO0vvwT37wSYnYFDYCk0AcYIWBxhPwgFZiwykw6w7eXbv6a/7+XrScRhPB4bp3UKLAief5USMz9c9sDGYwtijoEFt1cCjAuwx/MHiTAlLsCC+8lErmFKjK5hucwPlz2wMaNqvQBTvAQYsASYAMs1tjMQYI4dxpYGAsyxgwBDEKLD2NZAgDl1GFsbCDCnDgIMRWgO6QMOAQYrLIfsgZQAg5UAE2BK+RNfjsD803jfGShLIqxLhSYVjhFmkWXzpPt0KDaBCTBYYTiUmiwFGKwEmAAr9wkQYLCCd9jpwyHAYCXAfAe220lKgMEK2qHSqU2AwUqA+Q2s2mtUgMEK1qGml68Ag5UA8xlYXTd6JsC2l5NJOtrIG2C1wx54AFNDjbZf+TbciDGwRzW+2bcBffXjingAU4oH9PkzKJ1YK3NRWsBebz6kv1p8x8yTOndoGLjHJcKeP2a8/ADWNNCSCbDt5VW+YZFl86SOHRoHxvIAVuIlwAzlENj9RMmjWmLzyHMewMqyyLJ5UqcOLTMFCDBYCTAfgbVNxSHAYAXh0Dp1igCDlQDzD1j73EQCDFb2Dh1zSQkwWAkw34B1TdYmwGBl69A5uZ4Ag5UA8wtY9+yVHIENV4RbmYuSCEulMT0sxwizyLJ5UhcOOtP5CjBY2ThoTb9MDtjmeKT05rMAgzZAAfZyfdT5eYssmyfFd9Cb35wasKeLqafANOejpwbs5VqAIRkgXcPWbVevAQPTXfCBGrCni5GXlQ7tBTqoAdORRZbNkyI7CDDoo8V10F8Bhx6whSoRz/wC1mPFInLAFurq9XTRRswiy+ZJUR0YA0vuw1rrihZZNk+K6dBnSTABBisTh15LuFED1lgk5ss4CzBD4QBrqHQ8Dndp+35rJNIDVqvbt38eaoT1XNOSCbCsSBzeoHQm3QKKyoCFNY7GR1NDvYb1XTSWW4QNDVjvRX6pAWus1g8TWP9FmQUYrDwDthilqnQUGCSw/rxWq1XvNKkQgHnWRcCIlzkxFGA6Ms2wAGuQKtgOZobAXq7PurpOmWaYGrD+vHCARU8D16Puoq0W2Pwo6OrsZpphYsAMeKFcw5J+T/PDOxNgHj2tNwG2QqglqjIt+zV6ZLEIy8e2Jkk/gZnxwqjWr9OH7VHBtggjLSzm5i1lnJctzoa8cO7DFvGN1Do+99Ngc/LptCViyrXEtR99OkgBCxSnw7vkNvhMEWyrgvhYrTflhfekY3MyW2T1jnn1yYXfwIx5IQALSSU/1unN2PrNP9seYGg1rwgwLGDBXHFSFY6X6zDEQmrqMtZW7fMvwsx5oRSJWa8MVa0P6albsrZbYe8GpZs0Mq/Ac2GuQpGYPa0fdJFoEWDEmleC7D6srVZpkWXzpIAONrzIAfPgSYcVLwEGLBxghQe+1IAN/9GUXYBhAPtvrXSBxY+mWttmLLJsnhTKwZIXQWDdssiyeVIoB7sCUYBBq8vBNsAIAgtvu6eL1tZPiyybJ4VxsOZFD9j88LuL6WC7CNgWiPSARc9/2x89MgZmH2ACDFitDgC8yAELFqpIHOh9mH2B6BZYPLNeFYUvXQQgeKECW61WZWANHTs0qvXPHyfnD8yBQRSIqMCiXqp9gdXP5vZ6cxXcv/MPWE2nUQxgq4r0gdU3rDz/+kth+IpFls2TWjvA8HIbYcd144gqlY6ae+bt+wfuC28TbmW2uobVd8J5PE+BKVl8x8yT2joABZjbWqJxpSOPMK7AoHgxAcb+GgZTQ2wx0BESsEVNe9jrzQfetUSwACP4pKO2xZn5fRgcL3LABtmnA5CXAAOWd8CCqEP+sB7+QvIiB0yn869Fls2TmjuA8qLXzU1DFlk2T2ruQB6YXZE4OGCwvAQYsCoOwLwEGLAAgLVPxCHAYLXrAB1g5IANbDkqcF7kgA1sNjfoApEesPoGTK7A4AOMHLBBzSKAwMtxNzfVP2BeYTHYQen9uwXsZeh5xmg8HpeBnfzwLnj6aaVVbKi1RIwAw4yw8bhITAE7/dks2Py8HRjmOs5hfswPV0+FzKHwQgE2rigF9vdp8O/qPGHlav1ZWLPHmUUgyor58WrJCpjO3JVuI+zbH7389ttWYArV/CxYt9UVTTM8dkAszxwOL9RKR+Uadvqv3333i2rPjl1giyOcBsyYFy62LHM4BaLzTjh/+8NZOzA1E2ZIq/VuzDjHBVBjJG4WwPQm83UMbH0w6wCmZqCdt0/KbZHl3TfAsaUOWLxcA4v/tQHTkEWW698GDLfEAatApPekYy/AEkFgMwamO7s5PWD7nkXALtxiBzxe9IBRmUXAEFvkgFcg0gNGbFB673AzBKa/3IMA05E+N+WAyYteNzfKswhoYAuQedED1jSLAJ0F31rDzUNg9aK38HY9tgCZFxdgZBfe3gk3k4plL170gDW1h9FeeDvGFv/om5bSBOd6KreHNdyB0bmGNcvo3q1fgJGLsGrT5e1k8o4JMJMm0p68yAFr7EjKAlj/a1hfXuSANd4y8wDW24E9sMZ+icME1psXOWA6ssiyeVIUh/68BBiw/ALmz4JvsQx40QKmKYssmydFcDDhRRUYseYVHAcBhnm08A5GvAQYsPQdzHgJMGBpOxjyEmDAEmADBWbKixYwX1aZteBFC5imLLJsnhTWwS9g/MWvkbkk7yLMPL54RthejhbSQYA5OFpABxteAgxYGg5WvAQYsLod7HgJMGAJsKEBs+QlwIDV5WDLS4ABS4ANC5g1LwEGrHYHe14CDFgCbEjAAHgJMGC1OUDwEmDAanEA4cUF2PZyMrkSYO0GnUndAVMrzG6/4rzKLBQvJsAe1RjM2zTEjHO8WgGdtWY1Zg7KmQcwJfuV0qOl200T24p5r4CStICplYETmX7DImDmX1AtNWUOzJd+hMWD0p8/ZrzsgCEja8gcnCl9YJG2l1f5hnGOY1qozOozB2jIA1iJF0AtEY+ZAIt0P1GyriUWjxYJWW3mIK14ACsL6GhRwqwuc6A2HgNbYjATYKjAluDM6hwg9y/AlrDMqg7AMSzAIoExE2BugC2hmFUcXFwkdZMOC9gShFmlWmO7wy6DPkkHB2xpz2zHAf7GQYBVZIVMgLkHZhVmZQdHd+a6SQcLbGnOrPwsxWgXPQx6Jh0ysKUhMwG2V9m1UA+pkbkkohEWq2ecFdsD+pv1M+id1Atgy37MBBgBYMsezHIHpCZSAaYrPWSZg9smbb2kfgHTC7OsE4KVk4aBSVLfgC01mAkwWsCWXcwSB7x+WQLMQC3MYgfn/ej0knoLbNnMTIARBbZsYBY5YHYuFmA2qjJTDqidwQWYpXaYCTDqwJblW+oAmZcAA1EeZgEyLy7AHifk1nHekYORMZF4AFPL892/Iw1s6Wb8GRNgKTTawJyM8eQDLI4wogtvJ9rrKGp30gG2vXybzvpAOMLkGhZkC28nswgQB4bvQB9YTg50BCaSBFikx/MHiTBrA4fA1CBnFtcwAVanvRwtFQcBBisBJsDADPYGzFz499zoDhQeGwgwSgYaEmCUDDQkwCgZaIjucCNRrQQYMwkwZhJgzCTAmMkVsPx5P47UagiF9RCwDD50fxBZroA9fo17rFGvk3w9BCQD7K+dhhwBe/3mL795wDSIzufrN8jAXm8QY1hPjoBt3z/coh5rHGHv8b4U6CGsKUfA7j/ES4KgKb7EnCMCw75IasoNsNebSbH7MILQS6y8a+Z+5QZYVFahlonx+US08AvYvTqRqGUieiXOK2Cvf1IHi1onxr8P8wmYCE4CjJkEGDMJMGYSYMwkwJhJgDGTAGMmQsBers/a/rw5mdW+vxgdzFTiUayj+tTf/6PDvfMDRMQe2NPFtOMTHX/S/AAVsQdWeFuAuVUGTBVvbz7Hmwv1i9qMTunmOCz0pvmnjqJ30lIwPumb09+PskRxijP1erY5+XSc/D5NTYL4zWn0gT0cc38RBPZyHRJYHN6F/9R76WaIIyKyOZ6mn1L/KxG2OT7K9xEVmCH0mHa4w8VIvSigyV6P422JsP5Kga1VZIRnOjrJJ7PC5ub0c/bp6O116UynwKb5Pv53F78fA5smfy3uNdkWYP2VAlvE1b0zta0CLdlUp3Sel3/rMDJ2znQCTL2micLPhT8OZgn8IHsp7lWAmSkDplAorQ//EzOLtuJT+nQRXZo6gSWJni4OZlmElYAV9yrAjJQViQfJuXv6yaewDEw301Oa1OOjt2uLRPWaJoqwrmsirLRXAWakvNIRnuXohM5HR/lmeuFJTm1zpeNklidSu9kcH8wU5RKwwl6j7cLtHG2RApZcd9QvUQCsoyp8sqlObXxByj9+VHMfFr+m+wivegd/DGGE7EvAinsN4stjwzMSYiIETKQjAcZMAoyZBBgzCTBmEmDMJMCY6f9a+F4OJ8VfhgAAAABJRU5ErkJggg==" /><!-- --></p>
 <p>There is no practical difference between females and males in the patterns of response to <code>Treatment</code>; so I think most people would be quite comfortable with the marginal results that are reported earlier.</p>
 <p><a href="#contents">Back to Contents</a></p>
@@ -220,7 +220,7 @@ neuralgia.emm
 <div id="tranlink" class="section level2">
 <h2>Models having both a response transformation and a link function</h2>
 <p>It is possible to have a generalized linear model with a non-identity link <em>and</em> a response transformation. Here is an example, with the built-in <code>wapbreaks</code> dataset:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">warp.glm &lt;-<span class="st"> </span><span class="kw">glm</span>(<span class="kw">sqrt</span>(breaks) ~<span class="st"> </span>wool*tension, <span class="dt">family =</span> Gamma, <span class="dt">data =</span> warpbreaks)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">warp.glm &lt;-<span class="st"> </span><span class="kw">glm</span>(<span class="kw">sqrt</span>(breaks) <span class="op">~</span><span class="st"> </span>wool<span class="op">*</span>tension, <span class="dt">family =</span> Gamma, <span class="dt">data =</span> warpbreaks)
 <span class="kw">ref_grid</span>(warp.glm)
 ## 'emmGrid' object with variables:
 ##     wool = A, B
@@ -228,7 +228,7 @@ neuralgia.emm
 ## Transformation: &quot;inverse&quot; 
 ## Additional response transformation: &quot;sqrt&quot;</code></pre></div>
 <p>The canonical link for a gamma model is the reciprocal (or inverse); and there is the square-root response transformation besides. If we choose <code>type = &quot;response&quot;</code> in summarizing, we undo <em>both</em> transformations:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(warp.glm, ~<span class="st"> </span>tension |<span class="st"> </span>wool, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(warp.glm, <span class="op">~</span><span class="st"> </span>tension <span class="op">|</span><span class="st"> </span>wool, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
 ## wool = A:
 ##  tension response       SE  df asymp.LCL asymp.UCL
 ##  L       42.87080 5.237067 Inf  33.22074  53.74966
@@ -244,7 +244,7 @@ neuralgia.emm
 ## Confidence level used: 0.95 
 ## Intervals are back-transformed from the sqrt scale</code></pre></div>
 <p>What happened here is first the linear predictor was back-transformed from the link scale (inverse); then the squares were obtained to back-transform the rest of the way. It is possible to undo the link, and not the response transformation:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(warp.glm, ~<span class="st"> </span>tension |<span class="st"> </span>wool, <span class="dt">type =</span> <span class="st">&quot;unlink&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(warp.glm, <span class="op">~</span><span class="st"> </span>tension <span class="op">|</span><span class="st"> </span>wool, <span class="dt">type =</span> <span class="st">&quot;unlink&quot;</span>)
 ## wool = A:
 ##  tension response        SE  df asymp.LCL asymp.UCL
 ##  L       6.547580 0.3999238 Inf  5.847547  7.438013
@@ -267,9 +267,9 @@ neuralgia.emm
 <h2>Special transformations</h2>
 <p>The <code>make.tran()</code> function provides several special transformations and sets things up so they can be handled in <strong>emmeans</strong> with relative ease. (See [<code>help(&quot;make.tran&quot;, &quot;emmeans&quot;)](../html/make.tran.html) for descriptions of what is available.)</code>make.tran()<code>works much like</code>stats::make.link()<code>in that it returns a list of functions</code>linkfun()<code>,</code>linkinv()<code>, etc. that serve in managing results on a transformed scale. The difference is that most  transformations with</code>make.tran()` require additional arguments.</p>
 <p>To use this capability in <code>emmeans()</code>, it is fortuitous to first obtain the <code>make.tran()</code> result, and then to use it as the enclosing environment for fitting the model, with <code>linkfun</code> as the transformation. For example, suppose we want to use the response transformation <span class="math inline">\(\log(y + \frac12)\)</span>. Then proceed like this:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tran &lt;-<span class="st"> </span><span class="kw">make.tran</span>(<span class="st">&quot;genlog&quot;</span>, <span class="dv">1</span>/<span class="dv">2</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tran &lt;-<span class="st"> </span><span class="kw">make.tran</span>(<span class="st">&quot;genlog&quot;</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">2</span>)
 my.model &lt;-<span class="st"> </span><span class="kw">with</span>(tran, 
-    <span class="kw">lmer</span>(<span class="kw">linkfun</span>(yield) ~<span class="st"> </span>treatment +<span class="st"> </span>(<span class="dv">1</span>|Block), <span class="dt">data =</span> mydata))</code></pre></div>
+    <span class="kw">lmer</span>(<span class="kw">linkfun</span>(yield) <span class="op">~</span><span class="st"> </span>treatment <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>Block), <span class="dt">data =</span> mydata))</code></pre></div>
 <p>Subsequent calls to <code>ref_grid()</code>, <code>emmeans()</code>, <code>regrid()</code>, etc. will then be able to access the transformation information correctly.</p>
 <p>The help page for <code>make.tran()</code> has an example like this using a Box-Cox transformation.</p>
 <p><a href="#contents">Back to Contents</a></p>
@@ -277,8 +277,8 @@ my.model &lt;-<span class="st"> </span><span class="kw">with</span>(tran,
 <div id="after" class="section level2">
 <h2>Specifying a transformation after the fact</h2>
 <p>It is not at all uncommon to fit a model using statements like the following:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mydata &lt;-<span class="st"> </span><span class="kw">transform</span>(mydata, <span class="dt">logy.5 =</span> <span class="kw">log</span>(yield +<span class="st"> </span>.<span class="dv">5</span>))
-my.model &lt;-<span class="st"> </span><span class="kw">lmer</span>(logy<span class="fl">.5</span> ~<span class="st"> </span>treatment +<span class="st"> </span>(<span class="dv">1</span>|Block), <span class="dt">data =</span> mydata)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mydata &lt;-<span class="st"> </span><span class="kw">transform</span>(mydata, <span class="dt">logy.5 =</span> <span class="kw">log</span>(yield <span class="op">+</span><span class="st"> </span>.<span class="dv">5</span>))
+my.model &lt;-<span class="st"> </span><span class="kw">lmer</span>(logy.<span class="dv">5</span> <span class="op">~</span><span class="st"> </span>treatment <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>Block), <span class="dt">data =</span> mydata)</code></pre></div>
 <p>In this case, there is no way for <code>ref_grid()</code> to figure out that a response transformation was used. What can be done is to update the reference grid with the required information:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my.rg &lt;-<span class="st"> </span><span class="kw">update</span>(<span class="kw">ref_grid</span>(my.model), <span class="dt">tran =</span> <span class="kw">make.tran</span>(<span class="st">&quot;genlog&quot;</span>, .<span class="dv">5</span>))</code></pre></div>
 <p>Subsequently, use <code>my.rg</code> in place of <code>my.mnodel</code> in any <code>emmeans()</code> analyses, and the transformation information will be there.</p>
@@ -290,7 +290,7 @@ my.model &lt;-<span class="st"> </span><span class="kw">lmer</span>(logy<span cl
 <h2>Faking a log transformation</h2>
 <p>The <code>regrid()</code> function makes it possible to fake a log transformation of the response. Why would you want to do this? So that you can make comparisons using ratios instead of differences.</p>
 <p>Consider the <code>pigs</code> example once again, but suppose we had fitted a model with a square-root transformation instead of a log:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigroot.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">sqrt</span>(conc) ~<span class="st"> </span>source +<span class="st"> </span><span class="kw">factor</span>(percent), <span class="dt">data =</span> pigs)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigroot.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">sqrt</span>(conc) <span class="op">~</span><span class="st"> </span>source <span class="op">+</span><span class="st"> </span><span class="kw">factor</span>(percent), <span class="dt">data =</span> pigs)
 piglog.emm.s &lt;-<span class="st"> </span><span class="kw">regrid</span>(<span class="kw">emmeans</span>(pigroot.lm, <span class="st">&quot;source&quot;</span>), <span class="dt">transform =</span> <span class="st">&quot;log&quot;</span>)
 <span class="kw">confint</span>(piglog.emm.s, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
 ##  source response       SE df lower.CL upper.CL

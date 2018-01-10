@@ -86,18 +86,19 @@
 #'   \code{2}, \code{"!="}, \code{"two-sided"}, \code{"both"},
 #'   \code{"equivalence"}, or \code{"="}). See the special section below for
 #'   more details.
-#' @param ... Not used by \code{summary.emmGrid} or \code{predict.emmGrid}. In
-#'   \code{confint.emmGrid} and \code{test.emmGrid}, these arguments are passed to
+#' @param ... (Not used by \code{summary.emmGrid} or \code{predict.emmGrid}.) In
+#'   \code{as.data.frame.emmGrid}, \code{confint.emmGrid}, and 
+#'   \code{test.emmGrid}, these arguments are passed to
 #'   \code{summary.emmGrid}.
 #'
-#' @return \code{summary.emmGrid}, \code{confint.emmGrid}, and \code{test.emmGrid} 
-#'   return an object of class \code{"summary_emm"}, which is an extension of 
-#'   \code{\link{data.frame}} but with a special \code{print} method that with 
-#'   custom formatting. For models fitted using MCMC methods, the result is 
-#'   typically a frequentist summary, based on the empirical mean and covariance
-#'   matrix of the \code{post.beta} slot. A Bayesian summary may be obtained 
-#'   using \code{\link{as.mcmc.emmGrid}} and summarizing that result using tools
-#'   for Bayesian estimation.
+#' @return \code{summary.emmGrid}, \code{confint.emmGrid}, and
+#'   \code{test.emmGrid} return an object of class \code{"summary_emm"}, which
+#'   is an extension of \code{\link{data.frame}} but with a special \code{print}
+#'   method that displays it with custom formatting. For models fitted using
+#'   MCMC methods, the result is typically a frequentist summary, based on the
+#'   empirical mean and covariance matrix of the \code{post.beta} slot. A
+#'   Bayesian summary may be obtained using \code{\link{as.mcmc.emmGrid}} and
+#'   summarizing that result using tools for Bayesian estimation.
 #'   
 #' @section Defaults:
 #'   The \code{misc} slot in \code{object} contains default values for
@@ -149,7 +150,7 @@
 #'     with a control, this produces \dQuote{exact} Tukey or Dunnett adjustments,
 #'     respectively. However, the algorithm (from the \pkg{mvtnorm} package) uses a
 #'     Monte Carlo method, so results are not exactly repeatable unless the same
-#'     random-number seed is used (see \code{\link[base]{set.seed}}). As the family
+#'     random-number seed is used (see \code{\link[base:Random]{set.seed}}). As the family
 #'     size increases, the required computation time will become noticeable or even
 #'     intolerable, making the \code{"tukey"}, \code{"dunnettx"}, or others more
 #'     attractive.}
@@ -452,7 +453,6 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df,
     summ
 }
 
-
 # S3 predict method
 
 #' @rdname summary.emmGrid
@@ -488,6 +488,20 @@ predict.emmGrid <- function(object, type, ...) {
         }
     }
     result
+}
+
+# as.data.frame method
+
+#' @rdname summary.emmGrid
+#' @param x emmGrid object
+#' @param row.names passed to \code{\link{as.data.frame}}
+#' @param optional passed to \code{\link{as.data.frame}}
+#' @return The \code{as.data.frame} method returns a plain data frame,
+#'   equivalent to \code{as.data.frame(summary(.))}.
+#' @method as.data.frame emmGrid
+#' @export
+as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
+    as.data.frame(summary(x, ...), row.names = row.names, optional = optional)
 }
 
 

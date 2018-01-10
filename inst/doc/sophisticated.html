@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2017-12-05" />
+<meta name="date" content="2018-01-09" />
 
 <title>Sophisticated models in emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Sophisticated models in emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2017-12-05</em></h4>
+<h4 class="date"><em>2018-01-09</em></h4>
 
 
 
@@ -92,8 +92,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2>Linear mixed models (lmer)</h2>
 <p>Linear mixed models are really important in statistics. Emphasis here is placed on those fitted using <code>lme4::lmer()</code>, but <strong>emmeans</strong> also supports other mixed-model packages such as <strong>nlme</strong>.</p>
 <p>To illustrate, consider the <code>Oats</code> dataset in the <strong>nlme</strong> package. It has the results of a balanced split-plot experiment: experimental blocks are divided into plots that are randomly assigned to oat varieties, and the plots are subdivided into subplots that are randomly assigned to amounts of nitrogen within each plot. We will consider a linear mixed model for these data, excluding interaction (which is justified in this case). For sake of illustration, we will exclude a few observations.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Oats.lmer &lt;-<span class="st"> </span>lme4::<span class="kw">lmer</span>(yield ~<span class="st"> </span>Variety +<span class="st"> </span><span class="kw">factor</span>(nitro) +<span class="st"> </span>(<span class="dv">1</span>|Block/Variety),
-                        <span class="dt">data =</span> nlme::Oats, <span class="dt">subset =</span> -<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">8</span>,<span class="dv">13</span>,<span class="dv">21</span>,<span class="dv">34</span>,<span class="dv">55</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Oats.lmer &lt;-<span class="st"> </span>lme4<span class="op">::</span><span class="kw">lmer</span>(yield <span class="op">~</span><span class="st"> </span>Variety <span class="op">+</span><span class="st"> </span><span class="kw">factor</span>(nitro) <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>Block<span class="op">/</span>Variety),
+                        <span class="dt">data =</span> nlme<span class="op">::</span>Oats, <span class="dt">subset =</span> <span class="op">-</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">8</span>,<span class="dv">13</span>,<span class="dv">21</span>,<span class="dv">34</span>,<span class="dv">55</span>))</code></pre></div>
 <p>Let’s look at the EMMs for <code>nitro</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Oats.emm.n &lt;-<span class="st"> </span><span class="kw">emmeans</span>(Oats.lmer, <span class="st">&quot;nitro&quot;</span>)
 Oats.emm.n
@@ -139,7 +139,7 @@ Oats.emm.n
 ## 
 ## Results are averaged over the levels of: Variety</code></pre></div>
 <p>The interesting thing here is that the degrees of freedom are much larger than they are for the EMMs. The reason is because <code>nitro</code> within-plot factor, so inter-plot variations have little role in estimating contrasts among <code>nitro</code> levels. On the other hand, <code>Variety</code> is a whole-plot factor, and there is not much of a bump in degrees of freedom for comparisons:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(Oats.lmer, pairwise ~<span class="st"> </span>Variety)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(Oats.lmer, pairwise <span class="op">~</span><span class="st"> </span>Variety)
 ## $emmeans
 ##  Variety        emmean       SE   df lower.CL upper.CL
 ##  Golden Rain 105.24081 7.531718 8.46 88.03704 122.4446
@@ -170,10 +170,10 @@ Oats.emm.n
 <p>Ordinal-response models comprise an example where several options are available for obtaining EMMs. To illustrate, consider the <code>wine</code> data in the <strong>ordinal</strong> package. The response is a rating of bitterness on a five-point scale. we will consider a probit model in two factors during fermentation: <code>temp</code> (temperature) and <code>contact</code> (contact with grape skins), with the judge making the rating as a scale predictor:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">require</span>(<span class="st">&quot;ordinal&quot;</span>)
 ## Loading required package: ordinal
-wine.clm &lt;-<span class="st"> </span><span class="kw">clm</span>(rating ~<span class="st"> </span>temp +<span class="st"> </span>contact, <span class="dt">scale =</span> ~<span class="st"> </span>judge,
+wine.clm &lt;-<span class="st"> </span><span class="kw">clm</span>(rating <span class="op">~</span><span class="st"> </span>temp <span class="op">+</span><span class="st"> </span>contact, <span class="dt">scale =</span> <span class="op">~</span><span class="st"> </span>judge,
                 <span class="dt">data =</span> wine, <span class="dt">link =</span> <span class="st">&quot;probit&quot;</span>)</code></pre></div>
 <p>(in earlier modeling, we found little interaction between the factors.) Here are the EMMs for each factor using default options:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(wine.clm, <span class="kw">list</span>(pairwise ~<span class="st"> </span>temp, pairwise ~<span class="st"> </span>contact))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(wine.clm, <span class="kw">list</span>(pairwise <span class="op">~</span><span class="st"> </span>temp, pairwise <span class="op">~</span><span class="st"> </span>contact))
 ## $`emmeans of temp`
 ##  temp     emmean        SE  df  asymp.LCL  asymp.UCL
 ##  cold -0.8838870 0.2898157 Inf -1.4519155 -0.3158586
@@ -221,7 +221,7 @@ tmp
 ## Results are given on the probit (not the response) scale. 
 ## Confidence level used: 0.95</code></pre></div>
 <p>These are just the negatives of the latent results obtained earlier (the sign is changed to make the comparisons go the right direction). Closely related to this is <code>mode = &quot;cum.prob&quot;</code> and <code>mode = &quot;exc.prob&quot;</code>, which simply transform the linear predictor to cumulative probabilities and exceedance (1 - cumulative) probabilities. These modes give us access to the details of the fitted model but are cumbersome to use for describing results. When they can become useful is when you want to work in terms of a particular cut point. Let’s look at <code>temp</code> again in terms of the probability that the rating will be at least 4:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(wine.clm, ~<span class="st"> </span>temp, <span class="dt">mode =</span> <span class="st">&quot;exc.prob&quot;</span>, <span class="dt">at =</span> <span class="kw">list</span>(<span class="dt">cut =</span> <span class="st">&quot;3|4&quot;</span>))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(wine.clm, <span class="op">~</span><span class="st"> </span>temp, <span class="dt">mode =</span> <span class="st">&quot;exc.prob&quot;</span>, <span class="dt">at =</span> <span class="kw">list</span>(<span class="dt">cut =</span> <span class="st">&quot;3|4&quot;</span>))
 ##  temp   exc.prob         SE  df  asymp.LCL asymp.UCL
 ##  cold 0.07477754 0.03183196 Inf 0.01238804 0.1371670
 ##  warm 0.40688371 0.07056873 Inf 0.26857154 0.5451959
@@ -229,7 +229,7 @@ tmp
 ## Results are averaged over the levels of: contact, judge 
 ## Confidence level used: 0.95</code></pre></div>
 <p>There are yet more modes! With <code>mode = &quot;prob&quot;</code>, we obtain estimates of the probability distribution of each rating. Its reference grid includes a factor with the same name as the model response – in this case <code>rating</code>. We usually want to use that as the primary factor, and the factors of interest as <code>by</code> variables:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(wine.clm, ~<span class="st"> </span>rating |<span class="st"> </span>temp, <span class="dt">mode =</span> <span class="st">&quot;prob&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(wine.clm, <span class="op">~</span><span class="st"> </span>rating <span class="op">|</span><span class="st"> </span>temp, <span class="dt">mode =</span> <span class="st">&quot;prob&quot;</span>)
 ## temp = cold:
 ##  rating       prob         SE  df    asymp.LCL  asymp.UCL
 ##  1      0.12922075 0.06252864 Inf  0.006666872 0.25177462
@@ -274,9 +274,9 @@ tmp
 <div id="mcmc" class="section level2">
 <h2>Models fitted using MCMC methods</h2>
 <p>To illustrate <strong>emmeans</strong>’s support for models fitted using MCMC methods, consider the <code>example_model</code> available in the <strong>rstanarm</strong> package. The example concerns CBPP, a serious disease of cattle in Ethiopia. A generalized linear mixed model was fitted to the data using the code below. We subsequently obtain its reference grid in the usual way. <!--- I'm faking this; I actually saved the ref_grid in a system file ---></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example_model &lt;-<span class="st"> </span>rstanarm::<span class="kw">stan_glmer</span>(
-    <span class="kw">cbind</span>(incidence, size -<span class="st"> </span>incidence) ~<span class="st"> </span>size +<span class="st"> </span>period +<span class="st"> </span>(<span class="dv">1</span>|herd),
-    <span class="dt">data =</span> lme4::cbpp, <span class="dt">family =</span> binomial,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example_model &lt;-<span class="st"> </span>rstanarm<span class="op">::</span><span class="kw">stan_glmer</span>(
+    <span class="kw">cbind</span>(incidence, size <span class="op">-</span><span class="st"> </span>incidence) <span class="op">~</span><span class="st"> </span>size <span class="op">+</span><span class="st"> </span>period <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>herd),
+    <span class="dt">data =</span> lme4<span class="op">::</span>cbpp, <span class="dt">family =</span> binomial,
     <span class="dt">chains =</span> <span class="dv">2</span>, <span class="dt">cores =</span> <span class="dv">1</span>, <span class="dt">seed =</span> <span class="dv">12345</span>, <span class="dt">iter =</span> <span class="dv">500</span>)
 rst_ex.rg &lt;-<span class="st"> </span><span class="kw">ref_grid</span>(example_model)</code></pre></div>
 <!--- here's the system file with the ref_grid --->
@@ -326,7 +326,7 @@ period.emm
 ## period 3 -3.199 -2.739 -2.516 -2.286 -1.870
 ## period 4 -3.890 -3.254 -2.968 -2.698 -2.003</code></pre></div>
 <p>Note that <code>as.mcmc</code> will actually produce an <code>mcmc.list</code> when there is more than one chain present, as in this example. The 2.5th and 97.5th quantiles are similar, but not identical, to the 95% confidence intervals in the frequentist summary. Here is a plot of the posterior EMMs, back-transformed:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bayesplot::<span class="kw">mcmc_areas</span>(<span class="kw">as.mcmc</span>(<span class="kw">regrid</span>(period.emm)))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bayesplot<span class="op">::</span><span class="kw">mcmc_areas</span>(<span class="kw">as.mcmc</span>(<span class="kw">regrid</span>(period.emm)))</code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
 <p>… and here are intervals for each period compared with its neighbor; we wrap the important part of the call in an extra <code>as.mcmc(as.matrix(...))</code> so as to combine the two chains into one.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">HPDinterval</span>(<span class="kw">as.mcmc</span>(<span class="kw">as.matrix</span>(

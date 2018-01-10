@@ -35,6 +35,12 @@ contrast(emmeans(noise.lm, ~ size*type*side),
          interaction = c("poly", "consec", "consec"))
 
 ## ------------------------------------------------------------------------
+joint_tests(noise.lm)
+
+## ------------------------------------------------------------------------
+joint_tests(noise.lm, by = "side")
+
+## ------------------------------------------------------------------------
 org.quad <- lm(cbind(sales1, sales2) ~ poly(price1, price2, degree = 2)
                                        + day + store, data = oranges)
 org.int <- lm(cbind(sales1, sales2) ~ price1 * price2 + day + store, data = oranges)
