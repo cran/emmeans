@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2018-01-09" />
+<meta name="date" content="2018-02-24" />
 
 <title>Utilities and options for emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Utilities and options for emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-01-09</em></h4>
+<h4 class="date"><em>2018-02-24</em></h4>
 
 
 
@@ -151,9 +151,9 @@ pigs.anal.p
 ## 
 ## $contrasts
 ##  contrast    ratio         SE df  lower.CL upper.CL t.ratio p.value
-##  12 / 9   1.196684 0.06710564 23 1.0379600 1.379680   3.202  0.0113
-##  15 / 12  1.038570 0.06042501 23 0.8960192 1.203799   0.650  0.8613
-##  18 / 15  1.085945 0.07499759 23 0.9113765 1.293950   1.194  0.5199
+##  12 / 9   1.196684 0.06710564 23 1.0381982 1.379364   3.202  0.0113
+##  15 / 12  1.038570 0.06042501 23 0.8962325 1.203513   0.650  0.8612
+##  18 / 15  1.085945 0.07499759 23 0.9116340 1.293585   1.194  0.5201
 ## 
 ## Results are averaged over the levels of: source 
 ## Confidence level used: 0.95 
@@ -186,12 +186,12 @@ pigs.anal.p
 <p>The default adjustment is <code>&quot;bonferroni&quot;</code>; we could have specified something different via the <code>adjust</code> argument. An equivalent way to combine <code>emmGrid</code>s is via the addition operator. Any options may be provided by <code>update()</code>. Below, we combine the same results into a family but ask for the “exact” multiplicity adjustment.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">update</span>(pigs.anal.p[[<span class="dv">2</span>]] <span class="op">+</span><span class="st"> </span><span class="kw">pairs</span>(pigs.emm.s), <span class="dt">adjust =</span> <span class="st">&quot;mvt&quot;</span>)
 ##  contrast        ratio         SE df  lower.CL  upper.CL t.ratio p.value
-##  12 / 9      1.1966841 0.06710564 23 1.0215876 1.4017916   3.202  0.0213
-##  15 / 12     1.0385697 0.06042501 23 0.8813596 1.2238218   0.650  0.9681
-##  18 / 15     1.0859446 0.07499759 23 0.8937042 1.3195371   1.194  0.7305
-##  fish / soy  0.7612695 0.04029742 23 0.6556677 0.8838795  -5.153  0.0002
-##  fish / skim 0.6687950 0.03622146 23 0.5740343 0.7791987  -7.428  &lt;.0001
-##  soy / skim  0.8785259 0.04659947 23 0.7564275 1.0203329  -2.442  0.1111
+##  12 / 9      1.1966841 0.06710564 23 1.0215592 1.4018305   3.202  0.0212
+##  15 / 12     1.0385697 0.06042501 23 0.8813342 1.2238571   0.650  0.9681
+##  18 / 15     1.0859446 0.07499759 23 0.8936736 1.3195822   1.194  0.7305
+##  fish / soy  0.7612695 0.04029742 23 0.6556506 0.8839026  -5.153  0.0002
+##  fish / skim 0.6687950 0.03622146 23 0.5740189 0.7792196  -7.428  &lt;.0001
+##  soy / skim  0.8785259 0.04659947 23 0.7564076 1.0203597  -2.442  0.1109
 ## 
 ## Results are averaged over some or all of the levels of: source, percent 
 ## Confidence level used: 0.95 

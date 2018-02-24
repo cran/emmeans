@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2018-01-09" />
+<meta name="date" content="2018-02-24" />
 
 <title>Comparisons and contrasts in emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Comparisons and contrasts in emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-01-09</em></h4>
+<h4 class="date"><em>2018-02-24</em></h4>
 
 
 
@@ -109,16 +109,10 @@ pigs.emm.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.lm
 <p>The blue bars are confidence intervals for the EMMs, and the red arrows are for the comparisons among them. If an arrow from one mean overlaps an arrow from another group, the difference is not significant, based on the <code>adjust</code> setting (which defaults to <code>&quot;tukey&quot;</code>). (Note: Don’t ever use confidence intervals for EMMs to perform comparisons; they can be very misleading.)</p>
 <p>Another way to depict comparisons is by compact-letter displays:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cld</span>(pigs.emm.s)
-##  source   emmean         SE df lower.CL upper.CL .group
-##  fish   3.394492 0.03668122 23 3.318612 3.470373  1    
-##  soy    3.667260 0.03744798 23 3.589793 3.744727   2   
-##  skim   3.796770 0.03938283 23 3.715300 3.878240   2   
-## 
-## Results are averaged over the levels of: percent 
-## Results are given on the log (not the response) scale. 
-## Confidence level used: 0.95 
-## P value adjustment: tukey method for comparing a family of 3 estimates 
-## significance level used: alpha = 0.05</code></pre></div>
+##   source   emmean         SE df lower.CL upper.CL .group
+## 1   fish 3.394492 0.03668122 23 3.318612 3.470373     1 
+## 2    soy 3.667260 0.03744798 23 3.589793 3.744727      2
+## 3   skim 3.796770 0.03938283 23 3.715300 3.878240      2</code></pre></div>
 <p>Two EMMs sharing one or more grouping symbols are not significantly different. I really don’t recommend this method, though, as it imposes a stark difference between <em>P</em> values slightly less and slightly more than <code>alpha</code>.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
@@ -174,9 +168,9 @@ org.emml
 ## $contrasts
 ##  contrast  estimate       SE df t.ratio p.value
 ##  2 - 1    -0.772150 3.776875 25  -0.204  0.9997
-##  3 - 2     6.658000 3.776875 25   1.763  0.3244
-##  4 - 3    -5.716133 3.776875 25  -1.513  0.4682
-##  5 - 4     4.882133 3.776875 25   1.293  0.6130
+##  3 - 2     6.658000 3.776875 25   1.763  0.3246
+##  4 - 3    -5.716133 3.776875 25  -1.513  0.4677
+##  5 - 4     4.882133 3.776875 25   1.293  0.6129
 ##  6 - 5    -1.320950 3.776875 25  -0.350  0.9965
 ## 
 ## P value adjustment: mvt method for 5 tests</code></pre></div>

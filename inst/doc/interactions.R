@@ -18,6 +18,12 @@ emm_s.t <- emmeans(noise.lm, pairwise ~ size | type)
 emm_s.t
 
 ## ------------------------------------------------------------------------
+noise.emm <- emmeans(noise.lm, ~ size * side * type)
+
+## ------------------------------------------------------------------------
+contrast(noise.emm, "consec", simple = "each", combine = TRUE, adjust = "mvt")
+
+## ------------------------------------------------------------------------
 contrast(emm_s.t[[1]], "poly")   ## 'by = "type"' already in previous result 
 
 ## ------------------------------------------------------------------------

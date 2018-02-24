@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2018-01-09" />
+<meta name="date" content="2018-02-24" />
 
 <title>Sophisticated models in emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Sophisticated models in emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-01-09</em></h4>
+<h4 class="date"><em>2018-02-24</em></h4>
 
 
 
@@ -96,6 +96,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
                         <span class="dt">data =</span> nlme<span class="op">::</span>Oats, <span class="dt">subset =</span> <span class="op">-</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">8</span>,<span class="dv">13</span>,<span class="dv">21</span>,<span class="dv">34</span>,<span class="dv">55</span>))</code></pre></div>
 <p>Let’s look at the EMMs for <code>nitro</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Oats.emm.n &lt;-<span class="st"> </span><span class="kw">emmeans</span>(Oats.lmer, <span class="st">&quot;nitro&quot;</span>)
+## Loading required namespace: pbkrtest
 Oats.emm.n
 ##  nitro    emmean       SE   df  lower.CL  upper.CL
 ##    0.0  78.89207 7.294379 7.78  61.98930  95.79484
