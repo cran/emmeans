@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2018-02-24" />
+<meta name="date" content="2018-03-31" />
 
 <title>FAQs for emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">FAQs for emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-02-24</em></h4>
+<h4 class="date"><em>2018-03-31</em></h4>
 
 
 
@@ -84,6 +84,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#numeric">lsmeans/emmeans doesn’t work unless you have factors</a></li>
 <li><a href="#model">If I analyze subsets of the data separately, I get different results</a></li>
 <li><a href="#transformations">My lsmeans/EMMs are way off from what I expected</a></li>
+<li><a href="#asymp">Why do I get <code>Inf</code> for the degrees of freedom?</a></li>
 <li><a href="#NAs">Some or all of the results shown say NA or NonEst</a></li>
 <li><a href="#additive">I get exactly the same comparisons for each “by” group</a></li>
 <li><a href="#anova">My ANOVA <em>F</em> is significant, but nopairwise comparisons are</a></li>
@@ -130,6 +131,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="transformations" class="section level2">
 <h2>My lsmeans/EMMs are way off from what I expected</h2>
 <p>First step: Carefully read the annotations below the output. Do they say something like “results are on the log scale, not the response scale”? If so, that explains it. A Poisson or logistic model involves a link function, and by default, <code>emmeans()</code> produces its results on that same scale. You can add <code>type = &quot;response&quot;</code> to the <code>emmeans()</code> call and it will put the results of the scale you expect. But that is not always the best approach. The <a href="transformations.html">“transformations” vignette</a> has examples and discussion.</p>
+</div>
+<div id="asymp" class="section level2">
+<h2>Why do I get <code>Inf</code> for the degrees of freedom?</h2>
+<p>This is simply the way that <strong>emmeans</strong> labels asymptotic results (that is, estimates that are tested against the standard normal distribution – <em>z</em> tests – rather than the <em>t</em> distribution). Note that obtaining quantiles or probabilities from the <em>t</em> distribution with infinite degrees of freedom is the same as obtaining the corresponding values from the standard normal. For example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">qt</span>(<span class="kw">c</span>(.<span class="dv">9</span>, .<span class="dv">95</span>, .<span class="dv">975</span>), <span class="dt">df =</span> <span class="ot">Inf</span>)
+## [1] 1.281552 1.644854 1.959964
+<span class="kw">qnorm</span>(<span class="kw">c</span>(.<span class="dv">9</span>, .<span class="dv">95</span>, .<span class="dv">975</span>))
+## [1] 1.281552 1.644854 1.959964</code></pre></div>
+<p>so when you see infinite d.f., that just means its a <em>z</em> test or a <em>z</em> confidence interval.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="NAs" class="section level2">

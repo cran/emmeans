@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2018-02-24" />
+<meta name="date" content="2018-03-31" />
 
 <title>Working with messy data</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Working with messy data</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-02-24</em></h4>
+<h4 class="date"><em>2018-03-31</em></h4>
 
 
 
@@ -93,8 +93,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>As an illustration, consider the <code>nutrition</code> dataset provided with the package. These data are used as an example in Milliken and Johnson (1992), <em>Analysis of Messy Data</em>, and contain the results of an observational study on nutrition education. Low-income mothers are classified by race, age category, and whether or not they received food stamps (the <code>group</code> factor); and the response variable is a gain score (post minus pre scores) after completing a nutrition training program. First, let’s fit a model than includes all main effects and 2-way interactions, and obtain its “type II” ANOVA:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nutr.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(gain <span class="op">~</span><span class="st"> </span>(age <span class="op">+</span><span class="st"> </span>group <span class="op">+</span><span class="st"> </span>race)<span class="op">^</span><span class="dv">2</span>, <span class="dt">data =</span> nutrition) 
 car<span class="op">::</span><span class="kw">Anova</span>(nutr.lm)
-## Note: model has aliased coefficients
-##       sums of squares computed by model comparison
 ## Anova Table (Type II tests)
 ## 
 ## Response: gain

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2018-02-24" />
+<meta name="date" content="2018-03-31" />
 
 <title>Sophisticated models in emmeans</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Sophisticated models in emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-02-24</em></h4>
+<h4 class="date"><em>2018-03-31</em></h4>
 
 
 
@@ -82,6 +82,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <ol style="list-style-type: lower-alpha">
 <li><a href="#lmerOpts">System options for lmerMod models</a></li>
 </ol></li>
+<li><a href="#offsets">Models with offsets</a></li>
 <li><a href="#ordinal">Ordinal models</a></li>
 <li><a href="#mcmc">Models fitted using MCMC methods</a></li>
 <li><a href="models.html">Reference for supported models</a></li>
@@ -96,7 +97,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
                         <span class="dt">data =</span> nlme<span class="op">::</span>Oats, <span class="dt">subset =</span> <span class="op">-</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">8</span>,<span class="dv">13</span>,<span class="dv">21</span>,<span class="dv">34</span>,<span class="dv">55</span>))</code></pre></div>
 <p>Let’s look at the EMMs for <code>nitro</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Oats.emm.n &lt;-<span class="st"> </span><span class="kw">emmeans</span>(Oats.lmer, <span class="st">&quot;nitro&quot;</span>)
-## Loading required namespace: pbkrtest
 Oats.emm.n
 ##  nitro    emmean       SE   df  lower.CL  upper.CL
 ##    0.0  78.89207 7.294379 7.78  61.98930  95.79484
@@ -165,6 +165,50 @@ Oats.emm.n
 <p>The options <code>disable.pbkrtest</code> and <code>disable.lmerTest</code> may be <code>TRUE</code> or <code>FALSE</code>, and comprise another way of controlling which method is used (e.g., the Kenward-Roger method will not be used if <code>get_emm_option(&quot;disable.pbkrtest&quot;) == TRUE</code>). Finally, the options <code>pbkrtest.limit</code> and <code>lmerTest.limit</code>, which should be set to numeric values, enable the given package conditionally on whether the number of data rows does not exceed the given limit. The factory default is 3000 for both limits.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
+</div>
+<div id="offsets" class="section level2">
+<h2>Models with offsets</h2>
+<p>If a model is fitted and its formula includes an <code>offset()</code> term, then by default, the offset is computed and included in the reference grid. To illustrate, consider a hypothetical dataset on insurance claims (used as an <a href="https://support.sas.com/documentation/cdl/en/statug/63033/HTML/default/viewer.htm#statug_genmod_sect006.htm">example in SAS’s documentation</a>). There are classes of cars of varying counts (<code>n</code>), sizes (<code>size</code>), and age (<code>age</code>), and we record the number of insurance claims (<code>claims</code>). We fit a Poisson model to <code>claims</code> as a function of <code>size</code> and <code>age</code>. An offset of <code>log(n)</code> is included so that <code>n</code> functions as an “exposure” variable.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ins &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
+    <span class="dt">n =</span> <span class="kw">c</span>(<span class="dv">500</span>, <span class="dv">1200</span>, <span class="dv">100</span>, <span class="dv">400</span>, <span class="dv">500</span>, <span class="dv">300</span>),
+    <span class="dt">size =</span> <span class="kw">factor</span>(<span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>,<span class="dv">2</span>), <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;S&quot;</span>,<span class="st">&quot;M&quot;</span>,<span class="st">&quot;L&quot;</span>)),
+    <span class="dt">age =</span> <span class="kw">factor</span>(<span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="dt">each =</span> <span class="dv">3</span>)),
+    <span class="dt">claims =</span> <span class="kw">c</span>(<span class="dv">42</span>, <span class="dv">37</span>, <span class="dv">1</span>, <span class="dv">101</span>, <span class="dv">73</span>, <span class="dv">14</span>))
+ins.glm &lt;-<span class="st"> </span><span class="kw">glm</span>(claims <span class="op">~</span><span class="st"> </span>size <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span><span class="kw">offset</span>(<span class="kw">log</span>(n)), 
+               <span class="dt">data =</span> ins, <span class="dt">family =</span> <span class="st">&quot;poisson&quot;</span>)</code></pre></div>
+<p>First, let’s look at the reference grid obtained by default:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ref_grid</span>(ins.glm)
+## 'emmGrid' object with variables:
+##     size = S, M, L
+##     age = 1, 2
+##     n = 500
+## Transformation: &quot;log&quot;</code></pre></div>
+<p>Note that <code>n</code> is included in the reference grid and that its average value of 500 is used for all predictions. Thus, if we obtain EMMs for, say, <code>age</code>, these are results are based on a pool of 500 cars:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(ins.glm, <span class="st">&quot;size&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)
+##  size     rate       SE  df asymp.LCL asymp.UCL
+##  S    69.26111 6.250440 Inf 58.032750  82.66198
+##  M    34.64335 3.342971 Inf 28.673568  41.85604
+##  L    11.86512 3.136904 Inf  7.066934  19.92108
+## 
+## Results are averaged over the levels of: age 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the log scale</code></pre></div>
+<p>However, many users would like to ignore the offset for this kind of model, because then the estimates we obtain are rates per unit value of the (logged) offset. This may be accomplished by specifying an <code>offset</code> parameter in the call:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(ins.glm, <span class="st">&quot;size&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, <span class="dt">offset =</span> <span class="dv">0</span>)
+##  size       rate          SE  df  asymp.LCL  asymp.UCL
+##  S    0.13852223 0.012500880 Inf 0.11606550 0.16532396
+##  M    0.06928671 0.006685942 Inf 0.05734714 0.08371208
+##  L    0.02373023 0.006273808 Inf 0.01413387 0.03984217
+## 
+## Results are averaged over the levels of: age 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the log scale</code></pre></div>
+<p>You may verify that the above estimates are 1/500th of the previous ones. You may also verify that the above results are identical to those obtained by setting <code>n</code> equal to 1:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(ins.glm, <span class="st">&quot;size&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, <span class="dt">at =</span> <span class="kw">list</span>(<span class="dt">n =</span> <span class="dv">1</span>))</code></pre></div>
+<p>However, those who use these types of models will be more comfortable directly setting the offset to zero.</p>
+<p>By the way, you may set some other reference value for the rates. For example, if you want estimates of claims per 100 cars, simply use (results not shown):</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(ins.glm, <span class="st">&quot;size&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, <span class="dt">offset =</span> <span class="kw">log</span>(<span class="dv">100</span>))</code></pre></div>
+<p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="ordinal" class="section level2">
 <h2>Ordinal models</h2>
