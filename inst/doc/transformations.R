@@ -1,6 +1,6 @@
 ## ---- echo = FALSE, results = "hide", message = FALSE--------------------
 require("emmeans")
-knitr::opts_chunk$set(collapse = TRUE, fig.width = 4.5)
+knitr::opts_chunk$set(fig.width = 4.5, class.output = "ro")
 
 ## ------------------------------------------------------------------------
 pigs.lm <- lm(log(conc) ~ source + factor(percent), data = pigs)
@@ -9,6 +9,7 @@ pigs.lm <- lm(log(conc) ~ source + factor(percent), data = pigs)
 pigs.emm.s <- emmeans(pigs.lm, "source")
 str(pigs.emm.s)
 
+## ------------------------------------------------------------------------
 summary(pigs.emm.s, infer = TRUE, null = log(35))
 
 ## ------------------------------------------------------------------------

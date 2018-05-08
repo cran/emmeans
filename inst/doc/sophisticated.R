@@ -1,8 +1,7 @@
 ## ---- echo = FALSE, results = "hide", message = FALSE--------------------
 require("emmeans") 
 options(show.signif.stars = FALSE) 
-knitr::opts_chunk$set(collapse = TRUE,
-fig.width = 4.5) 
+knitr::opts_chunk$set(fig.width = 4.5, class.output = "ro") 
 
 ## ------------------------------------------------------------------------
 Oats.lmer <- lme4::lmer(yield ~ Variety + factor(nitro) + (1|Block/Variety),
@@ -80,27 +79,26 @@ summary(ref_grid(wine.clm, mode = "scale"), type = "response")
 #      cbind(incidence, size - incidence) ~ size + period + (1|herd),
 #      data = lme4::cbpp, family = binomial,
 #      chains = 2, cores = 1, seed = 12345, iter = 500)
-#  rst_ex.rg <- ref_grid(example_model)
+#  cbpp.rg <- ref_grid(example_model)
 
 ## ----echo = FALSE--------------------------------------------------------
-load(system.file("extdata", "rstex.RData", package = "emmeans"))
-rst_ex.rg <- do.call(emmobj, rstex)
+load(system.file("extdata", "cbpp.RData", package = "emmeans"))
+cbpp.rg <- do.call(emmobj, cbpp.list)
 
 ## ------------------------------------------------------------------------
-rst_ex.rg
+cbpp.rg
 
 ## ------------------------------------------------------------------------
-period.emm <- emmeans(rst_ex.rg, "period")
+period.emm <- emmeans(cbpp.rg, "period")
 period.emm
 
 ## ------------------------------------------------------------------------
-require("coda")  ### needed to access generic for as.mcmc()
+require("coda")
 summary(as.mcmc(period.emm))
 
 ## ------------------------------------------------------------------------
 bayesplot::mcmc_areas(as.mcmc(regrid(period.emm)))
 
 ## ------------------------------------------------------------------------
-HPDinterval(as.mcmc(as.matrix(
-    as.mcmc(contrast(period.emm, "consec", reverse = TRUE), names = FALSE))))
+contrast(period.emm, "consec", reverse = TRUE)
 

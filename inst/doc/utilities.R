@@ -1,15 +1,14 @@
 ## ---- echo = FALSE, results = "hide", message = FALSE--------------------
 require("emmeans") 
-knitr::opts_chunk$set(collapse = TRUE,
-fig.width = 4.5) 
+knitr::opts_chunk$set(fig.width = 4.5, class.output = "ro") 
 
 ## ------------------------------------------------------------------------
 pigs.lm <- lm(log(conc) ~ source + factor(percent), data = pigs)
-pigs.emm.s <- emmeans(pigs.lm, "source")
-pigs.emm.s
+pigs.emm <- emmeans(pigs.lm, "source")
+pigs.emm
 
 ## ------------------------------------------------------------------------
-pigs.emm.s <- update(pigs.emm.s, infer = c(TRUE, TRUE), null = log(35))
+pigs.emm.s <- update(pigs.emm, infer = c(TRUE, TRUE), null = log(35))
 pigs.emm.s
 
 ## ----eval = FALSE--------------------------------------------------------
@@ -42,7 +41,10 @@ rbind(pairs(pigs.emm.s), pigs.anal.p[[2]])
 update(pigs.anal.p[[2]] + pairs(pigs.emm.s), adjust = "mvt")
 
 ## ------------------------------------------------------------------------
-pigs.emm.s[2:3]
+pigs.emm[2:3]
+
+## ------------------------------------------------------------------------
+transform(pigs.emm, CI.width = upper.CL - lower.CL)
 
 ## ------------------------------------------------------------------------
 pigs.emm.ss <- add_grouping(pigs.emm.s, "type", "source",

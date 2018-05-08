@@ -12,54 +12,16 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2018-03-31" />
+<meta name="date" content="2018-05-07" />
 
 <title>Utilities and options for emmeans</title>
 
 
 
-<style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-</style>
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+<link href="data:text/css;charset=utf-8,body%20%7B%0Afont%2Dsize%3A%2011pt%3B%20font%2Dfamily%3A%20%22Palatino%20Linotype%22%2C%20%22Book%20Antiqua%22%2C%20Palatino%2C%20serif%3B%0Amargin%3A%2030px%2050px%2030px%2050px%3B%20%7D%0Ah1%2Ch2%2Ch3%2Ch4%2Ch5%2Ch6%20%7B%20font%2Dfamily%3A%20Arial%2CHelvetica%2CSans%2Dserif%3B%20%7D%0Aa%20%7B%20text%2Ddecoration%3A%20none%3B%20%7D%0Aa%3Alink%20%7B%20color%3Adarkblue%3B%20%7D%20a%3Avisited%20%7B%20color%3Adarkblue%3B%20%7D%20a%3Ahover%20%7B%20color%3Adodgerblue%3B%20%7D%0Aa%3Aactive%20%7B%20color%3Adodgerblue%3B%20%7D%20code%20%7B%0Acolor%3A%20%23602000%3B%0Afont%2Dfamily%3A%20%22Lucida%20Console%22%2C%20Monaco%2C%20monospace%3B%20font%2Dsize%3A%2090%25%3B%0A%7D%0A%2Er%20%7B%20%0Acolor%3A%20darkred%3B%20%7D%0A%2Ero%20%7B%20%0Acolor%3A%20darkgreen%3B%20background%2Dcolor%3A%20%23eeeeee%3B%20%7D%0A%2Er%20code%2C%20a%20code%2C%20%2Ero%20code%20%7B%20color%3A%20inherit%3B%20%7D%0A%2Evigindex%20ul%20%7B%20list%2Dstyle%2Dtype%3A%20none%3B%20%7D%0A%2Evigindex%20ul%20li%20%7B%20list%2Dstyle%3A%20none%3B%20%7D%0A%2Evigindex%20a%20code%20%7B%20color%3A%20inherit%3B%20%7D%0A%2Evigindex%20li%20code%20%7B%20color%3A%20inherit%3B%20%7D%0A" rel="stylesheet" type="text/css" />
 
 </head>
 
@@ -70,75 +32,83 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Utilities and options for emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-03-31</em></h4>
+<h4 class="date"><em>2018-05-07</em></h4>
 
 
 
+<!-- @index Vignettes!Utilities and options -->
 <div id="contents" class="section level2">
 <h2>Contents</h2>
 <ol style="list-style-type: decimal">
 <li><a href="#update">Updating an <code>emmGrid</code> object</a></li>
 <li><a href="#options">Setting options and defaults</a></li>
 <li><a href="#rbind">Combining and subsetting <code>emmGrid</code> objects</a></li>
+<li><a href="#data">Accessing results to use elsewhere</a></li>
 <li><a href="#groups">Adding grouping factors</a></li>
 </ol>
-<p><a href="index.html">Vignette index</a></p>
+<p><a href="vignette-topics.html">Index of all vignette topics</a></p>
 </div>
 <div id="update" class="section level2">
 <h2>Updating an <code>emmGrid</code> object</h2>
+<!-- @index `update()`; `emmGrid` objects!Modifying -->
 <p>Several internal settings are saved when functions like <code>ref_grid()</code>, <code>emmeans()</code>, <code>contrast()</code>, etc. are run. Those settings can be manipulated via the <code>update()</code> method for <code>emmGrid</code>s. To illustrate, consider the <code>pigs</code> dataset and model yet again:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(conc) <span class="op">~</span><span class="st"> </span>source <span class="op">+</span><span class="st"> </span><span class="kw">factor</span>(percent), <span class="dt">data =</span> pigs)
-pigs.emm.s &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.lm, <span class="st">&quot;source&quot;</span>)
-pigs.emm.s
-##  source   emmean         SE df lower.CL upper.CL
+<pre class="r"><code>pigs.lm &lt;- lm(log(conc) ~ source + factor(percent), data = pigs)
+pigs.emm &lt;- emmeans(pigs.lm, &quot;source&quot;)
+pigs.emm</code></pre>
+<pre class="ro"><code>##  source   emmean         SE df lower.CL upper.CL
 ##  fish   3.394492 0.03668122 23 3.318612 3.470373
 ##  soy    3.667260 0.03744798 23 3.589793 3.744727
 ##  skim   3.796770 0.03938283 23 3.715300 3.878240
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
-## Confidence level used: 0.95</code></pre></div>
+## Confidence level used: 0.95</code></pre>
 <p>We see confidence intervals but not tests, by default. This happens as a result of internal settings in <code>pigs.emm.s</code> that are passed to <code>summary()</code> when the object is displayed. If we are going to work with this object a lot, we might want to change its internal settings rather than having to rely on explicitly calling <code>summary()</code> with several arguments. If so, just update the internal settings to what is desired; for example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.emm.s &lt;-<span class="st"> </span><span class="kw">update</span>(pigs.emm.s, <span class="dt">infer =</span> <span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">TRUE</span>), <span class="dt">null =</span> <span class="kw">log</span>(<span class="dv">35</span>))
-pigs.emm.s
-##  source   emmean         SE df lower.CL upper.CL     null t.ratio p.value
+<pre class="r"><code>pigs.emm.s &lt;- update(pigs.emm, infer = c(TRUE, TRUE), null = log(35))
+pigs.emm.s</code></pre>
+<pre class="ro"><code>##  source   emmean         SE df lower.CL upper.CL     null t.ratio p.value
 ##  fish   3.394492 0.03668122 23 3.318612 3.470373 3.555348  -4.385  0.0002
 ##  soy    3.667260 0.03744798 23 3.589793 3.744727 3.555348   2.988  0.0066
 ##  skim   3.796770 0.03938283 23 3.715300 3.878240 3.555348   6.130  &lt;.0001
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
-## Confidence level used: 0.95</code></pre></div>
+## Confidence level used: 0.95</code></pre>
 <p>See <a href="../doc/update.emmGrid.html">`help(“update.emmGrid”)</a> for details on the keywords that can be changed. Mostly, they are the same as the names of arguments in the functions that construct these objects.</p>
 <p>Of course, we can always get what we want via calls to <code>test()</code>, <code>confint()</code> or <code>summary()</code> with appropriate arguments. But the <code>update()</code> function is more useful in sophisticated manipulations of objects, or called implicitly via the <code>options</code> argument in <code>emmeans()</code> and other functions. Those options are passed to <code>update()</code> just before the object is returned. For example, we could have done the above update within the <code>emmeans()</code> call as follows:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(pigs.lm, <span class="st">&quot;source&quot;</span>, <span class="dt">options =</span> <span class="kw">list</span>(<span class="dt">infer =</span> <span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">TRUE</span>), <span class="dt">null =</span> <span class="kw">log</span>(<span class="dv">35</span>)))</code></pre></div>
+<pre class="r"><code>emmeans(pigs.lm, &quot;source&quot;, options = list(infer = c(TRUE, TRUE), null = log(35)))</code></pre>
 <p><a href="#contents">Back to contents</a></p>
 </div>
 <div id="options" class="section level2">
 <h2>Setting options and defaults</h2>
+<!-- @index `get_emm_option()`; Options -->
 <p>Speaking of the <code>options</code> argument, note that the default in <code>emmeans()</code> is <code>options = get_emm_option(&quot;emmeans&quot;)</code>. Let’s see what that is:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">get_emm_option</span>(<span class="st">&quot;emmeans&quot;</span>)
-## $infer
-## [1]  TRUE FALSE</code></pre></div>
+<pre class="r"><code>get_emm_option(&quot;emmeans&quot;)</code></pre>
+<pre class="ro"><code>## $infer
+## [1]  TRUE FALSE</code></pre>
 <p>So, by default, confidence intervals, but not tests, are displayed when the result is summarized. The reverse is true for results of <code>contrast()</code> (and also the default for <code>pairs()</code> which calls <code>contrast()</code>):</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">get_emm_option</span>(<span class="st">&quot;contrast&quot;</span>)
-## $infer
-## [1] FALSE  TRUE</code></pre></div>
+<pre class="r"><code>get_emm_option(&quot;contrast&quot;)</code></pre>
+<pre class="ro"><code>## $infer
+## [1] FALSE  TRUE</code></pre>
 <p>There are also defaults for a newly constructed reference grid:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">get_emm_option</span>(<span class="st">&quot;ref_grid&quot;</span>)
-## $is.new.rg
+<pre class="r"><code>get_emm_option(&quot;ref_grid&quot;)</code></pre>
+<pre class="ro"><code>## $is.new.rg
 ## [1] TRUE
 ## 
 ## $infer
-## [1] FALSE FALSE</code></pre></div>
+## [1] FALSE FALSE</code></pre>
 <p>The default is to display neither intervals nor tests when summarizing. In addition, the flag <code>is.new.rg</code> is set to <code>TRUE</code>, and that is why one sees a <code>str()</code> listing rather than a summary as the default when the object is simply shown by typing its name at the console.</p>
+<div id="defaults" class="section level6">
+<h6></h6>
+<!-- @index `emm_options()`; `emmGrid` objects!Setting defaults for
+     `emmeans()`!Changing defaults; `contrast()`!Changing defaults -->
 <p>The user may have other preferences. She may want to see both intervals and tests whenever contrasts are produced; and perhaps she also wants to always default to the response scale when transformations or links are present. We can change the defaults by setting the corresponding options; and that is done via the <code>emm_options()</code> function:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emm_options</span>(<span class="dt">emmeans =</span> <span class="kw">list</span>(<span class="dt">type =</span> <span class="st">&quot;response&quot;</span>),
-            <span class="dt">contrast =</span> <span class="kw">list</span>(<span class="dt">infer =</span> <span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">TRUE</span>)))</code></pre></div>
+<pre class="r"><code>emm_options(emmeans = list(type = &quot;response&quot;),
+            contrast = list(infer = c(TRUE, TRUE)))</code></pre>
 <p>Now, new <code>emmeans()</code> results and contrasts follow the new defaults:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.anal.p &lt;-<span class="st"> </span><span class="kw">emmeans</span>(pigs.lm, consec <span class="op">~</span><span class="st"> </span>percent)
-pigs.anal.p
-## $emmeans
+<pre class="r"><code>pigs.anal.p &lt;- emmeans(pigs.lm, consec ~ percent)
+pigs.anal.p</code></pre>
+<pre class="ro"><code>## $emmeans
 ##  percent response       SE df lower.CL upper.CL
 ##        9 31.35290 1.281961 23 28.81003 34.12023
 ##       12 37.51952 1.439849 23 34.65613 40.61950
@@ -151,28 +121,31 @@ pigs.anal.p
 ## 
 ## $contrasts
 ##  contrast    ratio         SE df  lower.CL upper.CL t.ratio p.value
-##  12 / 9   1.196684 0.06710564 23 1.0382069 1.379352   3.202  0.0110
-##  15 / 12  1.038570 0.06042501 23 0.8962403 1.203502   0.650  0.8613
-##  18 / 15  1.085945 0.07499759 23 0.9116435 1.293571   1.194  0.5201
+##  12 / 9   1.196684 0.06710564 23 1.0381477 1.379431   3.202  0.0111
+##  15 / 12  1.038570 0.06042501 23 0.8961873 1.203573   0.650  0.8612
+##  18 / 15  1.085945 0.07499759 23 0.9115795 1.293662   1.194  0.5202
 ## 
 ## Results are averaged over the levels of: source 
 ## Confidence level used: 0.95 
 ## Conf-level adjustment: mvt method for 3 estimates 
 ## Intervals are back-transformed from the log scale 
 ## P value adjustment: mvt method for 3 tests 
-## Tests are performed on the log scale</code></pre></div>
+## Tests are performed on the log scale</code></pre>
 <p>Observe that the contrasts “inherited” the <code>type = &quot;response&quot;</code> default from the EMMs.</p>
 <p>NOTE: Setting the above options does <em>not</em> change how existing <code>emmGrid</code> objects are displayed; it only affects ones constructed in the future.</p>
 <p>There is one more option – <code>summary</code> – that overrides all other display defaults for both existing and future objects. For example, specifying <code>emm_options(summary = list(infer = c(TRUE, TRUE)))</code> will result in both intervals and tests being displayed, regardless of their internal defaults, unless <code>infer</code> is explicitly specified in a call to <code>summary()</code>.</p>
 <p>To temporarily revert to factory defaults in a single call to <code>emmeans()</code> or <code>contrast()</code> or <code>pairs()</code>, specify <code>options = NULL</code> in the call. To reset everything to factory defaults (which we do presently), null-out all of the <strong>emmeans</strong> package options:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">emmeans =</span> <span class="ot">NULL</span>)</code></pre></div>
+<pre class="r"><code>options(emmeans = NULL)</code></pre>
 <p><a href="#contents">Back to contents</a></p>
+</div>
 </div>
 <div id="rbind" class="section level2">
 <h2>Combining and subsetting <code>emmGrid</code> objects</h2>
+<!-- @index `emmGrid` objects!Combining and subsetting
+     `rbind()`; `+` operator@plus -->
 <p>Two or more <code>emmGrid</code> objects may be combined using the <code>rbind()</code> or <code>+</code> methods. The most common reason (or perhaps the only good reason) to do this is to combine EMMs or contrasts into one family for purposes of applying a multiplicity adjustment to tests or intervals. A user may want to combine the three pairwise comparisons of sources with the three comparisons above of consecutive percents into a single family of six tests with a suitable multiplicity adjustment. This is done quite simply:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rbind</span>(<span class="kw">pairs</span>(pigs.emm.s), pigs.anal.p[[<span class="dv">2</span>]])
-##  contrast       estimate         SE df t.ratio p.value
+<pre class="r"><code>rbind(pairs(pigs.emm.s), pigs.anal.p[[2]])</code></pre>
+<pre class="ro"><code>##  contrast       estimate         SE df t.ratio p.value
 ##  fish - soy  -0.27276784 0.05293450 23  -5.153  0.0002
 ##  fish - skim -0.40227768 0.05415929 23  -7.428  &lt;.0001
 ##  soy - skim  -0.12950983 0.05304280 23  -2.442  0.1364
@@ -182,49 +155,67 @@ pigs.anal.p
 ## 
 ## Results are averaged over some or all of the levels of: percent, source 
 ## Results are given on the log (not the response) scale. 
-## P value adjustment: bonferroni method for 6 tests</code></pre></div>
+## P value adjustment: bonferroni method for 6 tests</code></pre>
 <p>The default adjustment is <code>&quot;bonferroni&quot;</code>; we could have specified something different via the <code>adjust</code> argument. An equivalent way to combine <code>emmGrid</code>s is via the addition operator. Any options may be provided by <code>update()</code>. Below, we combine the same results into a family but ask for the “exact” multiplicity adjustment.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">update</span>(pigs.anal.p[[<span class="dv">2</span>]] <span class="op">+</span><span class="st"> </span><span class="kw">pairs</span>(pigs.emm.s), <span class="dt">adjust =</span> <span class="st">&quot;mvt&quot;</span>)
-##  contrast        ratio         SE df  lower.CL  upper.CL t.ratio p.value
-##  12 / 9      1.1966841 0.06710564 23 1.0215520 1.4018404   3.202  0.0213
-##  15 / 12     1.0385697 0.06042501 23 0.8813278 1.2238660   0.650  0.9680
-##  18 / 15     1.0859446 0.07499759 23 0.8936659 1.3195936   1.194  0.7305
-##  fish / soy  0.7612695 0.04029742 23 0.6556462 0.8839085  -5.153  0.0002
-##  fish / skim 0.6687950 0.03622146 23 0.5740150 0.7792249  -7.428  &lt;.0001
-##  soy / skim  0.8785259 0.04659947 23 0.7564026 1.0203665  -2.442  0.1108
+<pre class="r"><code>update(pigs.anal.p[[2]] + pairs(pigs.emm.s), adjust = &quot;mvt&quot;)</code></pre>
+<pre class="ro"><code>##  contrast        ratio         SE df  lower.CL  upper.CL t.ratio p.value
+##  12 / 9      1.1966841 0.06710564 23 1.0215211 1.4018828   3.202  0.0214
+##  15 / 12     1.0385697 0.06042501 23 0.8813001 1.2239044   0.650  0.9681
+##  18 / 15     1.0859446 0.07499759 23 0.8936326 1.3196428   1.194  0.7305
+##  fish / soy  0.7612695 0.04029742 23 0.6556275 0.8839337  -5.153  0.0002
+##  fish / skim 0.6687950 0.03622146 23 0.5739982 0.7792477  -7.428  &lt;.0001
+##  soy / skim  0.8785259 0.04659947 23 0.7563809 1.0203957  -2.442  0.1110
 ## 
 ## Results are averaged over some or all of the levels of: source, percent 
 ## Confidence level used: 0.95 
 ## Conf-level adjustment: mvt method for 6 estimates 
 ## Intervals are back-transformed from the log scale 
 ## P value adjustment: mvt method for 6 tests 
-## Tests are performed on the log scale</code></pre></div>
+## Tests are performed on the log scale</code></pre>
 <p>Also evident in comparing these results is that settings are obtained from the first object combined. So in the second output, where they are combined in reverse order, we get both confidence intervals and tests, and transformation to the response scale.</p>
+<div id="brackets" class="section level6">
+<h6></h6>
+<!-- @index Selecting results; `[ ]` and `[[ ]]` operators@brackets -->
 <p>To subset an <code>emmGrid</code> object, just use the subscripting operator <code>[]</code>. For instance,</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.emm.s[<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>]
-##  source  emmean         SE df lower.CL upper.CL     null t.ratio p.value
-##  soy    3.66726 0.03744798 23 3.589793 3.744727 3.555348   2.988  0.0066
-##  skim   3.79677 0.03938283 23 3.715300 3.878240 3.555348   6.130  &lt;.0001
+<pre class="r"><code>pigs.emm[2:3]</code></pre>
+<pre class="ro"><code>##  source  emmean         SE df lower.CL upper.CL
+##  soy    3.66726 0.03744798 23 3.589793 3.744727
+##  skim   3.79677 0.03938283 23 3.715300 3.878240
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
-## Confidence level used: 0.95</code></pre></div>
+## Confidence level used: 0.95</code></pre>
+</div>
+</div>
+<div id="data" class="section level2">
+<h2>Accessing results to use elsewhere</h2>
+<!-- @index `as.data.frame()`; `emmGrid` objects!Accessing data; Using results 
+     `summary_emm` object!As a data frame; `as.data.frame()` -->
+<p>Sometimes, users want to use the results of an analysis (say, an <code>emmeans()</code> call) in other computations. The <code>summary()</code> method creates a <code>summary_emm</code> object that inherits from the <code>data.frame</code> class; so one may use the variables therein just as those in a data frame.</p>
+<p>Another way is to use the <code>as.data.frame()</code> method for <code>emmGrid</code> objects. This is provided to implement the standard way to coerce an object to a data frame. For illustration, let’s compute the widths of the confidence intervals in our example.</p>
+<pre class="r"><code>transform(pigs.emm, CI.width = upper.CL - lower.CL)</code></pre>
+<pre class="ro"><code>##   source   emmean         SE df lower.CL upper.CL  CI.width
+## 1   fish 3.394492 0.03668122 23 3.318612 3.470373 0.1517618
+## 2    soy 3.667260 0.03744798 23 3.589793 3.744727 0.1549341
+## 3   skim 3.796770 0.03938283 23 3.715300 3.878240 0.1629392</code></pre>
+<p>This implicitly converted <code>pigs.emm</code> to a data frame by passing it to the <code>as.data.frame()</code> method, then performed the required computation. But sometimes you have to explicitly call <code>as.data.frame()</code>.</p>
 <p><a href="#contents">Back to contents</a></p>
 </div>
 <div id="groups" class="section level2">
 <h2>Adding grouping factors</h2>
+<!-- @index Grouping factors; `add_grouping()`; Nesting factors!Creating  -->
 <p>Sometimes, users want to group levels of a factor into a smaller number of groups. Those groups may then be, say, averaged separately and compared, or used as a <code>by</code> factor. The <code>add_grouping()</code> function serves this purpose. The function takes four arguments: the object, the name of the grouping factor to be created, the name of the reference factor that is being grouped, and a vector of level names of the grouping factor corresponding to levels of the reference factor. Suppose for example that we want to distinguish animal and non-animal sources of protein in the <code>pigs</code> example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pigs.emm.ss &lt;-<span class="st"> </span><span class="kw">add_grouping</span>(pigs.emm.s, <span class="st">&quot;type&quot;</span>, <span class="st">&quot;source&quot;</span>,
-                            <span class="kw">c</span>(<span class="st">&quot;animal&quot;</span>, <span class="st">&quot;vegetable&quot;</span>, <span class="st">&quot;animal&quot;</span>))
-<span class="kw">str</span>(pigs.emm.ss)
-## 'emmGrid' object with variables:
+<pre class="r"><code>pigs.emm.ss &lt;- add_grouping(pigs.emm.s, &quot;type&quot;, &quot;source&quot;,
+                            c(&quot;animal&quot;, &quot;vegetable&quot;, &quot;animal&quot;))
+str(pigs.emm.ss)</code></pre>
+<pre class="ro"><code>## 'emmGrid' object with variables:
 ##     source = fish, soy, skim
 ##     type = animal, vegetable
 ## Nesting structure:  source %in% type
-## Transformation: &quot;log&quot;</code></pre></div>
+## Transformation: &quot;log&quot;</code></pre>
 <p>Note that the new object has a nesting structure (see more about this in the <a href="messy-data.html#nesting">“messy-data” vignette</a>), with the reference factor nested in the new grouping factor. Now we can obtain means and comparisons for each group</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">emmeans</span>(pigs.emm.ss, pairwise <span class="op">~</span><span class="st"> </span>type)
-## $emmeans
+<pre class="r"><code>emmeans(pigs.emm.ss, pairwise ~ type)</code></pre>
+<pre class="ro"><code>## $emmeans
 ##  type        emmean         SE df lower.CL upper.CL
 ##  animal    3.595631 0.02673860 23 3.540318 3.650944
 ##  vegetable 3.667260 0.03744798 23 3.589793 3.744727
@@ -238,8 +229,9 @@ pigs.anal.p
 ##  animal - vegetable -0.071629 0.0455466 23  -1.573  0.1295
 ## 
 ## Results are averaged over the levels of: percent, source 
-## Results are given on the log (not the response) scale.</code></pre></div>
+## Results are given on the log (not the response) scale.</code></pre>
 <p><a href="#contents">Back to contents</a></p>
+<p><a href="vignette-topics.html">Index of all vignette topics</a></p>
 </div>
 
 

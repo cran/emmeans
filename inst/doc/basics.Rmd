@@ -2,7 +2,7 @@
 title: "Basics of estimated marginal means"
 author: "Russ Lenth"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: emmeans::.emm_vignette
 vignette: >
   %\VignetteIndexEntry{Basics of EMMs}
   %\VignetteEngine{knitr::rmarkdown}
@@ -10,8 +10,10 @@ vignette: >
 ---
 ```{r, echo = FALSE, results = "hide", message = FALSE}
 require("emmeans")
-knitr::opts_chunk$set(collapse = TRUE, fig.width = 4.5)
+knitr::opts_chunk$set(fig.width = 4.5, class.output = "ro")
 ```
+
+<!-- @index Vignettes!Basics -->
 
 ## Contents {#contents}
 
@@ -24,12 +26,15 @@ knitr::opts_chunk$set(collapse = TRUE, fig.width = 4.5)
       c. [Weighting](#weights)
       d. [Multivariate models](#multiv)
   3. [Summary](#summary)
-  4. [Further reading](#more)
+  4. [The back story of **emmeans**](#backstory)
+  5. [Further reading](#more)
   
-[Vignette index](index.html)
+[Index of all vignette topics](vignette-topics.html)
 
 
 ## Why we need EMMs {#motivation}
+<!-- @index Examples!`pigs`; Examples!Unbalanced data; 
+             Means!Cell; Means!Marginal -->
 Consider the `pigs` dataset provided with the package (`help("pigs")` provides
 details). These data come from an unbalanced experiment where pigs are given
 different percentages of protein (`percent`) from different sources (`source`)
@@ -80,7 +85,9 @@ The big discrepancy between the ordinary mean for `percent = 18` and the margina
 mean from `cell.means` is due to the fact that the lowest value receives 3 times
 the weight as the other two values.
 
-### The point
+### The point {#eqwts}
+<!-- @index Means!Weighted; Means!Marginal!of cell means@cell
+    EMMs!Appropriateness of -->
 The point is that the marginal means of `cell.means` give *equal weight* to each
 cell. In many situations (especially with experimental data), that is a much
 fairer way to compute marginal means, in that they are not biased by imbalances
@@ -100,8 +107,10 @@ of what we can expect in the marketplace.
 [Back to Contents](#contents)
 
 ## What exactly are EMMs? {#EMMdef}
+<!-- @index Estimated marginal means; EMMs; Means!Marginal!Based on a model -->
 
 ### Model and reference grid {#ref_grid}
+<!-- @index Reference grids; `ref_grid()` -->
 Estimated marginal means are based on a *model* -- not directly on data. 
 The basis for them is what we call the *reference grid* for a given model.
 To obtain the reference grid, consider all the predictors in the model.
@@ -150,6 +159,7 @@ ref_grid(pigs.lm2) @ grid
 [Back to Contents](#contents)
 
 ### Estimated marginal means {#emmeans}
+<!-- @index Estimated marginal means!Defined; `emmeans()` -->
 Once the reference grid is established, we can consider using the model to
 estimate the mean at each point in the reference grid. (Curiously, the
 convention is to call this "prediction" rather than "estimation"). For
@@ -194,6 +204,8 @@ is performed separately in each nesting group. See the [section on nesting in th
 [Back to Contents](#contents)
 
 ### Altering the reference grid {#altering}
+<!-- @index Reference grids!Altering; `ref_grid()`!`cov.reduce`; 
+            `ref_grid()`!`at`; Examples!`mtcars` -->
 It is possible to alter the reference grid. We might, for example, want to 
 define a reference grid for `pigs.lm2` that is comparable to the one for 
 `pigs.lm1`.
@@ -230,6 +242,7 @@ handled by `cov.reduce` or the default methods.
 [Back to Contents](#contents)
 
 ### Graphical displays {#plots}
+<!-- @index Graphical displays; Plots!of EMMs@emms; Plots!Interaction-style; `emmip()`;   -->
 The results of `ref_grid()` or `emmeans()` (these are objects of class `emmGrid`)
 may be plotted in two different 
 ways. One is an interaction-style plot, using `emmip()`. In the following, let's 
@@ -247,6 +260,8 @@ Neither of these plots is an interaction plot of the *data*; they are
 interaction plots of model predictions; and since both models do not include
 an interaction, no interaction at all is evident in the plots.
 
+###### {#plot.emmGrid}
+<!-- @index Plots!of confidence intervals@conf; `plot.emmGrid()` -->
 The other graphics option offered is the `plot()` method for `emmGrid` objects. In
 the following, we display the estimates and 95% confidence intervals for
 `mtcars.rg` in separate panels for each `disp`.
@@ -274,6 +289,8 @@ number of cylinders:
 plot(mtcars.rg_d.c)
 ```
 
+###### {#ggplot}
+<!-- @index **ggplot2** package -->
 Wizards with the **ggplot2** package can further enhance these plots if 
 they like. For example, we can add the data to an interaction plot -- this
 time we opt to include confidence intervals and put the three sources 
@@ -287,6 +304,7 @@ emmip(pigs.lm1, ~ percent | source, CIs = TRUE) +
 [Back to Contents](#contents)
 
 ### Using weights {#weights}
+<!-- @index Means!Weighted; `emmeans()`!`weights` -->
 It is possible to override the equal-weighting method for computing EMMs. Using
 `weights = "cells"` in the call will weight the predictions according to their
 cell frequencies (recall this information is retained in the reference grid).
@@ -311,6 +329,8 @@ variations due to the factors that are being averaged over.
 [Back to Contents](#contents)
 
 ### Multivariate responses {#multiv}
+<!-- @index Multivariate models; Examples!`MOats`
+     Examples!Multivariate; `ref_grid()`!`mult.name` -->
 The **emmeans** package supports various multivariate models. When there
 is a multivariate response, the dimensions of that response are treated as if
 they were levels of a factor. For example, the `MOats` dataset provided in the
@@ -343,6 +363,62 @@ have been named `rep.meas`.
   * Reference grids and `emmeans()` results may be plotted via `plot()`
     (for parallel confidence intervals) or `emmip()` (for an interaction-style
     plot).
+    
+[Back to Contents](#contents)
+
+
+## The back story of **emmeans** {#backstory}
+<!-- @index Back story of **emmeans**; University administration; **lsmeans** -->
+The **emmeans** package and its predecessor, **lsmeans**, were developed in part
+because I wanted it for teaching. This is hardly a surprise, as I am an
+academic. I had taught experimental design and analysis a number of times,
+usually requiring SAS to do the kind of *post hoc* comparisons that I like to
+encourage people to do. SAS is fine software (in spite of the opinions of some
+Rusers with attitude), but it is quite different from R, and more and more, I
+had students who were bewildered by it. Some colleagues of mine think it is
+absolutely essential that masters-level students learn to use SAS. I can see
+that point, but my job was to teach design, not SAS -- and there are a lot 
+of topics to cover.
+
+But here's what you wouldn't expect: the real impetus to develop the package
+came from doing some consulting work for the university administration. They
+wanted help in analyzing faculty salaries, especially with regard to gender and
+ethnicity differences. Accordingly, we fitted a pretty complicated regression
+model with effects for gender and ethnicity, as well as such things as college
+department, rank, tenure status, seniority, etc. It is a really messy model.
+I first came to the conclusion that to make sense of the model results
+in terms that the administration could understand, I could obtain predictions 
+from that model and average them together in meaningful ways to summarize the 
+primary factor effects. I figured out how to write R code to estimate those
+averages and test differences among them. Only after all that did I
+realize that really what I was computing was least-squares means (or EMMs);
+so the package was born.
+
+It grew from there, especially in terms of supporting more models, evolving from
+a spaghetti-code design to one incorporating essential building blocks with
+methods for different models. Meanwhile, I retired, so I had time on my hands to
+dink around with it (and to keep learning about new or unfamiliar models
+and data-analysis approaches). 
+
+One aspect of the package that I am especially proud of is the ability to
+express results in accessible ways when there is a transformed response or link
+function (see the ["transformations" vignette](transformations.html)). Again,
+this grew out of my needs for that administrative salary analysis. The model
+that fitted the best used a reciprocal transformation, but I wanted to express
+the predicted salaries in dollars. Moreover, I wanted to compare them using
+ratios. Those requirements led directly to the development of the `regrid()`
+function and the options to metamorphose any `emmGrid` object to the response or
+the log scale.
+
+The lesson is that it is possible that even university service duties can lead
+to technical developments in statistics. One never knows where new ideas and
+inspirations will arise. Speaking of this, I have learned and benefitted
+enormously from users' questions about the package, and basically all recent
+improvements to **emmeans** are a direct result of those communications. So
+don't be shy about asking questions or requesting features.
+
+[Back to Contents](#contents)
+
 
 ## Further reading {#more}
 The reader is referred to other vignettes for more details and advanced use.
@@ -365,4 +441,4 @@ also be accessed via `vignette("`*name*`", "emmeans")`
 
 [Back to Contents](#contents)
 
-[Vignette index](index.html)
+[Index of all vignette topics](vignette-topics.html)

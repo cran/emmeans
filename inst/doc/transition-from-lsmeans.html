@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2018-03-31" />
+<meta name="date" content="2018-05-07" />
 
 <title>Transitioning to emmeans from lsmeans</title>
 
@@ -21,7 +21,7 @@
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+<link href="data:text/css;charset=utf-8,body%20%7B%0Afont%2Dsize%3A%2011pt%3B%20font%2Dfamily%3A%20%22Palatino%20Linotype%22%2C%20%22Book%20Antiqua%22%2C%20Palatino%2C%20serif%3B%0Amargin%3A%2030px%2050px%2030px%2050px%3B%20%7D%0Ah1%2Ch2%2Ch3%2Ch4%2Ch5%2Ch6%20%7B%20font%2Dfamily%3A%20Arial%2CHelvetica%2CSans%2Dserif%3B%20%7D%0Aa%20%7B%20text%2Ddecoration%3A%20none%3B%20%7D%0Aa%3Alink%20%7B%20color%3Adarkblue%3B%20%7D%20a%3Avisited%20%7B%20color%3Adarkblue%3B%20%7D%20a%3Ahover%20%7B%20color%3Adodgerblue%3B%20%7D%0Aa%3Aactive%20%7B%20color%3Adodgerblue%3B%20%7D%20code%20%7B%0Acolor%3A%20%23602000%3B%0Afont%2Dfamily%3A%20%22Lucida%20Console%22%2C%20Monaco%2C%20monospace%3B%20font%2Dsize%3A%2090%25%3B%0A%7D%0A%2Er%20%7B%20%0Acolor%3A%20darkred%3B%20%7D%0A%2Ero%20%7B%20%0Acolor%3A%20darkgreen%3B%20background%2Dcolor%3A%20%23eeeeee%3B%20%7D%0A%2Er%20code%2C%20a%20code%2C%20%2Ero%20code%20%7B%20color%3A%20inherit%3B%20%7D%0A%2Evigindex%20ul%20%7B%20list%2Dstyle%2Dtype%3A%20none%3B%20%7D%0A%2Evigindex%20ul%20li%20%7B%20list%2Dstyle%3A%20none%3B%20%7D%0A%2Evigindex%20a%20code%20%7B%20color%3A%20inherit%3B%20%7D%0A%2Evigindex%20li%20code%20%7B%20color%3A%20inherit%3B%20%7D%0A" rel="stylesheet" type="text/css" />
 
 </head>
 
@@ -32,10 +32,23 @@
 
 <h1 class="title toc-ignore">Transitioning to emmeans from lsmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-03-31</em></h4>
+<h4 class="date"><em>2018-05-07</em></h4>
 
 
 
+<!-- @index Vignettes!Transitioning from **lsmeans**; **lsmeans** package!Transitioning from -->
+<div id="contents" class="section level2">
+<h2>Contents</h2>
+<p>This vignette is here to help past users of the <strong>lsmeans</strong> package.</p>
+<ol style="list-style-type: decimal">
+<li><a href="#overview">Overview</a></li>
+<li><a href="#impact">User impact</a></li>
+<li><a href="#scripts">Converting old scripts</a></li>
+<li><a href="#workspaces">Converting old workspaces</a></li>
+<li><a href="#devel">Notes for package developers</a></li>
+</ol>
+<p><a href="vignette-topics.html">Index of all vignette topics</a></p>
+</div>
 <div id="overview" class="section level2">
 <h2>Overview</h2>
 <p><strong>emmeans</strong> is a continuation of the <strong>lsmeans</strong> package. The name is changed for two reasons:</p>
@@ -43,8 +56,9 @@
 <li>The term “least-squares means” is misleading in terms of describing the analyses it provides. The term “estimated marginal means” (EMMs) is well-accepted, and it better describes the basic idea that we use marginal means of predictions over a reference grid. When we do that with, say, an ordinal model, the concept “estimated marginal mean” makes sense while “least-squares mean” does not, because no least-squares methods are used to fit the model or obtain the EMMs.</li>
 <li>A number of changes are made to the internal architecture of the package. The <strong>lsmeans</strong> package had two classes, <code>ref.grid</code> and <code>lsmobj</code>, and it was confusing to some users that they needed to use primarily <code>ref.grid</code> methods to summarize <code>lsmobj</code> objects. The <strong>emmeans</strong> package has only an <code>emmGrid</code> class that covers both of the old classes. Changing the name of the package at the same time as the object classes are changed makes for a cleaner transition.</li>
 </ol>
+<p><a href="#contents">Back to Contents</a></p>
 </div>
-<div id="user-impact" class="section level2">
+<div id="impact" class="section level2">
 <h2>User impact</h2>
 <p>For the most part, all that most users need to do to transition from using the <strong>lsmeans</strong> package is to use <code>require(emmeans)</code> or <code>library(emmeans)</code> to load the package. With that one change, almost all of the code in the <em>using-lsmeans</em> vignette runs without alteration, and almost all examples from the help system for <strong>lsmeans</strong> also work as-is. Even though we now emphasize using the <code>emmeans()</code> function and related “em” functions, <code>lsmeans()</code> and its relatives are still available as wrappers for the new functions.</p>
 <p>That said, here are a few changes that former <strong>lsmeans</strong> users may need to be aware of:</p>
@@ -61,9 +75,11 @@
 <li>The options <code>lsmeans</code> and <code>ref.grid</code> have been remapped to <code>emmeans</code> and <code>ref_grid</code> respectively. For example, calling <code>lsm.options(lsmeans = ...)</code> remaps as <code>emm_options(emmeans = ...)</code>. See <code>help(&quot;emm_options&quot;, package = &quot;emmeans&quot;)</code> and <code>help(&quot;lsm.options&quot;, package = &quot;lsmeans&quot;)</code> for explanations of these options.</li>
 <li><p>The degrees-of-freedom saga, continued… Initially, <strong>lsmeans</strong> used the <strong>pbkrtest</strong> package to compute degrees of freedom (via the Kenward-Roger method) for <code>lme4::lmerMod</code> models. Later, the default was changed to the Satterthwaite method, implemented in the <strong>lmerTest</strong> package. Both methods are problematic; but I have decided to revert to the Kenward-Roger method as the system default. The default may be changed via <code>emm_options(lmer.df = ...)</code>. See <a href="models.html#L"><code>vignette(&quot;models&quot;)</code></a> for details.</p></li>
 </ul>
+<p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="scripts" class="section level2">
 <h2>Converting scripts</h2>
+<!-- @index `convert_scripts()`; **lsmeans** package!Converting scripts -->
 <p>The user may run</p>
 <pre><code>emmeans:::convert_scripts()</code></pre>
 <p>to convert R scripts or R Markdown files to use <strong>emmeans</strong> functions. (This is a non-exported function – you need three <code>:</code>s in there.)</p>
@@ -82,16 +98,20 @@
 <li><code>lsmeans(</code> and relatives to <code>emmeans(</code> and relatives, if opted for</li>
 <li><code>pmmeans(</code> and relatives to <code>emmeans(</code> and relatives, if opted for</li>
 </ul>
+<p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="workspaces" class="section level2">
 <h2>Converting workspaces</h2>
+<!-- @index `convert_workspace()`; **lsmeans** package!Converting workspaces -->
 <p>If you have any objects from the <strong>lsmeans</strong> package laying around, it is all too likely that the <strong>lsmeans</strong> package will be loaded, and perhaps even get added to the search path. This can create annoying messages, if not conflicts. When this happens, type</p>
 <pre><code>emmeans:::convert_workspace()</code></pre>
 <p>on the console. This will convert any <code>ref.grid</code> or <code>lsmobj</code> objects laying around to the new <code>emmGrid</code> class, and unload all vestiges of <strong>lsmeans</strong>.</p>
 <p>Once you are comfortable using <strong>emmeans</strong> in place of <strong>lsmeans</strong>, you may effect a permanent solution (the “nuclear option?”) by uninstalling the <strong>lsmeans</strong> package. Doing so will <em>not</em> prevent you from converting old workspaces or scripts. Watch your package updates carefully, though, as it may get re-installed if it is still imported by another package.</p>
+<p><a href="#contents">Back to Contents</a></p>
 </div>
-<div id="notes-for-package-developers-to-transition-to-emmeans-support" class="section level2">
+<div id="devel" class="section level2">
 <h2>Notes for package developers to transition to emmeans support</h2>
+<!-- @index **lsmeans** package!Information for package developers -->
 <p>if you are the developer of a package that supports <strong>lsmeans</strong>, and you want to transition to supporting <strong>emmeans</strong>, I make the following suggestions:</p>
 <ol style="list-style-type: decimal">
 <li>Currently, your package provides methods <code>recover.data.xyz()</code> and <code>lsm.basis.xyz()</code>, where <code>xyz</code> stands in for the class of your object. Rename these functions <code>recover_data.xyz()</code> and <code>emm_basis.xyz()</code>.</li>
@@ -107,6 +127,8 @@
 <li>In lieu of (a)-(c) above, you could just export the functions <code>recover_data.xyz</code> and <code>emm_basis.xyz</code>.</li>
 </ol></li>
 </ol>
+<p><a href="#contents">Back to Contents</a></p>
+<p><a href="vignette-topics.html">Index of all vignette topics</a></p>
 </div>
 <div class="footnotes">
 <hr />

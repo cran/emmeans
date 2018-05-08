@@ -6,7 +6,7 @@
 \title{Plot an \code{emmGrid} or \code{summary_emm} object}
 \usage{
 \method{plot}{emmGrid}(x, y, type, intervals = TRUE, comparisons = FALSE,
-  alpha = 0.05, adjust = "tukey", int.adjust = "none", ...)
+  alpha = 0.05, adjust = "tukey", int.adjust = "none", frequentist, ...)
 
 \method{plot}{summary_emm}(x, y, horizontal = TRUE, xlab, ylab, layout, ...)
 }
@@ -32,6 +32,11 @@ the two estimates. (A warning is issued if this can't be done.)}
 \item{adjust}{Character value: Multiplicity adjustment method for comparison arrows \emph{only}.}
 
 \item{int.adjust}{Character value: Multiplicity adjustment method for the plotted confidence intervals \emph{only}.}
+
+\item{frequentist}{Logical value. If there is a posterior MCMC sample and 
+\code{frequentist} is non-missing and TRUE, a frequentist summary is used for
+obtaining the plot data, rather than the posterior point estimate and HPD
+intervals. This argument is ignored when it is not a Bayesian model.}
 
 \item{...}{Additional arguments passed to \code{\link{update.emmGrid}} or
 \code{\link[lattice:xyplot]{dotplot}}}

@@ -1,6 +1,6 @@
 ## ---- echo = FALSE, results = "hide", message = FALSE--------------------
 require("emmeans")
-knitr::opts_chunk$set(collapse = TRUE, fig.width = 4.5)
+knitr::opts_chunk$set(fig.width = 4.5, class.output = "ro")
 
 ## ------------------------------------------------------------------------
 par(mar = .1 + c(4, 4, 1, 1))   # reduce head space

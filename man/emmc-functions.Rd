@@ -17,15 +17,16 @@
 \alias{mean_chg.emmc}
 \title{Contrast families}
 \usage{
-pairwise.emmc(levs, ...)
+pairwise.emmc(levs, exclude = integer(0), ...)
 
-revpairwise.emmc(levs, ...)
+revpairwise.emmc(levs, exclude = integer(0), ...)
 
-tukey.emmc(levs, reverse = FALSE)
+tukey.emmc(levs, reverse = FALSE, ...)
 
-poly.emmc(levs, max.degree = min(6, k - 1))
+poly.emmc(levs, max.degree = min(6, k - 1), ...)
 
-trt.vs.ctrl.emmc(levs, ref = 1, reverse = FALSE)
+trt.vs.ctrl.emmc(levs, ref = 1, reverse = FALSE, exclude = integer(0),
+  ...)
 
 trt.vs.ctrl1.emmc(levs, ref = 1, ...)
 
@@ -33,16 +34,19 @@ trt.vs.ctrlk.emmc(levs, ref = length(levs), ...)
 
 dunnett.emmc(levs, ref = 1, ...)
 
-eff.emmc(levs, ...)
+eff.emmc(levs, exclude = integer(0), ...)
 
-del.eff.emmc(levs, ...)
+del.eff.emmc(levs, exclude = integer(0), ...)
 
-consec.emmc(levs, reverse = FALSE, ...)
+consec.emmc(levs, reverse = FALSE, exclude = integer(0), ...)
 
-mean_chg.emmc(levs, reverse = FALSE, ...)
+mean_chg.emmc(levs, reverse = FALSE, exclude = integer(0), ...)
 }
 \arguments{
 \item{levs}{Vector of factor levels}
+
+\item{exclude}{integer vector with indices of levels to exclude
+from consideration. These levels will receive weight 0 in all contrasts.}
 
 \item{...}{Additional arguments, passed to related methods as appropriate}
 
@@ -94,6 +98,9 @@ the reference level(s). \code{trt.vs.ctrl1.emmc} is the same as
 value of \code{length(levs)}. \code{dunnett.emmc} is the same as
 \code{trt.vs.ctrl}. The default multiplicity adjustment method is
 \code{"dunnettx"}, a close approximation to the Dunnett adjustment.
+\emph{Note} in all of these functions, it is illegal to have any overlap
+between the \code{ref} levels and the \code{exclude} levels. If any
+is found, an error is thrown.
 
 \code{consec.emmc} and \code{mean_chg.emmc} are useful for contrasting
 treatments that occur in sequence. For a factor with levels A, B, C, D, E,
@@ -115,6 +122,10 @@ method and is slightly conservative; see \code{\link[stats]{p.adjust}}.
 warp.lm <- lm(breaks ~ wool*tension, data = warpbreaks)
 warp.emm <- emmeans(warp.lm, ~ tension | wool)
 contrast(warp.emm, "poly")
+
+# Compare only low and high tensions
+# Note pairs(emm, ...) calls contrast(emm, "pairwise", ...)
+pairs(warp.emm, exclude = 2)
 
 ### Setting up a custom contrast function
 helmert.emmc <- function(levs, ...) {

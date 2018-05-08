@@ -1,3 +1,25 @@
+emmeans 1.2
+-----------
+
+  * Index of vignette topics added
+  * New, improved (to my taste) vignette formats
+  * Fixed df bug in regrid (#29)
+  * Fixed annotation bug for nested models (#30)
+  * Better documentation for `lme` models in "models" vignette
+  * Additional fixes for arguments passed to `.emmc` functions (#22)
+  * Support added for logical predictors (who knew we could have those? not me)
+  * Replaced tex/pdf "Extending" vignette with Rmd/html
+  * Overhauled the faulty logic for df methods in emm_basis.merMod
+  * Added Henrik to contributors list (long-standing oversight)
+  * Added `exclude` argument to most `.emmc` functions: allows
+    user to omit certain levels when computing contrasts
+  * New `hpd.summary()` function for Bayesian models to show HPD intervals
+    rather than frequentist summary. Note: `summary()` automatically
+    reroutes to it. Also `plot()` and `emmip()` play along.
+  * Rudimentary support for **brms** package
+  * *Ad hoc* SAtterthwaite method for `nlme::lme` models
+
+
 emmeans 1.1.3
 -------------
 

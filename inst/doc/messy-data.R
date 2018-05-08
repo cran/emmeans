@@ -1,8 +1,7 @@
 ## ---- echo = FALSE, results = "hide", message = FALSE--------------------
 require("emmeans") 
 options(show.signif.stars = FALSE) 
-knitr::opts_chunk$set(collapse = TRUE,
-fig.width = 4.5) 
+knitr::opts_chunk$set(fig.width = 4.5, class.output = "ro") 
 
 ## ------------------------------------------------------------------------
 nutr.lm <- lm(gain ~ (age + group + race)^2, data = nutrition) 
@@ -36,6 +35,10 @@ emmip(framing.glm, treat ~ educ | gender, type = "response",
 
 ## ----eval = FALSE--------------------------------------------------------
 #  emmeans(..., cov.reduce = list(x1 ~ trt, x2 ~ trt + x1, x3 ~ trt + x1 + x2))
+
+## ----eval = FALSE--------------------------------------------------------
+#  emmeans(model, "A", weights = "outer")
+#  emmeans(emmeans(model, c("A", "B"), weights = "prop"),  weights = "prop")
 
 ## ----message = FALSE-----------------------------------------------------
 sapply(c("equal", "prop", "outer", "cells", "flat"), function(w)

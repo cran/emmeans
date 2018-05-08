@@ -2,12 +2,13 @@
 title: "Models supported by emmeans"
 author: "Russ Lenth"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: emmeans::.emm_vignette
 vignette: >
   %\VignetteIndexEntry{Models supported by emmeans}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+<!-- @index Vignettes!Models -->
 
 Here we document what model objects may be used with **emmeans**, and some
 special features of some of them that may be accessed by passing additional
@@ -24,9 +25,10 @@ Additional models can be supported by writing appropriate `recover_data`
 and `emm_basis` methods. See the package documentation for 
 `extending-emmeans` and `vignette("extending")` for details.
 
-[Vignette index](index.html)
+[Index of all vignette topics](vignette-topics.html)
 
-## Quick reference for supported objects and options
+## Quick reference for supported objects and options {#quickref}
+<!-- @index Models!Quick reference -->
 
 Here is an alphabetical list of model classes that are supported, and
 the arguments that apply. Detailed documentation follows, with objects
@@ -39,6 +41,7 @@ Scroll down or follow the links to those groups for more information.
 |aovList      |stats    |[V](#V)  |Best with balanced designs, orthogonal coding                |
 |betareg      |betareg  |[B](#B)  |`mode = c("link", "precision", "phi.link",`                  |
 |             |         |         |`  "variance", "quantile")`                                  |
+|brmsfit      |brms     |[S](#S)  |Only simpler models                                          |
 |carbayes     |CARBayes |[S](#S)  |`data` is required                                           |
 |clm          |ordinal  |[O](#O)  |`mode = c("latent", "linear.predictor", "cum.prob",`         |
 |             |         |         |`  "exc.prob", "prob", "mean.class", "scale")`               |
@@ -60,7 +63,8 @@ Scroll down or follow the links to those groups for more information.
 |hurdle       |pscl     |[C](#C)  |`mode = c("response", "count", "zero", "prob0"),`            |
 |             |         |         |`lin.pred = c(FALSE, TRUE)`                                  |
 |lm           |stats    |[A](#A)  |Several other classes inherit from this and may be supported |
-|lme          |nlme     |[A](#A)  |`sigmaAdjust = c(TRUE, FALSE)`                               |
+|lme          |nlme     |[K](#K)  |`sigmaAdjust = c(TRUE, FALSE),`                              |
+|             |         |         |`mode = c("containment", "satterthwaite")` (*ad hoc*)        |
 |lmerMod      |lme4     |[L](#L)  |`lmer.df = c("kenward-roger", "satterthwaite", "asymptotic")`, |
 |             |         |         |`pbkrtest.limit = 3000`,  `disable.pbkrtest = FALSE`.        |
 |             |         |         |`emm_options(lmer.df =, pbkrtest.limit =, disable.pbkrtest =)` |
@@ -73,7 +77,7 @@ Scroll down or follow the links to those groups for more information.
 |mlm          |stats    |[M](#M)  |`mult.name`, `mult.levs`                                     |
 |multinom     |nnet     |[N](#N)  |`mode = c("prob", "latent")`                                 |
 |             |         |         |Always include response in specs for `emmeans()`             |
-|nauf         |         |[P](#P)  |Supported in **nauf** package                                |
+|nauf         |nauf.*xxx* |[P](#P)  |Supported in **nauf** package                                |
 |nlme         |nlme     |[A](#A)  |Supports fixed part. Requires `param`                        |
 |polr         |MASS     |[O](#O)  |`mode = c("latent", "linear.predictor", "cum.prob",`         |
 |             |         |         |`"exc.prob", "prob", "mean.class")`                          |
@@ -94,6 +98,7 @@ need special support; hence no extra arguments are needed.
 
 
 ## B -- Beta regression {#B}
+<!-- @index Beta regression; `betareg` models -->
 
 The additional `mode` argument for `betareg` objects has possible
 values of `"response"`, `"link"`, `"precision"`,
@@ -106,8 +111,10 @@ specifies which quantile(s) to compute; the default is 0.5 (the median). Also
 in `"quantile"` mode, an additional variable `quantile` is added to
 the reference grid, and its levels are the values supplied.
 
+[Back to quick reference](#quickref)
 
 ## Group C -- Count models {#C}
+<!-- @index Count regression; `hurdle` models; `zeroinfl` models -->
 
 Two optional arguments -- `mode` and `lin.pred` -- are provided.
 The `mode` argument has possible values `"response"` (the default),
@@ -138,8 +145,10 @@ it must yield a matrix of the same size as would be obtained using
 correspondence with `mode` of `("mean", "count", "zero")`. If
 `vcov.` is a function, it must support the `model` argument.
 
+[Back to quick reference](#quickref)
 
 ## Group E -- GEE models {#E}
+<!-- @index GEE models --> 
 
 These models all have more than one covariance estimate available, and it may
 be selected by supplying a string as the `vcov.method` argument. It is
@@ -154,7 +163,7 @@ in the documentation for `ref_grid`.
 
 
 ## Group G -- Generalized linear models and relatives {#G}
-
+<!-- @index Generalized linear models; `glm`*xxx* models -->
 Models in this group receive only standard support as in [Group A](#A), but
 typically the tests and confidence intervals are asymptotic. Thus the
 `df` column for tabular results will be `Inf`.
@@ -163,16 +172,36 @@ In the case of `gam::gam` objects, there is an optional `nboot` argument
 that sets the number of bootstrap replications used to estimate the 
 variances and covariances of the smoothing portions of the model.
 
-## Group H -- `gamlss` models {#H}
+[Back to quick reference](#quickref)
 
+## Group H -- `gamlss` models {#H}
+<!-- @index `gamlss` models -->
 The `what` argument has possible values of `"mu"` (default), `"sigma"`, `"nu"`, 
 or `"tau"` depending on which part of the model you want results for.
 Currently, there is no support when the selected part of the model contains
 a smoothing method like `pb()`. 
 
+## Group K -- `lme` models {#K}
+<!-- @index `lme` models; `gls` models; Satterthwaite d.f. -->
+The `sigmaAdjust` argument is a logical value that defaults to `TRUE`. It is
+comparable to the `adjustSigma` option in `nlme::summary.lme` (the name-mangling
+is to avoid conflicts with the often-used `adjust` argument), and determines
+whether or not a degrees-of-freedom adjustment is performed with models fitted
+using the ML method.
+
+The optional `mode` argument affects the degrees of freedom. It defaults to
+`"containment"`, which determines the degrees of freedom for the coarsest
+grouping involved in the contrast or linear functuion involved. There is an
+experimental `mode = "satterthwaite"` option that determines degrees of freedom
+approximately: It estimates a needed gradient in the covariance matrix
+experimentally by randomly perturbing the response values. Thus, the degrees
+of freedom will vary slightly (or possibly even a lot) if the reference grid is
+re-calculated.
+
+[Back to quick reference](#quickref)
 
 ## Group L -- `lmerMod` models {#L}
-
+<!-- @index `lmerMod` models; Kenward-Roger d.f.; Satterthwaite d.f. -->
 There is an optional `lmer.df` argument that defaults to 
 `get_EMM_option("lmer.df")` (which in turn defaults to 
 `"kenward-roger"`). The possible values are `"kenward-roger"`,
@@ -208,9 +237,10 @@ Finally, note that a user-specified covariance matrix
 (via the `vcov.` argument) will also disable the Kenward-Roger method; in
 that case, the Satterthwaite method is used in place of Kenward-Roger.
 
+[Back to quick reference](#quickref)
 
 ## Group M -- Multivariate models {#M}
-
+<!-- @index Multivariate models -->
 When there is a multivariate response, the different responses are treated as
 if they were levels of a factor -- named `rep.meas` by default. The
 `mult.name` argument may be used to change this name. The
@@ -221,7 +251,7 @@ expressed as combinations of the named factor levels via the function
 
 
 ## N - Multinomial responses {#N}
-
+<!-- @index `mlm` models; Multinomial models -->
 The reference grid includes a pseudo-factor with the same name and levels as
 the multinomial response. There is an optional `mode` argument which
 should match `"prob"` or `"latent"`. With `mode = "prob"`, the
@@ -243,9 +273,10 @@ if `resp` is a response with *k* levels, `emmeans(model, ~ resp
 `trt`; but `emmeans(model, ~ trt)` will just yield the average
 probability of 1/*k* for each `trt`.
 
+[Back to quick reference](#quickref)
 
 ## Group O - Ordinal responses {#O}
-
+<!-- @index Ordinal models; `clm` models; `polreg` models -->
 The reference grid for ordinal models will include all variables that appear in
 the main model
 as well as those in the `scale` or `nominal` models (if provided). 
@@ -300,6 +331,7 @@ default for `rms::Predict()`. This is quite similar in
 concept to `mode = "latent"`, where all intercepts are averaged
 together.
 
+[Back to quick reference](#quickref)
 
 ## P -- Other packages {#P}
 
@@ -309,7 +341,8 @@ package documentation for details on **emmeans** support.
 
 
 ## S -- Sampling (MCMC) methods {#S}
-
+<!-- @index Bayesian models; `mcmc` objects; `stanreg` objects; `brmsfit` objects
+  `as.mcmc()`; `summary()`!Bayesian models -->
 Models fitted using MCMC methods contain a sample from the posterior
 distribution of fixed-effect coefficients. In some cases (e.g., results of
 `MCMCpack::MCMCregress()` and `MCMCpack::MCMCpoisson()`), the object may include a
@@ -320,17 +353,21 @@ addition, the `contrasts` specifications are not necessarily recoverable
 from the object, so the system default must match what was actually used in
 fitting the model.
 
-The `summary.emmGrid()`, `test.emmGrid()`,
-etc. methods provide frequentist analyses of the results based on the
-posterior means and covariances. However, an `as.mcmc()` method is
-provided that creates an `mcmc` object that can be summarized or plotted
-using the **coda** package. It provides a posterior sample of EMMs for the
-given reference grid, based on the posterior sample of the fixed effects from
-the model object.
+The `summary.emmGrid()` method provides credibility intervals (HPD intervals) of
+the results, and ignores the frequentist-oriented arguments (`infer`, `adjust`,
+etc.) An `as.mcmc()` method is provided that creates an `mcmc` object that can
+be summarized or plotted using the **coda** package (or others that support
+those objects). It provides a posterior sample of EMMs, or contrasts thereof,
+for the given reference grid, based on the posterior sample of the fixed effects
+from the model object.
 
+Support for the **brms** package is provided but it is quite rudimentary and 
+usable only for the primary fixed effects and the simpler models.
+
+[Back to quick reference](#quickref)
 
 ## Group V -- `aovList` objects {#V}
-
+<!-- @index `aovList` objects -->
 Support for these objects is limited. To avoid strong biases in the
 predictions, the `contrasts` attribute of all factors should be of a
 type that sums to zero -- for example, `"contr.sum"`,
@@ -345,3 +382,6 @@ must yield a single covariance matrix for the unique fixed effects
 (not a set of them for each error stratum). In that case, the
 degrees of freedom are set to `NA`.
 
+[Back to quick reference](#quickref)
+
+[Index of all vignette topics](vignette-topics.html)
