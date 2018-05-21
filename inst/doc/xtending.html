@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2018-05-07" />
+<meta name="date" content="2018-05-20" />
 
 <title>For developers: Extending emmeans</title>
 
@@ -32,7 +32,7 @@
 
 <h1 class="title toc-ignore">For developers: Extending <strong>emmeans</strong></h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-05-07</em></h4>
+<h4 class="date"><em>2018-05-20</em></h4>
 
 
 
@@ -112,7 +112,7 @@ emmeans(fake.rlm, ~ B | A)</code></pre>
 ##     recover_data(fcall, delete.response(terms(object)), object$na.action, 
 ##         ...)
 ## }
-## &lt;bytecode: 0x000000002627e5c8&gt;
+## &lt;bytecode: 0x00000000189b6998&gt;
 ## &lt;environment: namespace:emmeans&gt;</code></pre>
 <p>Note that all it does is obtain the <code>call</code> component and call the method for class <code>call</code>, with additional arguments for its <code>terms</code> component and <code>na.action</code>. It happens that we can access these attributes in exactly the same way as for <code>lm</code> objects; so:</p>
 <pre class="r"><code>recover_data.lqs = emmeans:::recover_data.lm</code></pre>
@@ -161,7 +161,7 @@ head(rec.fake)</code></pre>
 ##     X &lt;- model.matrix(Terms, m, contrasts = object$contrasts)
 ##     drop(X %*% object$coefficients)
 ## }
-## &lt;bytecode: 0x0000000026981a18&gt;
+## &lt;bytecode: 0x0000000023511030&gt;
 ## &lt;environment: namespace:MASS&gt;</code></pre>
 <div id="eblqs" class="section level6">
 <h6></h6>

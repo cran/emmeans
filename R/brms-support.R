@@ -1,7 +1,7 @@
 ### Rudimentary support for brms. 
 ### Obviously this is way less than is needed, but it does support simpler models
 
-#' @importFrom brms parse_bf
+#xxxx' @importFrom brms parse_bf
 recover_data.brmsfit = function(object, data, ...) {
     bt = brms::parse_bf(formula(object))
     if (class(bt) != "brmsterms")
@@ -21,7 +21,7 @@ emm_basis.brmsfit = function(object, trms, xlev, grid, vcov., ...) {
     nbasis = estimability::all.estble
     dfargs = list()
     dffun = function(k, dfargs) Inf
-    misc = .std.link.labels(parse_bf(formula(object))$dpars$mu$family, list())
+    misc = .std.link.labels(brms::parse_bf(formula(object))$dpars$mu$family, list())
     post.beta = as.matrix(object, pars = paste0("b_", nm), exact = TRUE)
     bhat = apply(post.beta, 2, mean)
     
