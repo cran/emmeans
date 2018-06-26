@@ -432,7 +432,7 @@ recover_data.coxme = function(object, ...)
     recover_data.survreg(object, ...)
 
 emm_basis.coxme = function(object, trms, xlev, grid, ...) {
-    bhat = fixef(object)
+    bhat = coxme::fixef(object)
     k = length(bhat)
     V = .my.vcov(object, ...)[seq_len(k), seq_len(k), drop = FALSE]
     m = model.frame(trms, grid, na.action = na.pass, xlev = xlev)
@@ -629,6 +629,7 @@ emm_basis.glmmadmb = function (object, trms, xlev, grid, ...)
 
 # Call this to do the standard stuff with link labels
 # Returns a modified misc
+#' @export
 .std.link.labels = function(fam, misc) {
     if (is.null(fam) || !is.list(fam))
         return(misc)

@@ -38,16 +38,20 @@
     result
 }
 
-### Get Roxygen to document cld generic. Then remove it in favor of imported one from multcomp
-#
-# #' @rdname cld.emmGrid
-# cld = function (object, ...)
-#     UseMethod("cld")
+# Hack around providing a generic
 
-# S3 method for ref.grid
+#' @export cld
+#' @rdname cld.emmGrid
+cld = function (object, ...) {
+    if(requireNamespace("multcomp", quietly = TRUE))
+        multcomp::cld(object, ...)
+    else
+        UseMethod("cld")
+}
+
+# S3 method for emmGrid
 #' Extract and display information on all pairwise comparisons of least-squares means.
 #'
-#' @method cld emmGrid
 #' @aliases cld
 #' 
 #' @param object An object of class \code{emmGrid}
@@ -90,8 +94,7 @@
 #' 
 #' @seealso \code{\link[multcomp]{cld}} in the \pkg{multcomp} package
 #' 
-#' @importFrom multcomp cld
-#' @export cld
+#' @method cld emmGrid
 #' @export
 #'
 #' @examples
@@ -158,7 +161,7 @@ cld.emmGrid = function(object, details=FALSE, sort=TRUE,
         pb = p.boo[by.rows[[i]]]
         names(pb) = labs
         mcl = .mcletters(pb, Letters = Letters, reversed = reversed)$monospacedLetters
-        ltrs[by.out[[i]]] = paste(" ", mcl, sep="")
+        ltrs[by.out[[i]]] = paste0(" ", mcl[seq_along(by.out[[i]])])
     }
     # any missing estimates get blanks...
     ltrs[excl.rows] = ""

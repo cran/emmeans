@@ -2,6 +2,7 @@
 % Please edit documentation in R/emm-list.R
 \name{emm_list}
 \alias{emm_list}
+\alias{cld.emm_list}
 \title{The \code{emm_list} class}
 \description{
 An \code{emm_list} object is simply a list of
@@ -11,11 +12,14 @@ for example, by \code{\link{emmeans}} with a two-sided formula or a list as its
 }
 \details{
 Methods for \code{emm_list} objects include \code{summary}, \code{cld},
-\code{coef}, \code{confint}, \code{contrast}, \code{pairs}, \code{print}, and
+\code{coef}, \code{confint}, \code{contrast}, \code{pairs}, \code{plot},
+\code{print}, and
 \code{test}. These are all the same as those methods for \code{emmGrid}
 objects, with an additional \code{which} argument (integer) to specify which 
 members of the list to use. The default is \code{which = seq_along(object)};
 i.e., the method is applied to every member of the \code{emm_list} object.
+The exception is \code{plot}, where only the \code{which[1]}th element is 
+plotted.
 
 As an example,
 to summarize a single member -- say the second one -- of an \code{emm_list}, 

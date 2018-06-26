@@ -32,11 +32,14 @@
 #' \code{specs} argument.
 #' 
 #' Methods for \code{emm_list} objects include \code{summary}, \code{cld},
-#' \code{coef}, \code{confint}, \code{contrast}, \code{pairs}, \code{print}, and
+#' \code{coef}, \code{confint}, \code{contrast}, \code{pairs}, \code{plot},
+#' \code{print}, and
 #' \code{test}. These are all the same as those methods for \code{emmGrid}
 #' objects, with an additional \code{which} argument (integer) to specify which 
 #' members of the list to use. The default is \code{which = seq_along(object)};
 #' i.e., the method is applied to every member of the \code{emm_list} object.
+#' The exception is \code{plot}, where only the \code{which[1]}th element is 
+#' plotted.
 #' 
 #' As an example,
 #' to summarize a single member -- say the second one -- of an \code{emm_list}, 
@@ -45,6 +48,7 @@
 #'
 #' @rdname emm_list-object
 #' @name emm_list
+#' @aliases cld.emm_list
 NULL
 
 
@@ -102,11 +106,11 @@ confint.emm_list = function(object, ..., which = seq_along(object)) {
 }
 
 #' @export
-#' @method cld emm_list
 cld.emm_list = function(object, ..., which = seq_along(object)) {
     if (length(which) > 1)
-        message("NOTE: 'cld()' groupings are determined separately for each list member.")
-    lapply(object[which], cld, ...)
+        warning("`cld()` called with a list of ", length(which), " objects. ",
+             "Only the first one was used.")
+    cld(object[[which[1]]], ...)
 }
 
 #' @export
@@ -115,4 +119,11 @@ coef.emm_list = function(object, ..., which = seq_along(object)) {
     lapply(object[which], coef, ...)
 }
 
+# plot just plots one
+
+#' @export
+#' @method plot emm_list
+plot.emm_list = function(x, ..., which = 1) {
+    plot.emmGrid(x[[which[1]]], ...)
+}
 

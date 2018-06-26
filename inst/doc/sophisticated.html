@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2018-05-20" />
+<meta name="date" content="2018-06-25" />
 
 <title>Sophisticated models in emmeans</title>
 
@@ -32,7 +32,7 @@
 
 <h1 class="title toc-ignore">Sophisticated models in emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-05-20</em></h4>
+<h4 class="date"><em>2018-06-25</em></h4>
 
 
 
@@ -315,6 +315,7 @@ cbpp.rg &lt;- ref_grid(example_model)</code></pre>
 <p>And, again in the usual way, we can obtain EMMs:</p>
 <pre class="r"><code>period.emm &lt;- emmeans(cbpp.rg, &quot;period&quot;)
 period.emm</code></pre>
+<pre><code>## Loading required namespace: coda</code></pre>
 <pre class="ro"><code>##  period    emmean lower.HPD  upper.HPD
 ##  1      -1.430450 -1.959630 -0.8940016
 ##  2      -2.394991 -3.132075 -1.8225853

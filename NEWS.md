@@ -1,5 +1,19 @@
-emmeans 1.2.1
+emmeans 1.2.2
 -------------------
+
+  * Removed ggplot2, multcomp, and coda to Suggests -- thus vastly
+    reducing dependencies
+  * Added a FAQ to the FAQs vignette
+  * Modified advice in `xtending.Rmd` vignette on how to export methods
+  * Fixes to `revpairwise.emmc` and `cld` regarding comparing only 1 EMM
+  * `cld.emm_list` now returns results only for `object[[ which[1] ]]`,
+    along with a warning message.
+  * Deprecated `emmeans` specs like `cld ~ group`, a vestige of **lsmeans**
+    as it did not work correctly (and was already undocumented)
+
+
+emmeans 1.2.1
+-------------
 
   * Moved **brms** to `Suggests` (dozens and dozens fewer dependencies)
 

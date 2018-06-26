@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2018-05-20" />
+<meta name="date" content="2018-06-25" />
 
 <title>FAQs for emmeans</title>
 
@@ -32,7 +32,7 @@
 
 <h1 class="title toc-ignore">FAQs for emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-05-20</em></h4>
+<h4 class="date"><em>2018-06-25</em></h4>
 
 
 
@@ -44,13 +44,14 @@
 <li><a href="#what">What are EMMs/lsmeans?</a></li>
 <li><a href="#interactions">I have three (or two or four) factors that interact</a></li>
 <li><a href="#trends">I have covariate(s) that interact(s) with factor(s)</a></li>
+<li><a href="#notfactor">All my pairwise comparisons have the same <em>P</em> value</a></li>
 <li><a href="#numeric">lsmeans/emmeans doesn’t work unless you have factors</a></li>
 <li><a href="#model">If I analyze subsets of the data separately, I get different results</a></li>
 <li><a href="#transformations">My lsmeans/EMMs are way off from what I expected</a></li>
 <li><a href="#asymp">Why do I get <code>Inf</code> for the degrees of freedom?</a></li>
 <li><a href="#NAs">Some or all of the results shown say NA or NonEst</a></li>
 <li><a href="#additive">I get exactly the same comparisons for each “by” group</a></li>
-<li><a href="#anova">My ANOVA <em>F</em> is significant, but nopairwise comparisons are</a></li>
+<li><a href="#anova">My ANOVA <em>F</em> is significant, but no pairwise comparisons are</a></li>
 <li><a href="#namespace">I get annoying messages about namespaces</a></li>
 </ol>
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
@@ -76,6 +77,10 @@
 <h2>I have covariate(s) that interact(s) with factor(s)</h2>
 <!-- @index Covariates!Interacting with factors -->
 <p>This is a situation where it may well be appropriate to compare the slopes of trend lines, rather than the EMMs. See the <a href="../doc/emtrends.html">help page for <code>emtrends()</code></a> and the discussion of this topic in <a href="interactions.html#covariates">the “interactions” vignette</a></p>
+</div>
+<div id="notfactor" class="section level2">
+<h2>All my pairwise comparisons have the same <em>P</em> value</h2>
+<p>This will happen if you fitted a model where the treatments you want to compare were put in as a numeric predictor; for example <code>dose</code>, with values of 1, 2, and 3. If <code>dose</code> is modeled as numeric, you will be fitting a linear trend in those dose values, rather than a model that allows those doses to differ in arbitrary ways. Go back and fit a different model using <code>factor(dose)</code> instead; it will make all the difference. This is closely related to the next topic.</p>
 </div>
 <div id="numeric" class="section level2">
 <h2>lsmeans/emmeans doesn’t work unless you have factors</h2>

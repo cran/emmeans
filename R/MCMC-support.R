@@ -34,7 +34,6 @@
 #'
 #' @rdname mcmc-support
 #' @aliases mcmc-support
-#' @method as.mcmc emmGrid
 #' @param x An object of class \code{emmGrid}
 #' @param names Logical scalar or vector specifying whether variable names are
 #'   appended to levels in the column labels for the \code{as.mcmc} or
@@ -59,9 +58,8 @@
 #' results. The \code{as.mcmc.list} method is guaranteed to return an
 #' \code{mcmc.list}, even if it comprises just one chain. 
 #' 
-#' @importFrom coda as.mcmc
+#' @export as.mcmc.emmGrid
 #' @method as.mcmc emmGrid
-#' @export
 as.mcmc.emmGrid = function(x, names = TRUE, sep.chains = TRUE, ...) {
     object = x
     if (is.na(x@post.beta[1]))
@@ -93,8 +91,7 @@ as.mcmc.emmGrid = function(x, names = TRUE, sep.chains = TRUE, ...) {
 
 ### as.mcmc.list - guaranteed to return a list
 #' @rdname mcmc-support
-#' @importFrom coda as.mcmc.list
-#' @export
+#' @export as.mcmc.list.emmGrid
 #' @method as.mcmc.list emmGrid
 as.mcmc.list.emmGrid = function(x, names = TRUE, ...) {
     result = as.mcmc.emmGrid(x, names = names, sep.chains = TRUE, ...)
@@ -124,7 +121,6 @@ as.mcmc.list.emmGrid = function(x, names = TRUE, ...) {
 #'
 #' @return an object of class \code{summary_emm}
 #' @export
-#' @importFrom coda HPDinterval
 #'
 #' @examples
 #' load(system.file("extdata", "cbpp.RData", package = "emmeans"))
@@ -177,7 +173,7 @@ hpd.summary = function(object, prob, by, type,
     
     ### OK, finally, here is the real stuff
     mesg = misc$initMesg
-    mcmc = as.mcmc(object, names = FALSE, sep.chains = FALSE)
+    mcmc = as.mcmc.emmGrid(object, names = FALSE, sep.chains = FALSE)
     mcmc = mcmc[, use.elts, drop = FALSE]
     if (inv) {
         for (j in seq_along(mcmc[1, ]))
@@ -350,7 +346,7 @@ emm_basis.stanreg = function(object, trms, xlev, grid, mode, rescale, ...) {
     if(is.null(contr <- object$contrasts))
         contr = attr(model.matrix(object), "contrasts")
     X = model.matrix(trms, m, contrasts.arg = contr)
-    bhat = fixef(object)
+    bhat = rstanarm::fixef(object)
     V = vcov(object)
     misc = list()
     if (!is.null(object$family)) {
