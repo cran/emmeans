@@ -577,7 +577,7 @@ recover_data.glmmadmb = recover_data.lm
 
 emm_basis.glmmadmb = function (object, trms, xlev, grid, ...) 
 {
-    contrasts = object$contrasts
+    contrasts = attr(model.matrix(object), "contrasts")
     m = model.frame(trms, grid, na.action = na.pass, xlev = xlev)
     X = model.matrix(trms, m, contrasts.arg = contrasts)
     bhat = glmmADMB::fixef(object)

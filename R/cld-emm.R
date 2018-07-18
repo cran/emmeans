@@ -23,7 +23,7 @@
 # returns an error if not installed
 .mcletters = function(..., Letters=c("1234567890",LETTERS,letters), reversed=FALSE) {
     if(!requireNamespace("multcompView", quietly = TRUE)) {
-        stop("The 'multcompView' package must be installed to use cld methods")
+        stop("The 'multcompView' package must be installed to use CLD methods")
         return (list(monospacedLetters = "?"))
     }
     
@@ -38,21 +38,16 @@
     result
 }
 
-# Hack around providing a generic
+###if (!requireNamespace("multcomp", quietly = TRUE))
+#' @rdname CLD.emmGrid
+#' @export
+CLD = function (object, ...) UseMethod("CLD")
 
-#' @export cld
-#' @rdname cld.emmGrid
-cld = function (object, ...) {
-    if(requireNamespace("multcomp", quietly = TRUE))
-        multcomp::cld(object, ...)
-    else
-        UseMethod("cld")
-}
 
-# S3 method for emmGrid
+# S3 method for emmGrid 
 #' Extract and display information on all pairwise comparisons of least-squares means.
 #'
-#' @aliases cld
+#' @aliases CLD
 #' 
 #' @param object An object of class \code{emmGrid}
 #' @param details Logical value determining whether detailed information on tests of 
@@ -83,7 +78,7 @@ cld = function (object, ...) {
 #' 
 #' @return When details == FALSE, an object of class \code{summary.ref_grid}
 #'   (which inherits from \code{data.frame}) showing the summary of EMMs with 
-#'   an added column named \code{.groups} containing the \code{cld} information. 
+#'   an added column named \code{.groups} containing the \code{CLD} information. 
 #'   When \code{details == TRUE}, a \code{list} with the object just described, 
 #'   as well as the summary of the contrast results showing each comparison, 
 #'   its estimate, standard error, t ratio, and adjusted P value.
@@ -92,20 +87,21 @@ cld = function (object, ...) {
 #'   of all pairwise comparisons, Journal of Computational and Graphical Statistics, 13(2), 
 #'   456-466.
 #' 
-#' @seealso \code{\link[multcomp]{cld}} in the \pkg{multcomp} package
+#' @seealso \code{cld} in the \pkg{multcomp} package, for which a courtesy
+#'   method is provided for \code{emmGrid} objects.
 #' 
-#' @method cld emmGrid
+#' @method CLD emmGrid
 #' @export
-#'
+#' 
 #' @examples
 #' warp.lm <- lm(breaks ~ wool * tension, data = warpbreaks)
 #' warp.emm <- emmeans(warp.lm, ~ tension | wool)
-#' cld(warp.emm)                  # implicitly uses by = "wool"
-#' cld(warp.emm, by = "tension")  # overrides implicit 'by'
+#' CLD(warp.emm)                  # implicitly uses by = "wool"
+#' CLD(warp.emm, by = "tension")  # overrides implicit 'by'
 #' 
 #' # Mimic grouping bars and compare all 6 means
-#' cld(warp.emm, by = NULL, Letters = "||||||||", alpha = .01)
-cld.emmGrid = function(object, details=FALSE, sort=TRUE, 
+#' CLD(warp.emm, by = NULL, Letters = "||||||||", alpha = .01)
+CLD.emmGrid = function(object, details=FALSE, sort=TRUE, 
                     by, alpha=.05, 
                     Letters = c("1234567890",LETTERS,letters), 
                     reversed=FALSE, ...) {
@@ -180,3 +176,32 @@ cld.emmGrid = function(object, details=FALSE, sort=TRUE,
     else
         emmtbl
 }
+
+# Lingering support for multcomp::cld -- registered dynamically in zzz.R
+#' @rdname CLD.emmGrid
+#' @method cld emmGrid
+cld.emmGrid = function(object, ...) {
+    CLD.emmGrid(object, ...)
+}
+
+
+# Temporary hack while downstream dependencies have a chance to fix it:
+#' Temporary continued 'cld' support
+#' 
+#' This generic is temporarily provided to keep downstream packages from breaking.
+#' It will be removed in future versions to avoid masking issues with \code{multcomp::cld}.
+#' Please use \code{CLD} instead when working with \code{emmMeans} objects.
+#' 
+#' @param object an emmGrid object
+#' @param ... other arguments passed to \code{\link{CLD}}
+#' 
+#' @export cld
+#' @rdname old.cld
+cld = function (object, ...) {
+    if(requireNamespace("multcomp", quietly = TRUE))
+        multcomp::cld(object, ...)
+    else
+        UseMethod("cld")
+}
+
+

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2018-06-25" />
+<meta name="date" content="2018-07-17" />
 
 <title>Basics of estimated marginal means</title>
 
@@ -32,7 +32,7 @@
 
 <h1 class="title toc-ignore">Basics of estimated marginal means</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-06-25</em></h4>
+<h4 class="date"><em>2018-07-17</em></h4>
 
 
 
@@ -46,6 +46,7 @@
 <li><a href="#ref_grid">Reference grids</a></li>
 <li><a href="#emmeans">Estimated marginal means</a></li>
 <li><a href="#altering">Altering the reference grid</a></li>
+<li><a href="#depcovs">Derived covariates</a></li>
 <li><a href="#plots">Graphical displays</a></li>
 <li><a href="#weights">Weighting</a></li>
 <li><a href="#multiv">Multivariate models</a></li>
@@ -204,7 +205,7 @@ pigs.pred1</code></pre>
 ##     source = fish, soy, skim
 ##     percent =  9, 18
 ## Transformation: &quot;log&quot;</code></pre>
-<p>Perhaps more common is to use the <code>at</code> argument. Consider this model for the built-in <code>cars</code> dataset:</p>
+<p>Perhaps more common is to use the <code>at</code> argument. Consider this model for the built-in <code>mtcars</code> dataset:</p>
 <pre class="r"><code>mtcars.lm &lt;- lm(mpg ~ disp * cyl, data = mtcars)
 ref_grid(mtcars.lm)</code></pre>
 <pre class="ro"><code>## 'emmGrid' object with variables:
@@ -214,6 +215,51 @@ ref_grid(mtcars.lm)</code></pre>
 <pre class="r"><code>mtcars.rg &lt;- ref_grid(mtcars.lm, 
     at = list(disp = c(100, 200, 300), cyl = c(4, 6, 8)))</code></pre>
 <p>… which will create a 3 x 3 grid. (We’ll look at this model again shortly.) Another use of <code>at</code> is to focus on only some of the levels of a factor. Note that <code>at</code> does not need to specify every predictor; those not mentioned in <code>at</code> are handled by <code>cov.reduce</code> or the default methods.</p>
+<p><a href="#contents">Back to Contents</a></p>
+</div>
+<div id="depcovs" class="section level3">
+<h3>Derived covariates</h3>
+<!-- @index Covariates!Derived; Quadratic terms; Polynomial regression -->
+<p>You need to be careful when one covariate depends on the value of another. To illustrate in the <code>mtcars</code> example, suppose we want to use <code>cyl</code> as a factor and include a quadratic term for <code>disp</code>:</p>
+<pre class="r"><code>mtcars.1 &lt;- lm(mpg ~ factor(cyl) + disp + I(disp^2), data = mtcars)
+emmeans(mtcars.1, &quot;cyl&quot;)</code></pre>
+<pre class="ro"><code>##  cyl   emmean       SE df lower.CL upper.CL
+##    4 19.34642 2.663565 27 13.88123 24.81160
+##    6 17.22392 1.361765 27 14.42981 20.01804
+##    8 18.76340 1.473470 27 15.74009 21.78671
+## 
+## Confidence level used: 0.95</code></pre>
+<p>Some users may not like function calls in the model formula, so they instead do something like this:</p>
+<pre class="r"><code>mtcars &lt;- transform(mtcars, 
+                    Cyl = factor(cyl),
+                    dispsq = disp^2)
+mtcars.2 &lt;- lm(mpg ~ Cyl + disp + dispsq, data = mtcars)
+emmeans(mtcars.2, &quot;Cyl&quot;)</code></pre>
+<pre class="ro"><code>##  Cyl   emmean       SE df lower.CL upper.CL
+##  4   20.80999 2.052408 27 16.59879 25.02118
+##  6   18.68750 1.185159 27 16.25575 21.11924
+##  8   20.22698 1.770026 27 16.59518 23.85877
+## 
+## Confidence level used: 0.95</code></pre>
+<p>Wow! Those are really different results – even though the models are equivalent. Why is this? To understand, look at the reference grids:</p>
+<pre class="r"><code>ref_grid(mtcars.1)</code></pre>
+<pre class="ro"><code>## 'emmGrid' object with variables:
+##     cyl = 4, 6, 8
+##     disp = 230.72</code></pre>
+<pre class="r"><code>ref_grid(mtcars.2)</code></pre>
+<pre class="ro"><code>## 'emmGrid' object with variables:
+##     Cyl = 4, 6, 8
+##     disp = 230.72
+##     dispsq = 68113</code></pre>
+<p>For both models, the reference grid uses the <code>disp</code> mean of 230.72. But for <code>mtcars.2</code>, we also set <code>dispsq</code> to its mean of 68113. This is not right, because <code>dispsq</code> should be the square of <code>disp</code> (about 53232, not 68113) in order to be consistent. If we use that value of <code>dispsq</code>, we get the same results as for <code>mtcars.1</code> (discrepancies due to rounding of <code>disp</code>):</p>
+<pre class="r"><code>emmeans(mtcars.2, &quot;Cyl&quot;, at = list(dispsq = 230.72^2))</code></pre>
+<pre class="ro"><code>##  Cyl   emmean       SE df lower.CL upper.CL
+##  4   19.34633 2.663604 27 13.88107 24.81159
+##  6   17.22384 1.361789 27 14.42968 20.01800
+##  8   18.76332 1.473464 27 15.74002 21.78662
+## 
+## Confidence level used: 0.95</code></pre>
+<p>In summary, for polynomial models and others where some covariates depend on others in nonlinear ways, include that dependence in the model formula (as in <code>mtcars.1</code>) using <code>I()</code> or <code>poly()</code> expressions, or alter the reference grid so that the dependency among covariates is correct.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="plots" class="section level3">

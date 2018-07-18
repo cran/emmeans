@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2018-06-25" />
+<meta name="date" content="2018-07-17" />
 
 <title>FAQs for emmeans</title>
 
@@ -32,7 +32,7 @@
 
 <h1 class="title toc-ignore">FAQs for emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-06-25</em></h4>
+<h4 class="date"><em>2018-07-17</em></h4>
 
 
 
@@ -44,6 +44,7 @@
 <li><a href="#what">What are EMMs/lsmeans?</a></li>
 <li><a href="#interactions">I have three (or two or four) factors that interact</a></li>
 <li><a href="#trends">I have covariate(s) that interact(s) with factor(s)</a></li>
+<li><a href="#polys">I have covariate(s) and am fitting a polynomial model</a></li>
 <li><a href="#notfactor">All my pairwise comparisons have the same <em>P</em> value</a></li>
 <li><a href="#numeric">lsmeans/emmeans doesn’t work unless you have factors</a></li>
 <li><a href="#model">If I analyze subsets of the data separately, I get different results</a></li>
@@ -77,6 +78,10 @@
 <h2>I have covariate(s) that interact(s) with factor(s)</h2>
 <!-- @index Covariates!Interacting with factors -->
 <p>This is a situation where it may well be appropriate to compare the slopes of trend lines, rather than the EMMs. See the <a href="../doc/emtrends.html">help page for <code>emtrends()</code></a> and the discussion of this topic in <a href="interactions.html#covariates">the “interactions” vignette</a></p>
+</div>
+<div id="polys" class="section level2">
+<h2>I have covariate(s) and am fitting a polynomial model</h2>
+<p>You need to be careful to define the reference grid consistently. For example, if you use covariates <code>x</code> and <code>xsq</code> (equal to <code>x^2</code>) to fit a quadratic curve, the default reference grid uses the mean of each covariate – and <code>mean(xsq)</code> is usually not the same as <code>mean(x)^2</code>. So you need to use <code>at</code> to ensure that the covariates are set consistently with respect to the model. See <a href="basics.html#depcovs">this subsection of the “basics” vignette</a> for an example.</p>
 </div>
 <div id="notfactor" class="section level2">
 <h2>All my pairwise comparisons have the same <em>P</em> value</h2>

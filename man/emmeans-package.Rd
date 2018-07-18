@@ -72,8 +72,8 @@ available such as deviations from the mean, polynomial contrasts, and
 comparisons with one or more controls. Another \code{emmGrid} object is returned,
 which can be summarized or further analyzed. For convenience, a \code{pairs.emmGrid}
 method is provided for the case of pairwise comparisons. Related to this is
-the \code{\link{cld.emmGrid}} method, which provides a compact letter display for
-grouping pairs of means that are not significantly different. \code{cld}
+the \code{\link{CLD.emmGrid}} method, which provides a compact letter display for
+grouping pairs of means that are not significantly different. \code{CLD}
 requires the \pkg{multcompView} package.
 }
 \item{Graphs}{The \code{\link{plot.emmGrid}} method will display
@@ -92,10 +92,10 @@ like any other MCMC results, using tools in, say \pkg{coda} or
 
 \item{\pkg{multcomp} interface}{The \code{\link{as.glht}} function and
 \code{glht} method for \code{emmGrid}s provide an interface to the
-\code{\link[multcomp]{glht}} function in the \pkg{multcomp} package, thus
+\code{glht} function in the \pkg{multcomp} package, thus
 providing for more exacting simultaneous estimation or testing. The package
 also provides an \code{\link{emm}} function that works as an alternative to
-\code{\link[multcomp:glht]{mcp}} in a call to \code{glht}.
+\code{mcp} in a call to \code{glht}.
 }
 } %%% end describe
 }
