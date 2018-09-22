@@ -25,7 +25,7 @@
 ## Alternative to all.vars, but keeps vars like foo$x and foo[[1]] as-is
 ##   Passes ... to all.vars
 #' @export
-.all.vars = function(expr, retain = c("\\$", "\\[\\[", "\\]\\]"), ...) {
+.all.vars = function(expr, retain = c("\\$", "\\[\\[", "\\]\\]", "'", '"'), ...) {
     if (is.null(expr))
         return(character(0))
     if (!inherits(expr, "formula")) {
@@ -135,6 +135,7 @@
 
 ######################################################################
 ### Contributed by Jonathon Love, https://github.com/jonathon-love ###
+### and adapted by RVL to exclude terms like df$trt or df[["trt"]] ###
 ######################################################################
 # reformulate for us internally in emmeans
 # same as stats::reformulate, except it surrounds term labels with backsticks
@@ -147,17 +148,95 @@
 {
     if (!is.character(termlabels) || !length(termlabels))
         stop("'termlabels' must be a character vector of length at least one")
-    has.resp <- !is.null(response)
-    termtext <- paste(if (has.resp)
-        "response", "~", paste0("`", trimws(termlabels), "`", collapse = "+"), collapse = "")
+    has.resp = !is.null(response)
+    termlabels = sapply(trimws(termlabels), function(x) 
+        if (length(grep("\\$|\\[\\[", x)) > 0) x
+        else paste0("`", x, "`"))
+    termtext = paste(if (has.resp) "response", "~", 
+                     paste(termlabels, collapse = "+"), collapse = "")
+# prev version:                     paste0("`", trimws(termlabels), "`", collapse = "+"), collapse = "")
     if (!intercept)
-        termtext <- paste(termtext, "- 1")
-    rval <- eval(parse(text = termtext, keep.source = FALSE)[[1L]])
+        termtext = paste(termtext, "- 1")
+    rval = eval(parse(text = termtext, keep.source = FALSE)[[1L]])
     if (has.resp)
-        rval[[2L]] <- if (is.character(response))
+        rval[[2L]] = if (is.character(response))
             as.symbol(response)
     else response
-    environment(rval) <- parent.frame()
+    environment(rval) = parent.frame()
     rval
 }
 
+### Find variable names of the form df$x or df[["x"]]
+# Returns indexes. In addition, return value has attribute
+#   "details"  matrix with 1st row being dataset names, second row is variable names
+.find.comp.names = function(vars) {
+    comp = grep("\\$|\\[\\[", vars) # untick vars containing "$"
+    if (length(comp) > 0) {
+        attr(comp, "details") = gsub("\"", "",
+            sapply(strsplit(vars[comp], "\\$|\\[\\[|\\]\\]"), function(.) .[1:2]))
+    }
+    comp
+}
+
+# my own model.frame function. Intercepts compound names
+# and fixes up the data component accordingly. We do this
+# by creating data.frames within data having required variables of simple names 
+model.frame = function(formula, data, ...) {
+    if (is.null(data))
+        return (stats::model.frame(formula, ...))
+    idx = .find.comp.names(names(data))
+    if (length(idx) > 0) {
+        nm = names(data)[idx]
+        others = names(data[-idx])
+        details =  attr(idx, "details")
+        num = suppressWarnings(as.numeric(details[2, ]))
+        data = as.list(data)
+        for (dfnm in unique(details[1, ])) {
+            w = which(details[1, ] == dfnm)
+            data[[dfnm]] = as.data.frame(data[nm[w]])
+            names(data[[dfnm]]) = details[2, w]
+            data[[dfnm]] = .reorder.cols(data[[dfnm]], num[w])
+        }
+        data[nm] = NULL # toss out stuff we don't need
+        # save subst table in environ
+        if (get_emm_option("simplify.names")) {
+            details[1, ] = nm # top row is now fancy names, bottom is plain names
+            all.nms = c(details[2, ], others)
+            dup.cnt = sapply(details[2, ], function(.) sum(. == all.nms))
+            dup.cnt[!is.na(num)] = 3 # don't simplify numeric ones
+            details = details[, dup.cnt == 1, drop = FALSE]
+            if (ncol(details) > 0)
+                environment(formula)$.simplify.names. = details
+        }
+    }
+    stats::model.frame(formula, data = data, ...)
+}
+
+# Utility to simplify names. each elt of top row of tbl is changed to bottom row
+.simplify.names = function(nms, tbl) {
+    for (j in seq_along(tbl[1,]))
+        nms[nms == tbl[1, j]] = tbl[2, j]
+    nms
+}
+
+# reorder columns of data frame to match numeric positions in num (if any)
+.reorder.cols = function(data, num) {
+    if (all(is.na(num)))
+        return(data)
+    m = max(num[!is.na(num)])
+    nm = names(data)
+    if (m > length(nm)) {
+        k = length(nm)
+        data = cbind(data, matrix(NA, nrow = nrow(data), ncol = m - k))
+        nm = names(data) = c(nm, paste0(".xtra.", seq_len(m - k), "."))
+    }
+    for (i in num[!is.na(num)]) {
+        j = which(nm == as.character(i))
+        if (i != j) {
+            tmp = nm[i]
+            nm[i] = nm[j]
+            nm[j] = tmp
+        }
+    }
+    data[, nm, drop = FALSE]
+}

@@ -133,12 +133,12 @@ vcov.emmGrid = function(object, ...) {
 
 # Method to alter contents of misc slot
 
-#' Set or retrieve options for objects and summaries
+#' Update an \code{emmGrid} object
 #' 
-#' Objects of class \code{emmGrid} contain several settings that affect primarily 
-#' the defaults used by \code{\link{summary.emmGrid}}. This \code{update} method allows
-#' them to be changed more safely than by modifying this slot directly.
-#' In addition, the user may set or retrieve defaults for these settings.
+#' Objects of class \code{emmGrid} contain several settings that affect such things as
+#' what arguments to pass to \code{\link{summary.emmGrid}}. 
+#' The \code{update} method allows safer management of these settings than
+#' by direct modification of its slots.
 #'
 #' @param object An \code{emmGrid} object
 #' @param ... Options to be set. These must match a list of known options (see
@@ -147,12 +147,13 @@ vcov.emmGrid = function(object, ...) {
 #'   displayed if any options are not matched. If \code{TRUE}, no messages are
 #'   shown.
 #'
-#' @return \code{update.emmGrid} returns an updated \code{emmGrid} object.
+#' @return an updated \code{emmGrid} object.
+#' 
 #' @method update emmGrid
 #' @export
 #' 
-#' @section Details for \code{update.emmGrid}:
-#' In \code{update}, the names in \code{\dots} are partially matched against those that are valid, and if a match is found, it adds or replaces the current setting. The valid names are
+#' @section Details:
+#' The names in \code{\dots} are partially matched against those that are valid, and if a match is found, it adds or replaces the current setting. The valid names are
 #' 
 #' \describe{
 #' \item{\code{tran}, \code{tran2}}{(\code{list} or \code{character}) specifies
@@ -257,6 +258,7 @@ vcov.emmGrid = function(object, ...) {
 #' conform.}
 #' } %%%%%%% end \describe 
 #'
+#' @seealso \code{\link{emm_options}}
 #' @examples
 #' # Using an already-transformed response:
 #' mypigs <- transform(pigs, logconc = log(pigs$conc))
@@ -306,12 +308,12 @@ update.emmGrid = function(object, ..., silent = FALSE) {
     object
 }
 
-### set or change emmeans options
-#' @rdname update.emmGrid
-#' @section Using \code{emm_options}:
-#' In \code{emm_options}, we may set or change the \emph{default} values for the
-#' above options. These defaults are set separately for different contexts in
+#' Set or change emmeans options
+#'
+#' Use \code{emm_options} to set or change various options that are used in
+#' the \pkg{emmeans} package. These options are set separately for different contexts in
 #' which \code{emmGrid} objects are created, in a named list of option lists.
+#' 
 #' Currently, the following main list entries are supported:
 #' \describe{
 #' \item{\code{ref_grid}}{A named \code{list} of defaults for objects created by
@@ -330,14 +332,6 @@ update.emmGrid = function(object, ..., silent = FALSE) {
 #' \item{\code{graphics.engine}}{A character value matching 
 #'   \code{c("ggplot", "lattice")}, setting the default engine to use in
 #'   \code{\link{emmip}} and \code{\link{plot.emmGrid}}.  Defaults to \code{"ggplot"}.}
-#'% \item{\code{msg.data.call}}{Logical value controlling whether or not
-#'%   a warning is displayed when a model's \code{data} or \code{subset}
-#'%   component contains a call. This can be hazardous; for example, if a model
-#'%   call contains something like \code{subset = sample(...)}, then that same
-#'%   call to \code{sample} will be run again when the reference grid is
-#'%   constructed -- but it will be a different subset! This will definitely
-#'%   affect the covariate settings, and may even affect the factor levels.
-#'%   Defaults to \code{TRUE}.} 
 #' \item{\code{msg.interaction}}{A logical value controlling whether or not
 #'   a message is displayed when \code{emmeans} averages over a factor involved
 #'   in an interaction. It is probably not appropriate to do this, unless
@@ -349,6 +343,10 @@ update.emmGrid = function(object, ..., silent = FALSE) {
 #'   main effects but included them in interactions. This does not change the
 #'   model fit, but it produces a different parameterization that is picked
 #'   up when the reference grid is constructed. Defaults to \code{TRUE}.}
+#' \item{\code{simplify.names}}{A logical value controlling whether to
+#'   simplify (when possible) names in the model formula that refer to datasets --
+#'   for example, should we simplify a predictor name like \dQuote{\code{data$trt}}
+#'   to just \dQuote{\code{trt}}? Defaults to \code{TRUE}.}
 #' }%%% end describe{}
 #' Some other options have more specific purposes:
 #' \describe{
@@ -364,9 +362,12 @@ update.emmGrid = function(object, ..., silent = FALSE) {
 #' produced by the \pkg{lme4} package). See that section of the "models" vignette
 #' for details.}
 #' } %%%%%% end \describe
-
+#'
+#' @param ... Option names and values (see Details)
+#' 
 #' @return \code{emm_options} returns the current options (same as the result 
 #'   of \samp{getOption("emmeans")}) -- invisibly, unless called with no arguments.
+#' @seealso \code{\link{update.emmGrid}}
 #' @export
 #' @examples
 #' \dontrun{
@@ -397,12 +398,14 @@ emm_options = function(...) {
     options(emmeans = opts)
     if (length(newopts) > 0)
         invisible(opts)
-    else
-        opts
+    else {
+        opts = c(opts, emm_defaults)
+        opts[sort(names(opts))]
+    }
 }
 
 # equivalent of getOption()
-#' @rdname update.emmGrid
+#' @rdname emm_options
 #' @param x Character value - the name of an option to be queried
 #' @param default Value to return if \code{x} is not found
 #' @return \code{get_emm_option} returns the currently stored option for \code{x}, 
@@ -417,7 +420,7 @@ get_emm_option = function(x, default = emm_defaults[[x]]) {
 }
 
 ### Exported defaults for certain options
-#' @rdname update.emmGrid
+#' @rdname emm_options
 #' @export
 emm_defaults = list (
     ref_grid = list(is.new.rg = TRUE, infer = c(FALSE, FALSE)),
@@ -429,6 +432,7 @@ emm_defaults = list (
     msg.interaction = TRUE,   # message about averaging w/ interactions
     msg.nesting = TRUE,       # message when nesting is detected
     estble.tol = 1e-8,        # tolerance for estimability checks
+    simplify.names = TRUE,    # simplify names like data$x to just "x"
     lmer.df = "kenward-roger",  # Use Kenward-Roger for df
     disable.pbkrtest = FALSE, # whether to bypass pbkrtest routines for lmerMod
     pbkrtest.limit = 3000,    # limit on N for enabling K-R

@@ -1,3 +1,17 @@
+emmeans 1.2.4
+-------------
+
+  * Support for model formulas such as df$y ~ df$treat + df[["cov"]]. This had
+    failed previously for two obscure reasons, but now works correctly.
+  * New `simplify.names` option for above types of models
+  * `emm_options()` with no arguments now returns all options in force,
+    including the defaults. This makes it more consistent with `options()`
+  * Bug fix for `emtrends()`; produced incorrect results in models with offsets. 
+  * Separated the help pages for `update.emmGrid()` and `emm_options()`
+  * New `qdrg()` function (quick and dirty reference grid) for help with
+    unsupported model objects
+
+
 emmeans 1.2.3
 -------------
 
@@ -51,7 +65,7 @@ emmeans 1.2
     rather than frequentist summary. Note: `summary()` automatically
     reroutes to it. Also `plot()` and `emmip()` play along.
   * Rudimentary support for **brms** package
-  * *Ad hoc* SAtterthwaite method for `nlme::lme` models
+  * *Ad hoc* Satterthwaite method for `nlme::lme` models
 
 
 emmeans 1.1.3
