@@ -12,7 +12,7 @@
 
 <meta name="author" content="Russ Lenth" />
 
-<meta name="date" content="2018-09-21" />
+<meta name="date" content="2018-10-26" />
 
 <title>Sophisticated models in emmeans</title>
 
@@ -32,7 +32,7 @@
 
 <h1 class="title toc-ignore">Sophisticated models in emmeans</h1>
 <h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-09-21</em></h4>
+<h4 class="date"><em>2018-10-26</em></h4>
 
 
 
@@ -330,7 +330,6 @@ period.emm</code></pre>
 <p>We can access the posterior EMMs via the <code>as.mcmc</code> method for <code>emmGrid</code> objects. This gives us an object of class <code>mcmc</code> (defined in the <strong>coda</strong> package), which can be summarized and explored as we please.</p>
 <pre class="r"><code>require(&quot;coda&quot;)</code></pre>
 <pre><code>## Loading required package: coda</code></pre>
-<pre><code>## Warning: package 'coda' was built under R version 3.5.1</code></pre>
 <pre class="r"><code>summary(as.mcmc(period.emm))</code></pre>
 <pre class="ro"><code>## 
 ## Iterations = 1:250

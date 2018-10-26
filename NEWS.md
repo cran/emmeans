@@ -1,7 +1,23 @@
+emmeans 1.3.0
+-------------
+
+  * Deprecated functions like `ref.grid()` put to final rest, and we no 
+    longer support packages that provide `recover.data` or `lsm.basis` methods
+  * Courtesy exports `.recover_data()` and `.emm_basis()` to provide
+    access for extension developers to all available methods
+  * Streamlining of a stored example in `inst/extdata`
+  * Fix to `.all.vars()` that could cause errors when response variable
+    has a function call with character constants.
+  * Relabeling of differences as ratios when appropriate in `regrid()`
+    (so results match `summary()` labeling with `type = "response"`).
+  * `plot.emmGrid(..., comparisons = TRUE, type = "response")`
+    produced incorrect comparison arrows; now fixed
+
+
 emmeans 1.2.4
 -------------
 
-  * Support for model formulas such as df$y ~ df$treat + df[["cov"]]. This had
+  * Support for model formulas such as `df$y ~ df$treat + df[["cov"]]`. This had
     failed previously for two obscure reasons, but now works correctly.
   * New `simplify.names` option for above types of models
   * `emm_options()` with no arguments now returns all options in force,
