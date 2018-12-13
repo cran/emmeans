@@ -15,7 +15,8 @@
 
 \method{predict}{emmGrid}(object, type, ...)
 
-\method{as.data.frame}{emmGrid}(x, row.names = NULL, optional = FALSE, ...)
+\method{as.data.frame}{emmGrid}(x, row.names = NULL, optional = FALSE,
+  ...)
 
 \method{[}{summary_emm}(x, ..., as.df = TRUE)
 
@@ -23,8 +24,8 @@
 
 test(object, null, ...)
 
-\method{test}{emmGrid}(object, null = 0, joint = FALSE, verbose = FALSE,
-  rows, by, status = FALSE, ...)
+\method{test}{emmGrid}(object, null = 0, joint = FALSE,
+  verbose = FALSE, rows, by, status = FALSE, ...)
 }
 \arguments{
 \item{object}{An object of class \code{"emmGrid"} (see \link{emmGrid-class})}
@@ -81,10 +82,8 @@ left-tailed (\code{-1}, \code{"-"}, code{"<"}, \code{"left"}, or
 more details.}
 
 \item{frequentist}{Ignored except if a Bayesian model was fitted. If missing
-of \code{FALSE}, the object is passed to \code{\link{hpd.summary}} and a 
-Bayesian summary is returned showing HPD intervals for
-each prediction in the grid. Otherwise, a logical value of \code{TRUE} will
-have it return a frequentist summary.}
+or \code{FALSE}, the object is passed to \code{\link{hpd.summary}}. Otherwise, 
+a logical value of \code{TRUE} will have it return a frequentist summary.}
 
 \item{...}{(Not used by \code{summary.emmGrid} or \code{predict.emmGrid}.) In
 \code{as.data.frame.emmGrid}, \code{confint.emmGrid}, and 
@@ -128,7 +127,8 @@ such issues.}
   \code{test.emmGrid} return an object of class \code{"summary_emm"}, which
   is an extension of \code{\link{data.frame}} but with a special \code{print}
   method that displays it with custom formatting. For models fitted using
-  MCMC methods, the call is diverted to \code{\link{hpd.summary}}; one may
+  MCMC methods, the call is diverted to \code{\link{hpd.summary}} (with 
+  \code{prob} set to \code{level}, if specified); one may
   alternatively use general MCMC summarization tools with the 
   results of \code{as.mcmc}.
 

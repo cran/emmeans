@@ -87,10 +87,8 @@
 #'   \code{"equivalence"}, or \code{"="}). See the special section below for
 #'   more details.
 #' @param frequentist Ignored except if a Bayesian model was fitted. If missing
-#'   of \code{FALSE}, the object is passed to \code{\link{hpd.summary}} and a 
-#'   Bayesian summary is returned showing HPD intervals for
-#'   each prediction in the grid. Otherwise, a logical value of \code{TRUE} will
-#'   have it return a frequentist summary.
+#'   or \code{FALSE}, the object is passed to \code{\link{hpd.summary}}. Otherwise, 
+#'   a logical value of \code{TRUE} will have it return a frequentist summary.
 #' @param ... (Not used by \code{summary.emmGrid} or \code{predict.emmGrid}.) In
 #'   \code{as.data.frame.emmGrid}, \code{confint.emmGrid}, and 
 #'   \code{test.emmGrid}, these arguments are passed to
@@ -100,7 +98,8 @@
 #'   \code{test.emmGrid} return an object of class \code{"summary_emm"}, which
 #'   is an extension of \code{\link{data.frame}} but with a special \code{print}
 #'   method that displays it with custom formatting. For models fitted using
-#'   MCMC methods, the call is diverted to \code{\link{hpd.summary}}; one may
+#'   MCMC methods, the call is diverted to \code{\link{hpd.summary}} (with 
+#'   \code{prob} set to \code{level}, if specified); one may
 #'   alternatively use general MCMC summarization tools with the 
 #'   results of \code{as.mcmc}.
 #'   
@@ -255,7 +254,7 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df,
                         null, delta, side, frequentist, ...) {
 
     if(!is.na(object@post.beta[1]) && (missing(frequentist) || !frequentist))
-        return (hpd.summary(object, by = by, type = type, ...))
+        return (hpd.summary(object, prob = level, by = by, type = type, ...))
     
     # Any "summary" options override built-in
     opt = get_emm_option("summary")
@@ -265,10 +264,7 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df,
     }
     
     misc = object@misc
-    use.elts = if (is.null(misc$display))  
-                   rep(TRUE, nrow(object@grid)) 
-               else 
-                   misc$display
+    use.elts = .reconcile.elts(object)
     grid = object@grid[use.elts, , drop = FALSE]
     
     ### For missing arguments, get from misc, else default    
@@ -543,8 +539,7 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
         return(result[-1, ])
     }
     misc = object@misc
-    use.elts = if (is.null(misc$display))  rep(TRUE, nrow(object@grid)) 
-               else                        misc$display
+    use.elts = .reconcile.elts(object)
 
     if (!is.null(hook <- misc$estHook)) {
         if (is.character(hook)) hook = get(hook)
@@ -575,7 +570,7 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     result[1] = as.numeric(result[1]) # silly bit of code to avoid getting a data.frame of logicals if all are NA
     result = as.data.frame(result)
     names(result) = c(misc$estName, "SE", "df")
-    if (!is.null(misc$tran) && (misc$tran != "none")) {
+    if (!is.null(misc$tran) && is.character(misc$tran) && (misc$tran != "none")) {
         attr(result, "link") = .get.link(misc)
     }
     result
@@ -615,10 +610,6 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     n.contr = fam.info[2]
     et = as.numeric(fam.info[3])
 
-    ragged.by = (is.character(fam.size))   # flag that we need to do groups separately
-    if (!ragged.by)
-        by.rows = list(seq_along(t))       # not ragged, we can do all as one by group
-        
     if (n.contr == 1) # Force no adjustment when just one test
         adjust = "none"
     
@@ -632,6 +623,10 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
         adjust = "sidak"
     if ((et != 3) && adjust == "tukey") # not pairwise
         adjust = "sidak"
+    
+    ragged.by = (is.character(fam.size) || adjust == "mvt")   # flag that we need to do groups separately
+    if (!ragged.by)
+        by.rows = list(seq_along(t))       # not ragged, we can do all as one by group
     
     # asymptotic results when df is NA
     DF[is.na(DF)] = Inf
@@ -710,9 +705,6 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     et = as.numeric(fam.info[3])
     
     ragged.by = (is.character(fam.size))   # flag that we need to do groups separately
-    if (!ragged.by)
-        by.rows = list(seq_along(DF))       # not ragged, we can do all as one by group
-    
     if (!ragged.by && n.contr == 1) # Force no adjustment when just one interval
         adjust = "none"
     
@@ -722,6 +714,8 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
         k = which(adj.meths == "bonferroni") 
     adjust = adj.meths[k]
     
+    if (!ragged.by && adjust != "mvt")
+        by.rows = list(seq_along(DF))       # not ragged, we can do all as one by group
     
     if ((et != 3) && adjust == "tukey") # not pairwise
         adjust = "sidak"
@@ -927,9 +921,14 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
 #' @export
 print.summary_emm = function(x, ..., digits=NULL, quote=FALSE, right=TRUE) {
     x.save = x
+    for (i in seq_along(names(x)))   # zapsmall the numeric columns
+        if (is.numeric(x[[i]]))  
+            x[[i]] = zapsmall(x[[i]])
     if (!is.null(x$df)) x$df = round(x$df, 2)
-    if (!is.null(x$t.ratio)) x$t.ratio = round(x$t.ratio, 3)
-    if (!is.null(x$z.ratio)) x$z.ratio = round(x$z.ratio, 3)
+    if (!is.null(x$t.ratio)) 
+        x$t.ratio = format(round(x$t.ratio, 3), nsmall = 3, sci = FALSE)
+    if (!is.null(x$z.ratio)) 
+        x$z.ratio = format(round(x$z.ratio, 3), nsmall = 3, sci = FALSE)
     if (!is.null(x$p.value)) {
         fp = x$p.value = format(round(x$p.value,4), nsmall=4, sci=FALSE)
         x$p.value[fp=="0.0000"] = "<.0001"
@@ -937,6 +936,15 @@ print.summary_emm = function(x, ..., digits=NULL, quote=FALSE, right=TRUE) {
     estn = attr(x, "estName")
     just = sapply(x.save, function(col) if(is.numeric(col)) "R" else "L")
     est = x[[estn]]
+    if (get_emm_option("opt.digits") && is.null(digits)) {
+        if (!is.null(x[["SE"]]))
+            tmp = est + x[["SE"]] * cbind(rep(-2, nrow(x)), 0, 2)
+        else if (!is.null(x[["lower.HPD"]]))
+            tmp = x[, c("lower.HPD", estn, "upper.HPD"), drop = FALSE]
+        else tmp = NULL
+        if (!is.null(tmp))
+            digits = max(apply(tmp, 1, .opt.dig))
+    }
     if (any(is.na(est))) {
         x[[estn]] = format(est, digits=digits)
         x[[estn]][is.na(est)] = "nonEst"
@@ -975,3 +983,20 @@ print.summary_emm = function(x, ..., digits=NULL, quote=FALSE, right=TRUE) {
     invisible(x.save)
 }
 
+# determine optimum digits to display based on a conf or cred interval
+# (but always at least 3)
+.opt.dig = function(x) {
+    z = range(x) / max(abs(x))
+    max(round(1.51 - log(diff(z), 10)), 3, na.rm = TRUE)  # approx 1 - log(diff(z/3))
+}
+
+# Utility -- When misc$display present, reconcile which elements to use.
+# Needed if we messed with previous nesting
+.reconcile.elts = function(object) {
+    display = object@misc$display
+    nrows = nrow(object@grid)
+    use.elts = rep(TRUE, nrows)
+    if (!is.null(display) && (length(display) == nrows))  
+        use.elts = display
+    use.elts
+}

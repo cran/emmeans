@@ -1,5 +1,6 @@
 ## ---- echo = FALSE, results = "hide", message = FALSE--------------------
-require("emmeans") 
+require("emmeans")
+emm_options(opt.digits = FALSE)
 knitr::opts_chunk$set(fig.width = 4.5, class.output = "ro") 
 
 ## ------------------------------------------------------------------------
@@ -33,6 +34,13 @@ pigs.anal.p
 
 ## ------------------------------------------------------------------------
 options(emmeans = NULL)
+
+## ------------------------------------------------------------------------
+emm_options(opt.digits = TRUE)
+
+## ----eval = FALSE--------------------------------------------------------
+#  options(emmeans = list(opt.digits = TRUE,
+#                         contrast = list(infer = c(TRUE, FALSE))))
 
 ## ------------------------------------------------------------------------
 rbind(pairs(pigs.emm.s), pigs.anal.p[[2]])

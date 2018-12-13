@@ -46,7 +46,7 @@ plot.emmGrid = function(x, y, type, intervals = TRUE, comparisons = FALSE,
             int.adjust = "none"
     }
     
-    summ = summary(object, infer = c(TRUE, FALSE), adjust = int.adjust, frequentist = frequentist)
+    summ = summary(object, infer = c(TRUE, FALSE), adjust = int.adjust, frequentist = frequentist, ...)
     if (is.null(attr(summ, "pri.vars"))) { ## new ref_grid - use all factors w/ > 1 level
         pv = names(x@levels)
         len = sapply(x@levels, length)
@@ -389,7 +389,7 @@ plot.summary_emm = function(x, y, horizontal = TRUE, xlab, ylab, layout, ...) {
                     arrow = ggplot2::arrow(length = ggplot2::unit(.07, "inches"), 
                         ends = "both", type = "closed"), color = "red")
             if (length(byv) > 0)
-                grobj = grobj + ggplot2::facet_grid(paste(paste(byv, collapse = "+"), " ~ ."), 
+                grobj = grobj + ggplot2::facet_grid(as.formula(paste(paste(byv, collapse = "+"), " ~ .")), 
                                            labeller = "label_both")
             if (missing(xlab)) xlab = attr(summ, "estName")
             if (missing(ylab)) ylab = facName
@@ -407,7 +407,7 @@ plot.summary_emm = function(x, y, horizontal = TRUE, xlab, ylab, layout, ...) {
                     arrow = ggplot2::arrow(length = ggplot2::unit(.07, "inches"), ends = "both", 
                         type = "closed"), color = "red")
             if (length(byv) > 0)
-                grobj = grobj + ggplot2::facet_grid(paste(". ~ ", paste(byv, collapse = "+")), 
+                grobj = grobj + ggplot2::facet_grid(as.formula(paste(". ~ ", paste(byv, collapse = "+"))), 
                                            labeller = "label_both")
             if (missing(ylab)) ylab = attr(summ, "estName")
             if (missing(xlab)) xlab = facName

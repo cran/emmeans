@@ -1,3 +1,25 @@
+## NEWS for the emmeans package
+
+emmeans 1.3.1
+-------------
+
+  * `"mvt"` adjustment ignored `by` grouping
+  * `contrast()` mis-labeled estimates when levels varied among `by` groups
+    (most prominently this happened in `CLD(..., details = TRUE)`)
+  * Changed `aovlist` support so it re-fits the model when non-sum-to-zero
+    contrasts were used
+  * `print.summary_emm()` now cleans up numeric columns with `zapsmall()`
+  * More robust handling of `nesting` in `ref_grid()` and `update()`,
+    and addition of `covnest` argument for whether to include covariates
+    when auto-detecting nesting
+  * Revision of some vignettes
+  * Fixed bug in `hpd.summary()` and handoff to it from `summary()`
+  * Fixed bug where `ref_grid()` ignored `mult.levs`
+  * Fixes in emmeans where it passes `...` where it shouldn't
+  * `CLD()` now works for MCMC models (uses frequentist summary)
+  * Addition of `opt.digits` option
+
+
 emmeans 1.3.0
 -------------
 

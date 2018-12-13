@@ -199,16 +199,24 @@ contrast.emmGrid = function(object, method = "eff", interaction = FALSE,
         return(object)
     }
     
-    # else
+    # else we have a regular contrast (not interaction)
     linfct = object@linfct[, , drop = FALSE]
     args = g = object@grid[, , drop = FALSE]
     args[[".offset."]] = NULL 
     args[[".wgt."]] = NULL # ignore auxiliary stuff in labels, etc.
     if (!is.null(by)) {
         by.rows = .find.by.rows(args, by)
+        ulen = unique(sapply(by.rows, length))
+        if (length(ulen) > 1)
+            stop ("`by` groups are of irregular size;\n  currently not supported except with nested structures")
         bylevs = args[, by, drop=FALSE]
+        all.args = args
         args = args[by.rows[[1]], , drop=FALSE]
-        for (nm in by) args[[nm]] = NULL
+        for (nm in by) {
+            args[[nm]] = NULL
+            all.args[[nm]] = NULL
+        }
+        all.levs = do.call("paste", all.args)   # keep all levels in case we have permutations of them
     }
     args$sep = ","
     levs = do.call("paste", args)  # NOTE - these are levels for the first (or only) by-group
@@ -254,11 +262,19 @@ contrast.emmGrid = function(object, method = "eff", interaction = FALSE,
     }
     
     # NOTE: The kronecker thing here depends on the grid being regular.
-    # Irregular grids are handled by .neted_contrast
+    # Irregular grids are handled by .nested_contrast
     else {
         tcmat = kronecker(.diag(rep(1,length(by.rows))), tcmat)
         linfct = tcmat %*% linfct[unlist(by.rows), , drop = FALSE]
-        tmp = expand.grid(con = names(cmat), by = seq_len(length(by.rows)))###unique(by.id))
+        tmp = expand.grid(con = names(cmat), by = seq_len(length(by.rows)), stringsAsFactors = FALSE)###unique(by.id))
+        # check if levs have different orderings in subsequent by groups
+        for (i in 1 + seq_along(by.rows[-1])) { 
+            j = by.rows[[i]]
+            if (any(all.levs[j] != levs)) {
+                cm = method(all.levs[j], ...)
+                tmp$con[seq_along(cm) + length(cm)*(i-1)] = names(cm)
+            }
+        }
         grid = data.frame(.contrast. = tmp$con)
         n.each = ncol(cmat)
         row.1st = sapply(by.rows, function(x) x[1])

@@ -10,9 +10,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="Russ Lenth" />
+<meta name="author" content="emmeans package, Version 1.3.1" />
 
-<meta name="date" content="2018-10-26" />
 
 <title>Confidence intervals and tests in emmeans</title>
 
@@ -31,8 +30,7 @@
 
 
 <h1 class="title toc-ignore">Confidence intervals and tests in emmeans</h1>
-<h4 class="author"><em>Russ Lenth</em></h4>
-<h4 class="date"><em>2018-10-26</em></h4>
+<h4 class="author"><em>emmeans package, Version 1.3.1</em></h4>
 
 
 
@@ -223,22 +221,22 @@ summary(.Last.value, by = percent)       ### grouped the other way</code></pre>
 pigsint.rg &lt;- ref_grid(pigsint.lm)
 contrast(pigsint.rg, &quot;consec&quot;, simple = &quot;percent&quot;)</code></pre>
 <pre class="ro"><code>## source = fish:
-##  contrast     estimate         SE df t.ratio p.value
-##  12 - 9    0.184851182 0.10612784 17   1.742  0.5274
-##  15 - 12   0.004504448 0.10612784 17   0.042  1.0000
-##  18 - 15   0.040679810 0.10612784 17   0.383  0.9999
+##  contrast    estimate         SE df t.ratio p.value
+##  12 - 9    0.18485118 0.10612784 17   1.742  0.2355
+##  15 - 12   0.00450445 0.10612784 17   0.042  0.9999
+##  18 - 15   0.04067981 0.10612784 17   0.383  0.9626
 ## 
 ## source = soy:
-##  contrast     estimate         SE df t.ratio p.value
-##  12 - 9    0.141172845 0.09492363 17   1.487  0.6970
-##  15 - 12  -0.010218130 0.09492363 17  -0.108  1.0000
-##  18 - 15   0.089467012 0.13424228 17   0.666  0.9951
+##  contrast    estimate         SE df t.ratio p.value
+##  12 - 9    0.14117284 0.09492363 17   1.487  0.3593
+##  15 - 12  -0.01021813 0.09492363 17  -0.108  0.9992
+##  18 - 15   0.08946701 0.13424228 17   0.666  0.8571
 ## 
 ## source = skim:
-##  contrast     estimate         SE df t.ratio p.value
-##  12 - 9    0.204318195 0.09492363 17   2.152  0.2921
-##  15 - 12   0.139774084 0.10612784 17   1.317  0.8028
-##  18 - 15   0.186377064 0.14238544 17   1.309  0.8074
+##  contrast    estimate         SE df t.ratio p.value
+##  12 - 9    0.20431820 0.09492363 17   2.152  0.1184
+##  15 - 12   0.13977408 0.10612784 17   1.317  0.4519
+##  18 - 15   0.18637706 0.14238544 17   1.309  0.4569
 ## 
 ## Results are given on the log (not the response) scale. 
 ## P value adjustment: mvt method for 3 tests</code></pre>
