@@ -1,6 +1,6 @@
 ## ---- echo = FALSE, results = "hide", message = FALSE--------------------
 require("emmeans")
-emm_options(opt.digits = FALSE)
+emm_options(opt.digits = TRUE)
 knitr::opts_chunk$set(fig.width = 4.5, class.output = "ro") 
 
 ## ------------------------------------------------------------------------
@@ -36,10 +36,12 @@ pigs.anal.p
 options(emmeans = NULL)
 
 ## ------------------------------------------------------------------------
-emm_options(opt.digits = TRUE)
+emm_options(opt.digits = FALSE)
+pigs.emm
+emm_options(opt.digits = TRUE)  # revert to optimal digits
 
 ## ----eval = FALSE--------------------------------------------------------
-#  options(emmeans = list(opt.digits = TRUE,
+#  options(emmeans = list(lmer.df = "satterthwaite",
 #                         contrast = list(infer = c(TRUE, FALSE))))
 
 ## ------------------------------------------------------------------------

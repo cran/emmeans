@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.3.1" />
+<meta name="author" content="emmeans package, Version 1.3.2" />
 
 
 <title>Basics of estimated marginal means</title>
@@ -30,7 +30,7 @@
 
 
 <h1 class="title toc-ignore">Basics of estimated marginal means</h1>
-<h4 class="author"><em>emmeans package, Version 1.3.1</em></h4>
+<h4 class="author"><em>emmeans package, Version 1.3.2</em></h4>
 
 
 
@@ -174,11 +174,11 @@ pigs.pred1</code></pre>
 <p>These are slightly different from the previous EMMs for <code>source</code>, emphasizing the fact that EMMs are model-dependent. In models with covariates, EMMs are often called <em>adjusted means</em>.</p>
 <p>The <code>emmeans</code> function computes EMMs, accompanied by standard errors and confidence intervals. For example,</p>
 <pre class="r"><code>emmeans(pigs.lm1, &quot;percent&quot;)</code></pre>
-<pre class="ro"><code>##  percent   emmean         SE df lower.CL upper.CL
-##        9 3.445307 0.04088810 23 3.360723 3.529890
-##       12 3.624861 0.03837600 23 3.545475 3.704248
-##       15 3.662706 0.04372996 23 3.572244 3.753168
-##       18 3.745156 0.05296030 23 3.635599 3.854713
+<pre class="ro"><code>##  percent emmean     SE df lower.CL upper.CL
+##        9   3.45 0.0409 23     3.36     3.53
+##       12   3.62 0.0384 23     3.55     3.70
+##       15   3.66 0.0437 23     3.57     3.75
+##       18   3.75 0.0530 23     3.64     3.85
 ## 
 ## Results are averaged over the levels of: source 
 ## Results are given on the log (not the response) scale. 
@@ -221,10 +221,10 @@ ref_grid(mtcars.lm)</code></pre>
 <p>You need to be careful when one covariate depends on the value of another. To illustrate in the <code>mtcars</code> example, suppose we want to use <code>cyl</code> as a factor and include a quadratic term for <code>disp</code>:</p>
 <pre class="r"><code>mtcars.1 &lt;- lm(mpg ~ factor(cyl) + disp + I(disp^2), data = mtcars)
 emmeans(mtcars.1, &quot;cyl&quot;)</code></pre>
-<pre class="ro"><code>##  cyl   emmean       SE df lower.CL upper.CL
-##    4 19.34642 2.663565 27 13.88123 24.81160
-##    6 17.22392 1.361765 27 14.42981 20.01804
-##    8 18.76340 1.473470 27 15.74009 21.78672
+<pre class="ro"><code>##  cyl emmean   SE df lower.CL upper.CL
+##    4   19.3 2.66 27     13.9     24.8
+##    6   17.2 1.36 27     14.4     20.0
+##    8   18.8 1.47 27     15.7     21.8
 ## 
 ## Confidence level used: 0.95</code></pre>
 <p>Some users may not like function calls in the model formula, so they instead do something like this:</p>
@@ -233,10 +233,10 @@ emmeans(mtcars.1, &quot;cyl&quot;)</code></pre>
                     dispsq = disp^2)
 mtcars.2 &lt;- lm(mpg ~ Cyl + disp + dispsq, data = mtcars)
 emmeans(mtcars.2, &quot;Cyl&quot;)</code></pre>
-<pre class="ro"><code>##  Cyl   emmean       SE df lower.CL upper.CL
-##  4   20.80999 2.052408 27 16.59879 25.02118
-##  6   18.68750 1.185159 27 16.25575 21.11924
-##  8   20.22698 1.770026 27 16.59518 23.85877
+<pre class="ro"><code>##  Cyl emmean   SE df lower.CL upper.CL
+##  4     20.8 2.05 27     16.6     25.0
+##  6     18.7 1.19 27     16.3     21.1
+##  8     20.2 1.77 27     16.6     23.9
 ## 
 ## Confidence level used: 0.95</code></pre>
 <p>Wow! Those are really different results – even though the models are equivalent. Why is this? To understand, look at the reference grids:</p>
@@ -251,10 +251,10 @@ emmeans(mtcars.2, &quot;Cyl&quot;)</code></pre>
 ##     dispsq = 68113</code></pre>
 <p>For both models, the reference grid uses the <code>disp</code> mean of 230.72. But for <code>mtcars.2</code>, we also set <code>dispsq</code> to its mean of 68113. This is not right, because <code>dispsq</code> should be the square of <code>disp</code> (about 53232, not 68113) in order to be consistent. If we use that value of <code>dispsq</code>, we get the same results as for <code>mtcars.1</code> (discrepancies due to rounding of <code>disp</code>):</p>
 <pre class="r"><code>emmeans(mtcars.2, &quot;Cyl&quot;, at = list(dispsq = 230.72^2))</code></pre>
-<pre class="ro"><code>##  Cyl   emmean       SE df lower.CL upper.CL
-##  4   19.34633 2.663604 27 13.88107 24.81159
-##  6   17.22384 1.361789 27 14.42968 20.01800
-##  8   18.76332 1.473464 27 15.74002 21.78662
+<pre class="ro"><code>##  Cyl emmean   SE df lower.CL upper.CL
+##  4     19.3 2.66 27     13.9     24.8
+##  6     17.2 1.36 27     14.4     20.0
+##  8     18.8 1.47 27     15.7     21.8
 ## 
 ## Confidence level used: 0.95</code></pre>
 <p>In summary, for polynomial models and others where some covariates depend on others in nonlinear ways, include that dependence in the model formula (as in <code>mtcars.1</code>) using <code>I()</code> or <code>poly()</code> expressions, or alter the reference grid so that the dependency among covariates is correct.</p>
@@ -304,11 +304,11 @@ mtcars.rg_d.c @ grid</code></pre>
 <!-- @index Means!Weighted; `emmeans()`!`weights` -->
 <p>It is possible to override the equal-weighting method for computing EMMs. Using <code>weights = &quot;cells&quot;</code> in the call will weight the predictions according to their cell frequencies (recall this information is retained in the reference grid). This produces results comparable to ordinary marginal means:</p>
 <pre class="r"><code>emmeans(pigs.lm1, &quot;percent&quot;, weights = &quot;cells&quot;)</code></pre>
-<pre class="ro"><code>##  percent   emmean         SE df lower.CL upper.CL
-##        9 3.473434 0.04070389 23 3.389231 3.557636
-##       12 3.624861 0.03837600 23 3.545475 3.704248
-##       15 3.669528 0.04351429 23 3.579512 3.759544
-##       18 3.655150 0.05148680 23 3.548642 3.761659
+<pre class="ro"><code>##  percent emmean     SE df lower.CL upper.CL
+##        9   3.47 0.0407 23     3.39     3.56
+##       12   3.62 0.0384 23     3.55     3.70
+##       15   3.67 0.0435 23     3.58     3.76
+##       18   3.66 0.0515 23     3.55     3.76
 ## 
 ## Results are averaged over the levels of: source 
 ## Results are given on the log (not the response) scale. 
@@ -316,11 +316,11 @@ mtcars.rg_d.c @ grid</code></pre>
 <p>Note that, as in the ordinary means in <a href="#motivation">the motivating example</a>, the highest estimate is for <code>percent = 15</code> rather than <code>percent = 18</code>. It is interesting to compare this with the results for a model that includes only <code>percent</code> as a predictor.</p>
 <pre class="r"><code>pigs.lm3 &lt;- lm(log(conc) ~ factor(percent), data = pigs)
 emmeans(pigs.lm3, &quot;percent&quot;)</code></pre>
-<pre class="ro"><code>##  percent   emmean         SE df lower.CL upper.CL
-##        9 3.473434 0.07313042 25 3.322819 3.624049
-##       12 3.624861 0.06894802 25 3.482860 3.766862
-##       15 3.669528 0.07817971 25 3.508514 3.830542
-##       18 3.655150 0.09250348 25 3.464636 3.845665
+<pre class="ro"><code>##  percent emmean     SE df lower.CL upper.CL
+##        9   3.47 0.0731 25     3.32     3.62
+##       12   3.62 0.0689 25     3.48     3.77
+##       15   3.67 0.0782 25     3.51     3.83
+##       18   3.66 0.0925 25     3.46     3.85
 ## 
 ## Results are given on the log (not the response) scale. 
 ## Confidence level used: 0.95</code></pre>

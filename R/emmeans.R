@@ -240,7 +240,7 @@ emmeans = function(object, specs, by = NULL,
     }
     if (is.list(specs)) {
         return (emmeans.list(object, specs, by = by, 
-                             contr = contr, weights = weights))
+                             contr = contr, weights = weights, ...))
     }
     if (inherits(specs, "formula")) {
         spc = .parse.by.formula(specs)
@@ -269,6 +269,11 @@ emmeans = function(object, specs, by = NULL,
             RG@misc$display = NULL
             warning("emmeans() results may be corrupted by removal of a nesting structure")
         }
+        
+        # Ensure object is in standard order
+        ord = do.call(order, RG@grid[rev(names(RG@levels))])
+        if(any(ord != seq_along(ord)))
+            RG = RG[ord]
         
         if ((length(facs) == 1) && (facs == "1")) {  ### just want grand mean
             RG@levels[["1"]] = "overall"
@@ -422,8 +427,8 @@ emmeans = function(object, specs, by = NULL,
                  "To obtain a compact letter display, first call `emmeans()`,\n",
                  "then call `CLD()` on the result.")
         }
-        args = list() ###list(...)
-        ### args$data = NULL   # ensure 'data' not passed
+        args = list(...)
+        args$data = NULL   # ensure 'data' not passed
         args$object = result
         args$method = contr
         args$by = by

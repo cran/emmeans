@@ -80,6 +80,14 @@ emm_basis.mlm = function(object, trms, xlev, grid, ...) {
     bas
 }
 
+#----------------------------------------------------------
+# manova objects
+recover_data.manova = function(object, ...) {
+    fcall = match.call(aov, object$call)   # need to borrow arg matching from aov()
+    recover_data(fcall, delete.response(terms(object)), object$na.action, ...)
+}
+
+
 
 
 #--------------------------------------------------------------
@@ -211,8 +219,16 @@ emm_basis.merMod = function(object, trms, xlev, grid, vcov.,
 #' @export
 recover_data.lme = function(object, data, ...) {
     fcall = object$call
-    if (!is.null(fcall$weights))
-        fcall$weights = nlme::varWeights(object$modelStruct)
+    if (!is.null(fcall$weights)) {  # painful -- we only get weights for complete cases
+        if (!is.null(object$na.action)) {
+            w = nlme::varWeights(object$modelStruct)
+            wts = rep(0, length(w) + length(object$na.action))
+            wts[-object$na.action] = w
+            fcall$weights = wts
+        }
+        else
+            fcall$weights = nlme::varWeights(object$modelStruct)
+    }
     recover_data(fcall, delete.response(object$terms), object$na.action, data = data, ...)
 }
 
@@ -574,42 +590,30 @@ emm_basis.geese = function(object, trms, xlev, grid, vcov.method = "vbeta", ...)
 #--------------------------------------------------------------
 ### glmmADMB package
 
-recover_data.glmmadmb = recover_data.lm
-
-emm_basis.glmmadmb = function (object, trms, xlev, grid, ...) 
-{
-    contrasts = attr(model.matrix(object), "contrasts")
-    m = model.frame(trms, grid, na.action = na.pass, xlev = xlev)
-    X = model.matrix(trms, m, contrasts.arg = contrasts)
-    bhat = glmmADMB::fixef(object)
-    V = .my.vcov(object, ...)
-    misc = list()
-    if (!is.null(object$family)) {
-        fam = object$family
-        misc$tran = object$link
-        misc$inv.lbl = "response"
-        if (!is.na(pmatch(fam,"binomial"))) 
-            misc$inv.lbl = "prob"
-        else if (!is.na(pmatch(fam,"poisson"))) 
-            misc$inv.lbl = "rate"
-    }
-    nbasis = estimability::all.estble
-    dffun = function(...) Inf
-    list(X = X, bhat = bhat, nbasis = nbasis, V = V, dffun = dffun, 
-         dfargs = list(), misc = misc)
-}
-
-
-# --------------------------------------------------------------
-### Explicit non-support for 'gam' objects (runs, but results are wrong)
-
-# emm_basis.gam = function(object, trms, xlev, grid, ...) {
-#     stop("Can't handle an object of class ", dQuote(class(object)[1]), "\n",
-#          .show_supported())
+# recover_data.glmmadmb = recover_data.lm
+# 
+# emm_basis.glmmadmb = function (object, trms, xlev, grid, ...) 
+# {
+#     contrasts = attr(model.matrix(object), "contrasts")
+#     m = model.frame(trms, grid, na.action = na.pass, xlev = xlev)
+#     X = model.matrix(trms, m, contrasts.arg = contrasts)
+#     bhat = glmmADMB::fixef(object)
+#     V = .my.vcov(object, ...)
+#     misc = list()
+#     if (!is.null(object$family)) {
+#         fam = object$family
+#         misc$tran = object$link
+#         misc$inv.lbl = "response"
+#         if (!is.na(pmatch(fam,"binomial"))) 
+#             misc$inv.lbl = "prob"
+#         else if (!is.na(pmatch(fam,"poisson"))) 
+#             misc$inv.lbl = "rate"
+#     }
+#     nbasis = estimability::all.estble
+#     dffun = function(...) Inf
+#     list(X = X, bhat = bhat, nbasis = nbasis, V = V, dffun = dffun, 
+#          dfargs = list(), misc = misc)
 # }
-
-
-
 
 
 
@@ -622,7 +626,7 @@ emm_basis.glmmadmb = function (object, trms, xlev, grid, ...)
 #' @export
 .my.vcov = function(object, vcov. = .statsvcov, ...) {
     if (is.function(vcov.))
-        vcov. = vcov.(object)
+        vcov. = vcov.(object, ...)
     else if (!is.matrix(vcov.))
         stop("vcov. must be a function or a square matrix")
     vcov.

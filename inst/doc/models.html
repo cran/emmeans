@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.3.1" />
+<meta name="author" content="emmeans package, Version 1.3.2" />
 
 
 <title>Models supported by emmeans</title>
@@ -30,7 +30,7 @@
 
 
 <h1 class="title toc-ignore">Models supported by emmeans</h1>
-<h4 class="author"><em>emmeans package, Version 1.3.1</em></h4>
+<h4 class="author"><em>emmeans package, Version 1.3.2</em></h4>
 
 
 
@@ -121,6 +121,18 @@
 </tr>
 <tr class="even">
 <td align="left">gam</td>
+<td align="left">mgcv</td>
+<td align="center"><a href="#G">G</a></td>
+<td align="left"><code>freq = FALSE</code>, <code>unconditional = FALSE</code></td>
+</tr>
+<tr class="odd">
+<td align="left">gamm</td>
+<td align="left">mgcv</td>
+<td align="center"><a href="#G">G</a></td>
+<td align="left"><code>call = object$gam$call</code></td>
+</tr>
+<tr class="even">
+<td align="left">Gam</td>
 <td align="left">gam</td>
 <td align="center"><a href="#G">G</a></td>
 <td align="left"><code>nboot = 800</code></td>
@@ -176,8 +188,8 @@
 <tr class="odd">
 <td align="left">glmmadmb</td>
 <td align="left">glmmADMB</td>
-<td align="center"><a href="#G">G</a></td>
-<td align="left"></td>
+<td align="center"></td>
+<td align="left">No longer supported</td>
 </tr>
 <tr class="even">
 <td align="left">glmmPQL</td>
@@ -401,9 +413,12 @@
 </div>
 <div id="G" class="section level2">
 <h2>Group G – Generalized linear models and relatives</h2>
-<!-- @index Generalized linear models; `glm`*xxx* models -->
-<p>Models in this group receive only standard support as in <a href="#A">Group A</a>, but typically the tests and confidence intervals are asymptotic. Thus the <code>df</code> column for tabular results will be <code>Inf</code>.</p>
-<p>In the case of <code>gam::gam</code> objects, there is an optional <code>nboot</code> argument that sets the number of bootstrap replications used to estimate the variances and covariances of the smoothing portions of the model.</p>
+<!-- @index Generalized linear models; `glm`*xxx* models; 
+    Generalized additive models; `gam` models; -->
+<p>Most models in this group receive only standard support as in <a href="#A">Group A</a>, but typically the tests and confidence intervals are asymptotic. Thus the <code>df</code> column for tabular results will be <code>Inf</code>.</p>
+<p>In the case of <code>mgcv::gam</code> objects, there are optional <code>freq</code> and <code>unconditional</code> arguments as is detailed in the documentation for <code>mgcv::vcov.gam()</code>. Both default to <code>FALSE</code>. The value of <code>unconditional</code> matters only if <code>freq = FALSE</code> and <code>object$Vc</code> is non-null.</p>
+<p>For <code>mgcv::gamm</code> objects, <code>emmeans()</code> results are based on the <code>object$gam</code> part. Unfortunately, that is missing its <code>call</code> component, so the user must supply it in the <code>call</code> argument (e.g., <code>call = quote(gamm(y ~ s(x), data = dat))</code>) or give the dataset in the <code>data</code> argument. Alternatively (and recommended), you may first set <code>object$gam$call</code> to the quoted call ahead of time.</p>
+<p>With <code>gam::Gam</code> objects, standard errors are estimated using a bootstrap method when there are any smoothers involved. Accordingly, there is an optional <code>nboot</code> argument that sets the number of bootstrap replications used to estimate the variances and covariances of the smoothing portions of the model. Generally, it is better to use models fitted via <code>mgcv::gam()</code> rather than <code>gam::gam()</code>.</p>
 <p><a href="#quickref">Back to quick reference</a></p>
 </div>
 <div id="H" class="section level2">

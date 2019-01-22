@@ -1,5 +1,37 @@
 ## NEWS for the emmeans package
 
+
+emmeans 1.3.2
+-------------
+
+  * I decided to enable "optimal digits" display by default. In summaries,
+    we try to show enough---but not too much---precision in estimates and
+    confidence intervals. If you don't like this and want to revert
+    to the old (exaggerated precision) behavior, do 
+    `emm_options(opt.digits = FALSE)`
+  * Added `include` argument to most `.emmc` functions (#67)
+  * Now allow character values for `ref`, `exclude`, and `include` in
+    `.emmc` functions (#68)
+  * Better handling of matrix predictors (#66)
+  * Fixed over-zealous choice to not pass `...` arguments in `emmeans()`
+    when two-sided formulas are present
+  * Fix to `clm` support when model is rank-deficient
+  * Fix to `regrid(..., transform = "log")` error when there are
+    existing non-estimable cases (issue #65)
+  * Improvements to `brmsfit` support (#43)
+  * Added support for `mgcv::gam` and `mgcv::gamm` models
+  * `.my.vcov()` now passes `...` to clients
+  * Removed **glmmADMB** support. This package appears to be dormant
+  * Fixed ordering bug for nested models (#71)
+  * Support for `manova` object no longer requires `data` keyword (#72)
+  * Added support for multivariate response in `aovlist` models (#73)
+  * Documentation clarification (#76)
+  * Fix to `CLD` fatal error when `sort = TRUE` (#77)
+  * Fix to issue with weights and incomplete cases with `lme` objects (#75)
+  * Nested fixed-effects yielded NonEsts when two factors are nested 
+    in the same factor(s) (#79)
+
+
 emmeans 1.3.1
 -------------
 

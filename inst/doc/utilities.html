@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.3.1" />
+<meta name="author" content="emmeans package, Version 1.3.2" />
 
 
 <title>Utilities and options for emmeans</title>
@@ -30,7 +30,7 @@
 
 
 <h1 class="title toc-ignore">Utilities and options for emmeans</h1>
-<h4 class="author"><em>emmeans package, Version 1.3.1</em></h4>
+<h4 class="author"><em>emmeans package, Version 1.3.2</em></h4>
 
 
 
@@ -58,10 +58,10 @@
 <pre class="r"><code>pigs.lm &lt;- lm(log(conc) ~ source + factor(percent), data = pigs)
 pigs.emm &lt;- emmeans(pigs.lm, &quot;source&quot;)
 pigs.emm</code></pre>
-<pre class="ro"><code>##  source   emmean         SE df lower.CL upper.CL
-##  fish   3.394492 0.03668122 23 3.318612 3.470373
-##  soy    3.667260 0.03744798 23 3.589793 3.744727
-##  skim   3.796770 0.03938283 23 3.715300 3.878240
+<pre class="ro"><code>##  source emmean     SE df lower.CL upper.CL
+##  fish     3.39 0.0367 23     3.32     3.47
+##  soy      3.67 0.0374 23     3.59     3.74
+##  skim     3.80 0.0394 23     3.72     3.88
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
@@ -69,10 +69,10 @@ pigs.emm</code></pre>
 <p>We see confidence intervals but not tests, by default. This happens as a result of internal settings in <code>pigs.emm.s</code> that are passed to <code>summary()</code> when the object is displayed. If we are going to work with this object a lot, we might want to change its internal settings rather than having to rely on explicitly calling <code>summary()</code> with several arguments. If so, just update the internal settings to what is desired; for example:</p>
 <pre class="r"><code>pigs.emm.s &lt;- update(pigs.emm, infer = c(TRUE, TRUE), null = log(35))
 pigs.emm.s</code></pre>
-<pre class="ro"><code>##  source   emmean         SE df lower.CL upper.CL     null t.ratio p.value
-##  fish   3.394492 0.03668122 23 3.318612 3.470373 3.555348  -4.385  0.0002
-##  soy    3.667260 0.03744798 23 3.589793 3.744727 3.555348   2.988  0.0066
-##  skim   3.796770 0.03938283 23 3.715300 3.878240 3.555348   6.130  &lt;.0001
+<pre class="ro"><code>##  source emmean     SE df lower.CL upper.CL null t.ratio p.value
+##  fish     3.39 0.0367 23     3.32     3.47 3.56 -4.385  0.0002 
+##  soy      3.67 0.0374 23     3.59     3.74 3.56  2.988  0.0066 
+##  skim     3.80 0.0394 23     3.72     3.88 3.56  6.130  &lt;.0001 
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
@@ -112,21 +112,21 @@ pigs.emm.s</code></pre>
 <pre class="r"><code>pigs.anal.p &lt;- emmeans(pigs.lm, consec ~ percent)
 pigs.anal.p</code></pre>
 <pre class="ro"><code>## $emmeans
-##  percent response       SE df lower.CL upper.CL
-##        9 31.35290 1.281961 23 28.81003 34.12023
-##       12 37.51952 1.439849 23 34.65613 40.61950
-##       15 38.96664 1.704010 23 35.59637 42.65601
-##       18 42.31561 2.241048 23 37.92458 47.21506
+##  percent response   SE df lower.CL upper.CL
+##        9     31.4 1.28 23     28.8     34.1
+##       12     37.5 1.44 23     34.7     40.6
+##       15     39.0 1.70 23     35.6     42.7
+##       18     42.3 2.24 23     37.9     47.2
 ## 
 ## Results are averaged over the levels of: source 
 ## Confidence level used: 0.95 
 ## Intervals are back-transformed from the log scale 
 ## 
 ## $contrasts
-##  contrast    ratio         SE df  lower.CL upper.CL t.ratio p.value
-##  12 / 9   1.196684 0.06710564 23 1.0384102 1.379082   3.202  0.0111
-##  15 / 12  1.038570 0.06042501 23 0.8964224 1.203258   0.650  0.8613
-##  18 / 15  1.085945 0.07499759 23 0.9118633 1.293259   1.194  0.5202
+##  contrast ratio     SE df lower.CL upper.CL t.ratio p.value
+##  12 / 9    1.20 0.0671 23    1.038     1.38 3.202   0.0110 
+##  15 / 12   1.04 0.0604 23    0.896     1.20 0.650   0.8613 
+##  18 / 15   1.09 0.0750 23    0.911     1.29 1.194   0.5200 
 ## 
 ## Results are averaged over the levels of: source 
 ## Confidence level used: 0.95 
@@ -143,14 +143,25 @@ pigs.anal.p</code></pre>
 <div id="digits" class="section level3">
 <h3>Optimal digits to display</h3>
 <!-- @index Digits, optimizing; `opt.digits` option -->
-<p>When an <code>emmGrid</code> object is summarized and displayed, the factory default is to display it in a consistent way with many other analyses in R — i.e., using the number of digits in <code>getOption(&quot;digits&quot;)</code>. This is often much more precision than is really justified. You may use the <code>&quot;opt.digits&quot;</code> option to change this. If it is set to <code>TRUE</code>, the number of digits is set to a more realistic value based on the estimates and their confidence or HPD intervals. In the remainder of this vignette, we turn on this option; observe that fewer digits are displayed than those that came before.</p>
-<pre class="r"><code>emm_options(opt.digits = TRUE)</code></pre>
+<p>When an <code>emmGrid</code> object is summarized and displayed, the factory default is to display it with just enough digits as is justified by the standard errors or HPD intervals of the estimates displayed. You may use the <code>&quot;opt.digits&quot;</code> option to change this. If it is <code>TRUE</code> (the default), we display only enough digits as is justified (but at least 3). If it is set to <code>FALSE</code>, the number of digits is set using the R system’s default, <code>getOption(&quot;digits&quot;)</code>; this is often much more precision than is justified. To illustrate, here is the summary of <code>pigs.emm</code> displayed without optimizing digits. Compare it with the first summary in this vignette.</p>
+<pre class="r"><code>emm_options(opt.digits = FALSE)
+pigs.emm</code></pre>
+<pre class="ro"><code>##  source   emmean         SE df lower.CL upper.CL
+##  fish   3.394492 0.03668122 23 3.318612 3.470373
+##  soy    3.667260 0.03744798 23 3.589793 3.744727
+##  skim   3.796770 0.03938283 23 3.715300 3.878240
+## 
+## Results are averaged over the levels of: percent 
+## Results are given on the log (not the response) scale. 
+## Confidence level used: 0.95</code></pre>
+<pre class="r"><code>emm_options(opt.digits = TRUE)  # revert to optimal digits</code></pre>
 <p>By the way, setting this option does <em>not</em> round the calculated values computed by <code>summary.emmGrid()</code> or saved in a <code>summary)emm</code> object; it simply controls the precision displayed by <code>print.summary_emm()</code>.</p>
 </div>
 <div id="startup" class="section level3">
 <h3>Startup options</h3>
-<p>The options accessed by <code>emm_options()</code> and <code>get_emm_option()</code> are stored in a list named <code>emmeans</code> within R’s options environment. Therefore, if you desire options other than the defaults provided on a regular basis, this can be easily arranged by specifying them in your startup script for R. For example, if you usually want optimal precision and confidence intervals for contrasts, your <code>.Rprofile</code> file could contain the line</p>
-<pre class="r"><code>options(emmeans = list(opt.digits = TRUE, 
+<!-- @index Startup options; Options!Startup -->
+<p>The options accessed by <code>emm_options()</code> and <code>get_emm_option()</code> are stored in a list named <code>emmeans</code> within R’s options environment. Therefore, if you desire options other than the defaults provided on a regular basis, this can be easily arranged by specifying them in your startup script for R. For example, if you want to default to Satterthwaite degrees of freedom for <code>lmer</code> models, and display confidence intervals rather than tests for contrasts, your <code>.Rprofile</code> file could contain the line</p>
+<pre class="r"><code>options(emmeans = list(lmer.df = &quot;satterthwaite&quot;, 
                        contrast = list(infer = c(TRUE, FALSE))))</code></pre>
 <p><a href="#contents">Back to contents</a></p>
 </div>
@@ -162,12 +173,12 @@ pigs.anal.p</code></pre>
 <p>Two or more <code>emmGrid</code> objects may be combined using the <code>rbind()</code> or <code>+</code> methods. The most common reason (or perhaps the only good reason) to do this is to combine EMMs or contrasts into one family for purposes of applying a multiplicity adjustment to tests or intervals. A user may want to combine the three pairwise comparisons of sources with the three comparisons above of consecutive percents into a single family of six tests with a suitable multiplicity adjustment. This is done quite simply:</p>
 <pre class="r"><code>rbind(pairs(pigs.emm.s), pigs.anal.p[[2]])</code></pre>
 <pre class="ro"><code>##  contrast    estimate     SE df t.ratio p.value
-##  fish - soy   -0.2728 0.0529 23  -5.153  0.0002
-##  fish - skim  -0.4023 0.0542 23  -7.428  &lt;.0001
-##  soy - skim   -0.1295 0.0530 23  -2.442  0.1364
-##  12 - 9        0.1796 0.0561 23   3.202  0.0238
-##  15 - 12       0.0378 0.0582 23   0.650  1.0000
-##  18 - 15       0.0825 0.0691 23   1.194  1.0000
+##  fish - soy   -0.2728 0.0529 23 -5.153  0.0002 
+##  fish - skim  -0.4023 0.0542 23 -7.428  &lt;.0001 
+##  soy - skim   -0.1295 0.0530 23 -2.442  0.1364 
+##  12 - 9        0.1796 0.0561 23  3.202  0.0238 
+##  15 - 12       0.0378 0.0582 23  0.650  1.0000 
+##  18 - 15       0.0825 0.0691 23  1.194  1.0000 
 ## 
 ## Results are averaged over some or all of the levels of: percent, source 
 ## Results are given on the log (not the response) scale. 
@@ -175,12 +186,12 @@ pigs.anal.p</code></pre>
 <p>The default adjustment is <code>&quot;bonferroni&quot;</code>; we could have specified something different via the <code>adjust</code> argument. An equivalent way to combine <code>emmGrid</code>s is via the addition operator. Any options may be provided by <code>update()</code>. Below, we combine the same results into a family but ask for the “exact” multiplicity adjustment.</p>
 <pre class="r"><code>update(pigs.anal.p[[2]] + pairs(pigs.emm.s), adjust = &quot;mvt&quot;)</code></pre>
 <pre class="ro"><code>##  contrast    ratio     SE df lower.CL upper.CL t.ratio p.value
-##  12 / 9      1.197 0.0671 23    1.022    1.402   3.202  0.0213
-##  15 / 12     1.039 0.0604 23    0.881    1.224   0.650  0.9681
-##  18 / 15     1.086 0.0750 23    0.894    1.320   1.194  0.7306
-##  fish / soy  0.761 0.0403 23    0.656    0.884  -5.153  0.0002
-##  fish / skim 0.669 0.0362 23    0.574    0.779  -7.428  &lt;.0001
-##  soy / skim  0.879 0.0466 23    0.756    1.020  -2.442  0.1110
+##  12 / 9      1.197 0.0671 23    1.022    1.402  3.202  0.0212 
+##  15 / 12     1.039 0.0604 23    0.881    1.224  0.650  0.9680 
+##  18 / 15     1.086 0.0750 23    0.894    1.320  1.194  0.7305 
+##  fish / soy  0.761 0.0403 23    0.656    0.884 -5.153  0.0002 
+##  fish / skim 0.669 0.0362 23    0.574    0.779 -7.428  &lt;.0001 
+##  soy / skim  0.879 0.0466 23    0.756    1.020 -2.442  0.1109 
 ## 
 ## Results are averaged over some or all of the levels of: source, percent 
 ## Confidence level used: 0.95 
@@ -242,7 +253,7 @@ str(pigs.emm.ss)</code></pre>
 ## 
 ## $contrasts
 ##  contrast           estimate     SE df t.ratio p.value
-##  animal - vegetable  -0.0716 0.0455 23  -1.573  0.1295
+##  animal - vegetable  -0.0716 0.0455 23 -1.573  0.1295 
 ## 
 ## Results are averaged over the levels of: percent, source 
 ## Results are given on the log (not the response) scale.</code></pre>

@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.3.1" />
+<meta name="author" content="emmeans package, Version 1.3.2" />
 
 
 <title>For developers: Extending emmeans</title>
@@ -30,7 +30,7 @@
 
 
 <h1 class="title toc-ignore">For developers: Extending <strong>emmeans</strong></h1>
-<h4 class="author"><em>emmeans package, Version 1.3.1</em></h4>
+<h4 class="author"><em>emmeans package, Version 1.3.2</em></h4>
 
 
 
@@ -112,7 +112,7 @@ emmeans(fake.rlm, ~ B | A)</code></pre>
 ##     recover_data(fcall, delete.response(terms(object)), object$na.action, 
 ##         ...)
 ## }
-## &lt;bytecode: 0x000000001fe017d0&gt;
+## &lt;bytecode: 0x000000001fd531d8&gt;
 ## &lt;environment: namespace:emmeans&gt;</code></pre>
 <p>Note that all it does is obtain the <code>call</code> component and call the method for class <code>call</code>, with additional arguments for its <code>terms</code> component and <code>na.action</code>. It happens that we can access these attributes in exactly the same way as for <code>lm</code> objects; so:</p>
 <pre class="r"><code>recover_data.lqs = emmeans:::recover_data.lm</code></pre>
@@ -161,7 +161,7 @@ head(rec.fake)</code></pre>
 ##     X &lt;- model.matrix(Terms, m, contrasts = object$contrasts)
 ##     drop(X %*% object$coefficients)
 ## }
-## &lt;bytecode: 0x0000000022474648&gt;
+## &lt;bytecode: 0x0000000022499020&gt;
 ## &lt;environment: namespace:MASS&gt;</code></pre>
 <div id="eblqs" class="section level6">
 <h6></h6>
@@ -232,7 +232,9 @@ head(rec.fake)</code></pre>
 <li><code>emmeans::.aovlist.dffun(k, dfargs)</code> This function is exported because it is needed for computing degrees of freedom for models fitted using <code>aov</code>, but it may be useful for other cases where Satterthwaite degrees-of-freedom calculations are needed. It requires the <code>dfargs</code> slot to contain analogous contents.</li>
 <li><code>emmeans::.get.offset(terms, grid)</code> If <code>terms</code> is a model formula containing an <code>offset</code> call, this is will compute that offset in the context of <code>grid</code> (a <code>data.frame</code>).</li>
 <li><code>emmeans::.my.vcov(object, ...)</code> In a call to <code>ref_grid</code>, <code>emmeans</code>, etc., the user may use <code>vcov.</code> to specify an alternative function or matrix to use as the covariance matrix of the fixed-effects coefficients. This function supports that feature. Calling <code>.my.vcov</code> in place of the <code>vcov</code> method will substitute the user’s <code>vcov.</code> when it is specified.</li>
-<li><p><code>emmeans::.std.link.labels(fam, misc)</code> This is useful in <code>emm_basis</code> methods for generalized linear models. Call it with <code>fam</code> equal to the <code>family</code> object for your model, and <code>misc</code> either an existing list, or just <code>list()</code> if none. It returns a new <code>misc</code> list containing the link function and, in some cases, extra features that are used for certain types of link functions (e.g., for a log link, the setups for returning ratio comparisons with <code>type = &quot;response&quot;</code>).</p></li>
+<li><code>emmeans::.std.link.labels(fam, misc)</code> This is useful in <code>emm_basis</code> methods for generalized linear models. Call it with <code>fam</code> equal to the <code>family</code> object for your model, and <code>misc</code> either an existing list, or just <code>list()</code> if none. It returns a new <code>misc</code> list containing the link function and, in some cases, extra features that are used for certain types of link functions (e.g., for a log link, the setups for returning ratio comparisons with <code>type = &quot;response&quot;</code>).</li>
+<li><code>emmeans::.num.key(levs, key)</code> Returns integer indices of elements of <code>key</code> in <code>levs</code> when <code>key</code> is a character vector; or just returns integer values if already integer. Also throws an error if levels are mismatched or indices exceed legal range. This is useful in custom contrast functions (<code>.emmc</code> functions).</li>
+<li><p><code>emmeans::.get.excl(levs, exclude, include)</code> This is support for the <code>exclude</code> and <code>include</code> arguments of contrast functions. It checks legality and returns an integer vector of <code>exclude</code> indices in <code>levs</code>, given specified integer or character arguments <code>exclude</code> and <code>include</code>. In your <code>.emmc</code> function, <code>exclude</code> should default to <code>integer(0)</code> and <code>include</code> should have no default.</p></li>
 </ul>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
