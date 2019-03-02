@@ -1,5 +1,24 @@
 ## NEWS for the emmeans package
 
+emmeans 1.3.3
+-------------
+
+  * Fix to unintended consequence of #71 that caused incorrect ordering 
+    of `contrast()` results if they are later used by `emmeans()`.
+    This was first noticed with ordinal models in `prob` mode (#83).
+  * Improved checking of conformability of parameters -- for models
+    with rank deficiency not handled same way as lm()'s NA convention
+  * Added basic support for `sommer::mmer`, `MuMIn::averaging`, and
+    `mice::mira` objects
+  * Fix in `nnet::multinom` support when there are 2 outcomes (#19)
+  * Added Satterthwaite d.f. to `gls` objects
+  * `famSize` now correct when `exclude` or `include` is used in 
+    a contrast function (see #68)
+  * Stronger warnings of possible bias with `aovList` objects, in part
+    due to the popularity of `afex::aov_ez()` which uses these models.
+  * Updates to FAQs vignette
+
+
 
 emmeans 1.3.2
 -------------

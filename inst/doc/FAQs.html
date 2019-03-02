@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.3.2" />
+<meta name="author" content="emmeans package, Version 1.3.3" />
 
 
 <title>FAQs for emmeans</title>
@@ -30,7 +30,7 @@
 
 
 <h1 class="title toc-ignore">FAQs for emmeans</h1>
-<h4 class="author"><em>emmeans package, Version 1.3.2</em></h4>
+<h4 class="author"><em>emmeans package, Version 1.3.3</em></h4>
 
 
 
@@ -40,6 +40,7 @@
 <h2>Contents</h2>
 <ol style="list-style-type: decimal">
 <li><a href="#what">What are EMMs/lsmeans?</a></li>
+<li><a href="#fastest">What is the fastest way to obtain EMMs and pairwise comparisons?</a></li>
 <li><a href="#interactions">I have three (or two or four) factors that interact</a></li>
 <li><a href="#trends">I have covariate(s) that interact(s) with factor(s)</a></li>
 <li><a href="#polys">I have covariate(s) and am fitting a polynomial model</a></li>
@@ -51,7 +52,8 @@
 <li><a href="#asymp">Why do I get <code>Inf</code> for the degrees of freedom?</a></li>
 <li><a href="#additive">I get exactly the same comparisons for each “by” group</a></li>
 <li><a href="#anova">My ANOVA <em>F</em> is significant, but no pairwise comparisons are</a></li>
-<li><a href="#namespace">I get annoying messages about namespaces</a></li>
+<li><a href="#notukey">I asked for a Tukey adjustments, but that’s not what I got</a></li>
+<li><a href="#nowelch"><code>emmeans()</code> gives me pooled <em>t</em> tests, but I expected Welch’s <em>t</em></a></li>
 </ol>
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
 </div>
@@ -59,6 +61,17 @@
 <h2>What are EMMs/lsmeans?</h2>
 <!-- @index EMMs!What are they?; Least-squares means -->
 <p>Estimated marginal means (EMMs), a.k.a. least-squares means, are predictions on a reference grid of predictor settings, or marginal averages thereof. See details in <a href="basics.html">the “basics” vignette</a>.</p>
+</div>
+<div id="fastest" class="section level2">
+<h2>What is the fastest way to obtain EMMs and pairwise comparisons?</h2>
+<!-- @index Model!Importance of; Quick start; -->
+<p>There are two answers to this (i.e., be careful what you wish for):</p>
+<ol style="list-style-type: decimal">
+<li>Don’t think; just fit the first model that comes to mind and run <code>emmeans(model, pairwise ~ treatment)</code>. This is the fastest way; however, the results have a good chance of being invalid.</li>
+<li><em>Do</em> think: Make sure you fit a model that really explains the responses. Do diagnostic residual plots, include appropriate interactions, account for heteroscadestaicity if necessary, etc. This is the fastest way to obtain <em>appropriate</em> estimates and comparisons.</li>
+</ol>
+<p>The point here is that <code>emmeans()</code> summarizes the <em>model</em>, not the data directly. If you use a bad model, you will get bad results. And if you use a good model, you will get appropriate results. It’s up to you: it’s your research—is it important?</p>
+<p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="interactions" class="section level2">
 <h2>I have three (or two or four) factors that interact</h2>
@@ -127,9 +140,9 @@ emmeans(pg.lm, consec ~ percent)</code></pre>
 ## 
 ## $contrasts
 ##  contrast estimate     SE df t.ratio p.value
-##  12 - 9     0.1796 0.0561 23 3.202   0.0109 
+##  12 - 9     0.1796 0.0561 23 3.202   0.0112 
 ##  15 - 12    0.0378 0.0582 23 0.650   0.8613 
-##  18 - 15    0.0825 0.0691 23 1.194   0.5201 
+##  18 - 15    0.0825 0.0691 23 1.194   0.5200 
 ## 
 ## Results are averaged over the levels of: source 
 ## Results are given on the log (not the response) scale. 
@@ -172,12 +185,32 @@ emmeans(pg.lm, consec ~ percent)</code></pre>
 <p>This is a common misunderstanding of ANOVA. If <em>F</em> is significant, this implies only that <em>some contrast</em> among the means (or effects) is statistically significant (compared to a Scheffé critical value). That contrast may be very much unlike a pairwise comparison, especially when there are several means being compared. Another factor is that by default, <em>P</em> values for pairwise comparisons are adjusted using the Tukey method, and the adjusted <em>P</em> values can be quite a bit larger than the unadjusted ones. (But I definitely do <em>not</em> advocate using no adjustment to “repair” this problem.)</p>
 <p>As is shown in <a href="https://stats.stackexchange.com/questions/83131/how-much-smaller-can-p-values-from-anovas-f-test-be-vs-those-from-multiple/109422#109422">my answer in a <em>Cross Validated</em> discussion</a>, the unadjusted <em>P</em> value can be more than .15 when <em>F</em> is significant (remarkably, regardless of the significance level used for <em>F</em>!).</p>
 </div>
-<div id="namespace" class="section level2">
-<h2>I get annoying messages about namespaces</h2>
-<!-- @index Annoying messages; `convert_workspace()` -->
-<p>This probably happens because somehow the <strong>lsmeans</strong> package or its namespace has been loaded – possibly because some old objects from that package are still in your workspace. Try this:</p>
-<pre class="r"><code>emmeans:::convert_workspace()</code></pre>
-<p>This non-exported function removes <code>Last.ref.grid</code> if it exists, converts every <code>ref.grid</code> or <code>lsmobj</code> object to class <code>emmGrid</code>, and unloads any vestige of the <strong>lsmeans</strong> package. [Note: You may get an error message if there are other packages loaded that depend on <strong>lsmeans</strong>. If so, <code>detach(package:</code><em>pkg</em><code>, unload = TRUE)</code> any that are in <code>search()</code> and use <code>unloadNamespace(&quot;pkg&quot;)</code> for others; then re-run <code>emmeans:::convert_workspace()</code>.]</p>
+<div id="notukey" class="section level2">
+<h2>I asked for Tukey adjustments, but that’s not what I got</h2>
+<!-- @index Tukey adjustment!Ignored or changed -->
+<p>There are two reasons this could happen:</p>
+<ol style="list-style-type: decimal">
+<li>There are only two means (or only two in each <code>by</code> group). Thus there is only one comparison. When there is only one thing to test, there is no multiplicity issue, and hence no multiplicity adjustment to the <em>P</em> values.</li>
+<li>A Tukey adjustment is inappropriate. The Tukey adjustment is appropriate for pairwise comparisons of means. When you have some other set of contrasts, the Tukey method is deemed unsuitable and the Sidak method is used instead. A suggestion is to use <code>&quot;mvt&quot;</code> adjustment (which is exact); we don’t default to this because it can require a lot of computing time for a large set of contrasts or comparisons.</li>
+</ol>
+<p><a href="#contents">Back to Contents</a></p>
+</div>
+<div id="nowelch" class="section level2">
+<h2><code>emmeans()</code> gives me pooled <em>t</em> tests, but I expected Welch’s <em>t</em></h2>
+<!-- @index Welch's *t* comparisons; Pooled *t*!Instead of Welch's *t*;
+            Model!Importance of getting it right; `emmeans()`!And the underlying model;
+            Get the model right first -->
+<p>It is important to note that <code>emmeans()</code> and its relatives produce results based on the <em>model object</em> that you provide – not the data. So if your sample SDs are wildly different, a model fitted using <code>lm()</code> or <code>aov()</code> is not a good model, because those R functions use a statistical model that presumes that the errors have constant variance. That is, the problem isn’t in <code>emmeans()</code>, it’s in handing it an inadequate model object.</p>
+<p>Here is a simple illustrative example. Consider a simple one-way experiment and the following model:</p>
+<pre><code>mod1 &lt;- aov(response ~ treat, data = mydata)
+emmeans(mod1, pairwise ~ treat)</code></pre>
+<p>This code will estimate means and comparisons among treatments. All standard errors, confidence intervals, and <em>t</em> statistics are based on the pooled residual SD with <em>N - k</em> degrees of freedom (assuming <em>N</em> observations and <em>k</em> treatments). These results are useful <em>only</em> if the underlying assumptions of <code>mod1</code> are correct – including the assumption that the error SD is the same for all treatments.</p>
+<p>Alternatively, you could fit the following model using generalized least-squares:</p>
+<pre><code>mod2 = nlme::gls(response ~ treat, data = mydata,
+                 weights = varIdent(form = ~1 | treat))
+emmeans(mod2, pairwise ~ treat)</code></pre>
+<p>This model specifies that the error variance depends on the levels of <code>treat</code>. This would be a much better model to use when you have wildly different sample SDs. The results of the <code>emmeans()</code> call will reflect this improvement in the modeling. The standard errors of the EMMs will depend on the individual sample variances, and the <em>t</em> tests of the comparisons will be in essence the Welch <em>t</em> statistics with Satterthwaite degrees of freedom.</p>
+<p>To obtain appropriate <em>post hoc</em> estimates, contrasts, and comparisons, one must first find a model that successfully explains the peculiarities in the data. This point cannot be emphasized enough. If you give <code>emmeans()</code> a good model, you will obtain correct results; if you give it a bad model, you will obtain incorrect results. Get the model right <em>first</em>.</p>
 <p><a href="#contents">Back to Contents</a></p>
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
 </div>

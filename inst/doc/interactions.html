@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.3.2" />
+<meta name="author" content="emmeans package, Version 1.3.3" />
 
 
 <title>Interaction analysis in emmeans</title>
@@ -30,7 +30,7 @@
 
 
 <h1 class="title toc-ignore">Interaction analysis in emmeans</h1>
-<h4 class="author"><em>emmeans package, Version 1.3.2</em></h4>
+<h4 class="author"><em>emmeans package, Version 1.3.3</em></h4>
 
 
 
@@ -144,26 +144,26 @@ anova(noise.lm)</code></pre>
 <p>Ordinarily, when <code>simple</code> is a list (or equal to <code>&quot;each&quot;</code>), a list of contrast sets is returned. However, if the additional argument <code>combine</code> is set to <code>TRUE</code>, they are all combined into one family:</p>
 <pre class="r"><code>contrast(noise.emm, &quot;consec&quot;, simple = &quot;each&quot;, combine = TRUE, adjust = &quot;mvt&quot;)</code></pre>
 <pre class="ro"><code>##  side type  size contrast    estimate   SE df t.ratio p.value
-##  L    Std   .    M - S          15.00 3.12 24   4.811 0.0012 
+##  L    Std   .    M - S          15.00 3.12 24   4.811 0.0011 
 ##  L    Std   .    L - M         -86.67 3.12 24 -27.795 &lt;.0001 
 ##  R    Std   .    M - S          25.00 3.12 24   8.018 &lt;.0001 
 ##  R    Std   .    L - M         -55.00 3.12 24 -17.639 &lt;.0001 
-##  L    Octel .    M - S          -3.33 3.12 24  -1.069 0.9769 
+##  L    Octel .    M - S          -3.33 3.12 24  -1.069 0.9770 
 ##  L    Octel .    L - M         -56.67 3.12 24 -18.174 &lt;.0001 
 ##  R    Octel .    M - S           1.67 3.12 24   0.535 0.9999 
 ##  R    Octel .    L - M         -46.67 3.12 24 -14.967 &lt;.0001 
 ##  .    Std   S    R - L         -18.33 3.12 24  -5.880 0.0001 
-##  .    Std   M    R - L          -8.33 3.12 24  -2.673 0.1712 
+##  .    Std   M    R - L          -8.33 3.12 24  -2.673 0.1714 
 ##  .    Std   L    R - L          23.33 3.12 24   7.483 &lt;.0001 
-##  .    Octel S    R - L          -5.00 3.12 24  -1.604 0.7749 
+##  .    Octel S    R - L          -5.00 3.12 24  -1.604 0.7752 
 ##  .    Octel M    R - L           0.00 3.12 24   0.000 1.0000 
-##  .    Octel L    R - L          10.00 3.12 24   3.207 0.0562 
-##  L    .     S    Octel - Std   -10.00 3.12 24  -3.207 0.0567 
+##  .    Octel L    R - L          10.00 3.12 24   3.207 0.0565 
+##  L    .     S    Octel - Std   -10.00 3.12 24  -3.207 0.0571 
 ##  L    .     M    Octel - Std   -28.33 3.12 24  -9.087 &lt;.0001 
 ##  L    .     L    Octel - Std     1.67 3.12 24   0.535 0.9999 
-##  R    .     S    Octel - Std     3.33 3.12 24   1.069 0.9769 
+##  R    .     S    Octel - Std     3.33 3.12 24   1.069 0.9767 
 ##  R    .     M    Octel - Std   -20.00 3.12 24  -6.414 &lt;.0001 
-##  R    .     L    Octel - Std   -11.67 3.12 24  -3.742 0.0166 
+##  R    .     L    Octel - Std   -11.67 3.12 24  -3.742 0.0165 
 ## 
 ## P value adjustment: mvt method for 20 tests</code></pre>
 <p>The dots (<code>.</code>) in this result correspond to which simple effect is being displayed. If we re-run this same call with <code>combine = FALSE</code> or omitted, these twenty comparisons would be displayed in three broad sets of contrasts, each broken down further by combinations of <code>by</code> variables, each separately multiplicity-adjusted (a total of 16 different tables).</p>
@@ -188,34 +188,27 @@ anova(noise.lm)</code></pre>
 ## 
 ## Results are averaged over the levels of: side</code></pre>
 <p>The comparison of these contrasts may be done using the <code>interaction</code> argument in <code>contrast()</code> as follows:</p>
-<pre class="r"><code>IC_st &lt;- contrast(emm_s.t[[1]], interaction = c(&quot;poly&quot;, &quot;consec&quot;))
+<pre class="r"><code>IC_st &lt;- contrast(emm_s.t[[1]], interaction = c(&quot;poly&quot;, &quot;consec&quot;), by = NULL)
 IC_st</code></pre>
-<pre class="ro"><code>## type = Std:
-##  size_poly estimate   SE df t.ratio p.value
-##  linear       -50.8 2.20 24 -23.056 &lt;.0001 
-##  quadratic    -90.8 3.82 24 -23.786 &lt;.0001 
-## 
-## type = Octel:
-##  size_poly estimate   SE df t.ratio p.value
-##  linear       -52.5 2.20 24 -23.812 &lt;.0001 
-##  quadratic    -50.8 3.82 24 -13.311 &lt;.0001 
+<pre class="ro"><code>##  size_poly type_consec estimate   SE df t.ratio p.value
+##  linear    Octel - Std    -1.67 3.12 24 -0.535  0.5979 
+##  quadratic Octel - Std    40.00 5.40 24  7.407  &lt;.0001 
 ## 
 ## Results are averaged over the levels of: side</code></pre>
-<p>The practical meaning of this is that there isn’t a statistical difference in the linear trends, but the quadratic trend for Octel is greater than for standard filter types. (Both quadratic trends are negative, so in fact it is the standard filters that have more pronounced <em>downward</em> curvature, as is seen in the plot.) In case you need to understand more clearly what contrasts are being estimated, the <code>coef()</code> method helps:</p>
+<p>(Using <code>by = NULL</code> restores <code>type</code> to a primary factor in these contrasts.) The practical meaning of this is that there isn’t a statistical difference in the linear trends, but the quadratic trend for Octel is greater than for standard filter types. (Both quadratic trends are negative, so in fact it is the standard filters that have more pronounced <em>downward</em> curvature, as is seen in the plot.) In case you need to understand more clearly what contrasts are being estimated, the <code>coef()</code> method helps:</p>
 <pre class="r"><code>coef(IC_st)</code></pre>
-<pre class="ro"><code>##   size  type c.1 c.2 c.3 c.4
-## 1    S   Std  -1   1   0   0
-## 2    M   Std   0  -2   0   0
-## 3    L   Std   1   1   0   0
-## 4    S Octel   0   0  -1   1
-## 5    M Octel   0   0   0  -2
-## 6    L Octel   0   0   1   1</code></pre>
+<pre class="ro"><code>##   size  type c.1 c.2
+## 1    S   Std   1  -1
+## 2    M   Std   0   2
+## 3    L   Std  -1  -1
+## 4    S Octel  -1   1
+## 5    M Octel   0  -2
+## 6    L Octel   1   1</code></pre>
 <p>Note that the 4th through 6th contrast coefficients are the negatives of the 1st through 3rd – thus a comparison of two contrasts.</p>
 <p>By the way, “type III” tests of interaction effects can be obtained via interaction contrasts:</p>
 <pre class="r"><code>test(IC_st, joint = TRUE)</code></pre>
-<pre class="ro"><code>##  type  df1 df2 F.ratio p.value
-##  Std     2  24 548.667 &lt;.0001 
-##  Octel   2  24 372.095 &lt;.0001</code></pre>
+<pre class="ro"><code>##  df1 df2 F.ratio p.value
+##    2  24  27.571 &lt;.0001</code></pre>
 <p>This result is exactly the same as the <em>F</em> test of <code>size:type</code> in the <code>anova</code> output.</p>
 <p>The three-way interaction may be explored via interaction contrasts too:</p>
 <pre class="r"><code>contrast(emmeans(noise.lm, ~ size*type*side),

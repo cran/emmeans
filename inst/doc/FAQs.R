@@ -12,6 +12,3 @@ emmeans(pg.lm, consec ~ percent)
 qt(c(.9, .95, .975), df = Inf)
 qnorm(c(.9, .95, .975))
 
-## ----eval = FALSE--------------------------------------------------------
-#  emmeans:::convert_workspace()
-
