@@ -1,5 +1,36 @@
 ## NEWS for the emmeans package
 
+emmeans 1.3.4
+-------------
+
+  * Un-naming a lot of arguments in `do.call(paste, ...)` and `do.call(order, ...)`,
+    to prevent problems with factor names like `method` that are argument names
+    for these functions (#94)
+  * Fix to a logic error in `summary.emmGrid()` whereby transformations of class
+    `list` were ignored.
+  * Enhancement to `update.emmGrid(..., levels = levs)` whereby we can easily
+    relabel the reference grid and ensure that the `grid` and `roles` slots
+    stay consistent. Added vignette example.
+  * Clarified ordering rules used by `emmeans()`. We now ensure that the
+    original order of the reference grid is preserved. Previously, the grid 
+    was re-ordered if any numeric or character levels occurred out of order, 
+    per `order()`
+  * Curbing use of "statistical significance" language. This includes
+    additional vignette material and plans to deprecate `CLD()` due to its 
+    misleading display of pairwise-comparison tests.
+  * Bug fix for `betareg` objects, where the wrong `terms` component was 
+    sometimes used.
+  * Correction to logic error that affected multiplicity adjustments when
+    `by` variables are present (#98).
+  * Addition of `pwpp()` function to plot *P* values of comparisons
+  * Improvement to `summary(..., adjust = "scheffe")`. We now actually
+    compute and use the rank of the matrix of linear functions to obtain
+    the *F* numerator d.f., rather than trying to guess the likely correct 
+    value.
+  * Removal of vignette on transitioning from **lsmeans** -- 
+    it's been a long enough time now.
+  
+
 emmeans 1.3.3
 -------------
 

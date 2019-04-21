@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.3.3" />
+<meta name="author" content="emmeans package, Version 1.3.4" />
 
 
 <title>FAQs for emmeans</title>
@@ -30,7 +30,7 @@
 
 
 <h1 class="title toc-ignore">FAQs for emmeans</h1>
-<h4 class="author"><em>emmeans package, Version 1.3.3</em></h4>
+<h4 class="author"><em>emmeans package, Version 1.3.4</em></h4>
 
 
 
@@ -44,6 +44,7 @@
 <li><a href="#interactions">I have three (or two or four) factors that interact</a></li>
 <li><a href="#trends">I have covariate(s) that interact(s) with factor(s)</a></li>
 <li><a href="#polys">I have covariate(s) and am fitting a polynomial model</a></li>
+<li><a href="#CIerror">Some “significant” comparisons have overlapping confidence intervals</a></li>
 <li><a href="#notfactor">All my pairwise comparisons have the same <em>P</em> value</a></li>
 <li><a href="#numeric">emmeans() doesn’t work as expected</a></li>
 <li><a href="#NAs">All or some of the results are NA</a></li>
@@ -68,7 +69,7 @@
 <p>There are two answers to this (i.e., be careful what you wish for):</p>
 <ol style="list-style-type: decimal">
 <li>Don’t think; just fit the first model that comes to mind and run <code>emmeans(model, pairwise ~ treatment)</code>. This is the fastest way; however, the results have a good chance of being invalid.</li>
-<li><em>Do</em> think: Make sure you fit a model that really explains the responses. Do diagnostic residual plots, include appropriate interactions, account for heteroscadestaicity if necessary, etc. This is the fastest way to obtain <em>appropriate</em> estimates and comparisons.</li>
+<li><em>Do</em> think: Make sure you fit a model that really explains the responses. Do diagnostic residual plots, include appropriate interactions, account for heteroscadesticity if necessary, etc. This is the fastest way to obtain <em>appropriate</em> estimates and comparisons.</li>
 </ol>
 <p>The point here is that <code>emmeans()</code> summarizes the <em>model</em>, not the data directly. If you use a bad model, you will get bad results. And if you use a good model, you will get appropriate results. It’s up to you: it’s your research—is it important?</p>
 <p><a href="#contents">Back to Contents</a></p>
@@ -93,6 +94,12 @@
 <div id="polys" class="section level2">
 <h2>I have covariate(s) and am fitting a polynomial model</h2>
 <p>You need to be careful to define the reference grid consistently. For example, if you use covariates <code>x</code> and <code>xsq</code> (equal to <code>x^2</code>) to fit a quadratic curve, the default reference grid uses the mean of each covariate – and <code>mean(xsq)</code> is usually not the same as <code>mean(x)^2</code>. So you need to use <code>at</code> to ensure that the covariates are set consistently with respect to the model. See <a href="basics.html#depcovs">this subsection of the “basics” vignette</a> for an example.</p>
+</div>
+<div id="CIerror" class="section level2">
+<h2>3. Some “significant” comparisons have overlapping confidence intervals</h2>
+<!-- @index Confidence intervals!Overlapping; Comparisons!with overlapping CIs@over -->
+<p>That can happen because <em>it is just plain wrong to use [non-]overlapping CIs for individual means to do comparisons</em>. Look at the printed results from something like <code>emmeans(mymodel, pairwise ~ treatment)</code>. In particular, note that the <code>SE</code> values are <em>not</em> the same*, and may even have different degrees of freedom. Means are one thing statistically, and differences of means are quite another thing. Don’t ever mix them up, and don’t ever use a CI display for comparing means.</p>
+<p>I’ll add that making hard-line decisions about “significant” and “non-significant” is in itself a poor practice. See <a href="basics.html#pvalues">the discussion in the “basics” vignette</a></p>
 </div>
 <div id="notfactor" class="section level2">
 <h2>All my pairwise comparisons have the same <em>P</em> value</h2>
@@ -142,7 +149,7 @@ emmeans(pg.lm, consec ~ percent)</code></pre>
 ##  contrast estimate     SE df t.ratio p.value
 ##  12 - 9     0.1796 0.0561 23 3.202   0.0112 
 ##  15 - 12    0.0378 0.0582 23 0.650   0.8613 
-##  18 - 15    0.0825 0.0691 23 1.194   0.5200 
+##  18 - 15    0.0825 0.0691 23 1.194   0.5202 
 ## 
 ## Results are averaged over the levels of: source 
 ## Results are given on the log (not the response) scale. 
@@ -181,9 +188,10 @@ emmeans(pg.lm, consec ~ percent)</code></pre>
 <div id="anova" class="section level2">
 <h2>My ANOVA <em>F</em> is significant, but no pairwise comparisons are</h2>
 <!-- @index *F* test!vs. pairwise comparisons@pairwz
-        Analysis of variance!versus *pos hoc* comparisons@post -->
-<p>This is a common misunderstanding of ANOVA. If <em>F</em> is significant, this implies only that <em>some contrast</em> among the means (or effects) is statistically significant (compared to a Scheffé critical value). That contrast may be very much unlike a pairwise comparison, especially when there are several means being compared. Another factor is that by default, <em>P</em> values for pairwise comparisons are adjusted using the Tukey method, and the adjusted <em>P</em> values can be quite a bit larger than the unadjusted ones. (But I definitely do <em>not</em> advocate using no adjustment to “repair” this problem.)</p>
-<p>As is shown in <a href="https://stats.stackexchange.com/questions/83131/how-much-smaller-can-p-values-from-anovas-f-test-be-vs-those-from-multiple/109422#109422">my answer in a <em>Cross Validated</em> discussion</a>, the unadjusted <em>P</em> value can be more than .15 when <em>F</em> is significant (remarkably, regardless of the significance level used for <em>F</em>!).</p>
+        Analysis of variance!versus *post hoc* comparisons@post -->
+<p>First of all, you should not be making binary decisions of “significant” or “nonsignificant.” This is a simplistic view of <em>P</em> values that assigns an unmerited magical quality to the value 0.05. It is suggested that you just report the <em>P</em> values actually obtained, and let your readers decide how significant your findings are in the context of the scientific findings.</p>
+<p>But to answer the question: This is a common misunderstanding of ANOVA. If <em>F</em> has a particular <em>P</em> value, this implies only that <em>some contrast</em> among the means (or effects) has the same <em>P</em> value, after applying the Scheffe adjustment. That contrast may be very much unlike a pairwise comparison, especially when there are several means being compared. Having an <em>F</em> statistic with a <em>P</em> value of, say, 0.06, does <em>not</em> imply that any pairwise comparison will have a <em>P</em> value of 0.06 or smaller. Again referring to the paragraph above, just report the <em>P</em> value for each pairwise comparison, and don’t try to relate them to the <em>F</em> statistic.</p>
+<p>Another consideration is that by default, <em>P</em> values for pairwise comparisons are adjusted using the Tukey method, and the adjusted <em>P</em> values can be quite a bit larger than the unadjusted ones. (But I definitely do <em>not</em> advocate using no adjustment to “repair” this problem.)</p>
 </div>
 <div id="notukey" class="section level2">
 <h2>I asked for Tukey adjustments, but that’s not what I got</h2>

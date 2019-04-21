@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.3.3" />
+<meta name="author" content="emmeans package, Version 1.3.4" />
 
 
 <title>Confidence intervals and tests in emmeans</title>
@@ -30,7 +30,7 @@
 
 
 <h1 class="title toc-ignore">Confidence intervals and tests in emmeans</h1>
-<h4 class="author"><em>emmeans package, Version 1.3.3</em></h4>
+<h4 class="author"><em>emmeans package, Version 1.3.4</em></h4>
 
 
 
@@ -149,7 +149,7 @@ class(pigs.emm.s)</code></pre>
 <h2>Multiplicity adjustments</h2>
 <!-- @index Multiplicity adjustments; `adjust`; 
      Tukey adjustment; Sidak adjustment -->
-<p>Both tests and confidence intervals may be adjusted for simultaneous inference. Such adjustments ensure that the confidence coefficient for a whole set of intervals is at least the specified level, or to control the overall significance level for a whole family of tests. This is done via the <code>adjust</code> argument. For <code>ref_grid()</code> and <code>emmeans()</code> results, the default is <code>adjust = &quot;none&quot;</code>. For most <code>contrast()</code> results, <code>adjust</code> is often something else, depending on what type of contrasts are created. For example, pairwise comparisons default to <code>adjust = &quot;tukey&quot;</code>, i.e., the Tukey HSD method. The <code>summary()</code> function sometimes <em>changes</em> <code>adjust</code> if it is inappropriate. For example, with</p>
+<p>Both tests and confidence intervals may be adjusted for simultaneous inference. Such adjustments ensure that the confidence coefficient for a whole set of intervals is at least the specified level, or to control for multiplicity in a whole family of tests. This is done via the <code>adjust</code> argument. For <code>ref_grid()</code> and <code>emmeans()</code> results, the default is <code>adjust = &quot;none&quot;</code>. For most <code>contrast()</code> results, <code>adjust</code> is often something else, depending on what type of contrasts are created. For example, pairwise comparisons default to <code>adjust = &quot;tukey&quot;</code>, i.e., the Tukey HSD method. The <code>summary()</code> function sometimes <em>changes</em> <code>adjust</code> if it is inappropriate. For example, with</p>
 <pre class="r"><code>confint(pigs.emm.s, adjust = &quot;tukey&quot;)</code></pre>
 <pre class="ro"><code>##  source emmean     SE df lower.CL upper.CL
 ##  fish     3.39 0.0367 23     3.30     3.49
@@ -166,7 +166,7 @@ class(pigs.emm.s)</code></pre>
 <!-- @index **mvtnorm** package; Bonferroni adjustment
      Multivariate *t* (`"mvt"`) adjustment; Unadjusted tests -->
 <p>An adjustment method that is usually appropriate is Bonferroni; however, it can be quite conservative. Using <code>adjust = &quot;mvt&quot;</code> is the closest to being the “exact” all-around method “single-step” method, as it uses the multivariate <em>t</em> distribution (and the <strong>mvtnorm</strong> package) with the same covariance structure as the estimates to determine the adjustment. However, this comes at high computational expense as the computations are done using simulation techniques. For a large set of tests (and especially confidence intervals), the computational lag becomes noticeable if not intolerable.</p>
-<p>For tests, <code>adjust</code> increases the <em>P</em> values over those otherwise obtained with <code>adjust = &quot;none&quot;</code>, making it harder to declare an individual test as “significant.” Compare the following adjusted tests with the unadjusted ones previously computed.</p>
+<p>For tests, <code>adjust</code> increases the <em>P</em> values over those otherwise obtained with <code>adjust = &quot;none&quot;</code>. Compare the following adjusted tests with the unadjusted ones previously computed.</p>
 <pre class="r"><code>test(pigs.emm.s, null = log(40), side = &quot;&gt;&quot;, adjust = &quot;bonferroni&quot;)</code></pre>
 <pre class="ro"><code>##  source emmean     SE df null t.ratio p.value
 ##  fish     3.39 0.0367 23 3.69 -8.026  1.0000 
@@ -222,7 +222,7 @@ pigsint.rg &lt;- ref_grid(pigsint.lm)
 contrast(pigsint.rg, &quot;consec&quot;, simple = &quot;percent&quot;)</code></pre>
 <pre class="ro"><code>## source = fish:
 ##  contrast estimate     SE df t.ratio p.value
-##  12 - 9     0.1849 0.1061 17  1.742  0.2356 
+##  12 - 9     0.1849 0.1061 17  1.742  0.2355 
 ##  15 - 12    0.0045 0.1061 17  0.042  0.9999 
 ##  18 - 15    0.0407 0.1061 17  0.383  0.9626 
 ## 
@@ -230,13 +230,13 @@ contrast(pigsint.rg, &quot;consec&quot;, simple = &quot;percent&quot;)</code></p
 ##  contrast estimate     SE df t.ratio p.value
 ##  12 - 9     0.1412 0.0949 17  1.487  0.3592 
 ##  15 - 12   -0.0102 0.0949 17 -0.108  0.9992 
-##  18 - 15    0.0895 0.1342 17  0.666  0.8572 
+##  18 - 15    0.0895 0.1342 17  0.666  0.8571 
 ## 
 ## source = skim:
 ##  contrast estimate     SE df t.ratio p.value
-##  12 - 9     0.2043 0.0949 17  2.152  0.1185 
+##  12 - 9     0.2043 0.0949 17  2.152  0.1189 
 ##  15 - 12    0.1398 0.1061 17  1.317  0.4521 
-##  18 - 15    0.1864 0.1424 17  1.309  0.4569 
+##  18 - 15    0.1864 0.1424 17  1.309  0.4568 
 ## 
 ## Results are given on the log (not the response) scale. 
 ## P value adjustment: mvt method for 3 tests</code></pre>
@@ -282,7 +282,7 @@ pigs.prs.s</code></pre>
 <div id="equiv" class="section level2">
 <h2>Testing equivalence, noninferiority, and nonsuperiority</h2>
 <!-- @index Tests!Equivalence; Tests!Noninferiority; `test()`!`delta` -->
-<p>The <code>delta</code> argument in <code>summary()</code> or <code>test()</code> allows the user to specify a threshold value to use in a test of equivalence, noninferiority, or nonsuperiority. An equivalence test is kind of a backwards significance test, where differences enough smaller than <code>delta</code> are the ones that can be significant. The help page for <code>summary.emmGrid</code> gives the details of these tests. Suppose in the present example, we consider two sources to be equivalent if they are within 25% of each other. We can test this as follows:</p>
+<p>The <code>delta</code> argument in <code>summary()</code> or <code>test()</code> allows the user to specify a threshold value to use in a test of equivalence, noninferiority, or nonsuperiority. An equivalence test is kind of a backwards significance test, where <em>P</em> values <em>decrease</em> as differences decrease below a specified threshold value <code>delta</code>. The help page for <code>summary.emmGrid</code> gives the details of these tests. Suppose in the present example, we consider two sources to be equivalent if they are within 25% of each other. We can test this as follows:</p>
 <pre class="r"><code>test(pigs.prs.s, delta = log(1.25), adjust = &quot;none&quot;)</code></pre>
 <pre class="ro"><code>##  contrast    estimate     SE df t.ratio p.value
 ##  fish - soy    -0.273 0.0529 23  0.937  0.8209 
@@ -293,7 +293,7 @@ pigs.prs.s</code></pre>
 ## Results are given on the log (not the response) scale. 
 ## Statistics are tests of equivalence with a threshold of 0.22314 
 ## P values are left-tailed</code></pre>
-<p>By our 25% standard, soy and skim are equivalent at the <span class="math inline">\(\alpha = .05\)</span> level, when no multiplicity adjustment is used.</p>
+<p>By our 25% standard, the <em>P</em> value is quite small for comparing soy and skim, providing statistical evidence that their difference is enough smaller than the threshold to consider them equivalent.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="graphics" class="section level2">

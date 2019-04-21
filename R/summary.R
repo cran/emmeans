@@ -212,6 +212,15 @@
 #'   \eqn{||Nx||^2 / ||x||^2} exceeds \code{tol}, which by default is
 #'   \code{1e-8}. You may change it via \code{\link{emm_options}} by setting
 #'   \code{estble.tol} to the desired value.
+#'   
+#' @section Warning about potential misuse of P values:
+#'   A growing consensus in the statistical and scientific community is that
+#'   the term \dQuote{statistical significance} should be completely abandoned, and
+#'   that criteria such as \dQuote{p < 0.05} never be used to assess the
+#'   importance of an effect. These practices are just too misleading and prone to abuse.
+#'   See \href{../doc/basics.html#pvalues}{the \dQuote{basics} vignette} for more
+#'   discussion.
+#'   
 #' 
 #' @note In doing testing and a transformation and/or link is in force, any
 #'   \code{null} and/or \code{delta} values specified must always be on the
@@ -226,6 +235,7 @@
 #'   Thus, with ordinary usage of \code{\link{emmeans}} and such, it is
 #'   unnecessary to call \code{summary} unless there is a need to
 #'   specify other than its default options.
+#'   
 #'   
 #' @method summary emmGrid  
 #' @export
@@ -378,14 +388,19 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df,
     cnm = NULL
     
     # get vcov matrix only if needed (adjust == "mvt")
-    corrmat = NULL
+    corrmat = sch.rank = NULL
     if (!is.na(pmatch(adjust, "mvt"))) {
         corrmat = cov2cor(vcov(object))
         attr(corrmat, "by.rows") = by.rows
     }
-    
+    else if (!is.na(pmatch(adjust, "scheffe"))) {
+        sch.rank = sapply(by.rows, function(.) qr(object@linfct[., , drop = FALSE])$rank)
+        if(length(unique(sch.rank)) > 1)
+            fam.info[1] = "uneven"   # This forces ragged.by = TRUE in .adj functions
+    }
+
     if(infer[1]) { # add CIs
-        acv = .adj.critval(level, result$df, adjust, fam.info, side, corrmat, by.rows)
+        acv = .adj.critval(level, result$df, adjust, fam.info, side, corrmat, by.rows, sch.rank)
         ###adjust = acv$adjust # in older versions, I forced same adj method for tests
         cv = acv$cv
         cv = switch(side + 2, cbind(-Inf, cv), cbind(-cv, cv), cbind(-cv, Inf))
@@ -420,7 +435,7 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df,
         else {
             t.ratio = result[[tnm]] = (result[[1]] - null + side * delta) / result$SE            
         }
-        apv = .adj.p.value(t.ratio, result$df, adjust, fam.info, tail, corrmat, by.rows)
+        apv = .adj.p.value(t.ratio, result$df, adjust, fam.info, tail, corrmat, by.rows, sch.rank)
         adjust = apv$adjust   # in case it was abbreviated
         result$p.value = apv$pval
         mesg = c(mesg, apv$mesg)
@@ -450,6 +465,10 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df,
         misc$pri.vars = names(object@levels)
     attr(summ, "pri.vars") = setdiff(union(misc$pri.vars, misc$by.vars), by)
     attr(summ, "by.vars") = by
+    attr(summ, "adjust") = adjust
+    attr(summ, "side") = side
+    attr(summ, "delta") = delta
+    attr(summ, "type") = type
     attr(summ, "mesg") = unique(mesg)
     class(summ) = c("summary_emm", "data.frame")
     summ
@@ -570,8 +589,10 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     result[1] = as.numeric(result[1]) # silly bit of code to avoid getting a data.frame of logicals if all are NA
     result = as.data.frame(result)
     names(result) = c(misc$estName, "SE", "df")
-    if (!is.null(misc$tran) && is.character(misc$tran) && (misc$tran != "none")) {
+    if (!is.null(misc$tran)) {
         attr(result, "link") = .get.link(misc)
+        if(is.character(misc$tran) && (misc$tran == "none"))
+            attr(result, "link") = NULL
     }
     result
 }
@@ -600,12 +621,16 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     link
 }
 
+####!!!!! TODO: Re-think whether we are handling Scheffe adjustments correctly
+####!!!!!       if/when we shift around 'by' specs, etc.
+
 # utility to compute an adjusted p value
 # tail is -1, 0, 1 for left, two-sided, or right
 # Note fam.info is c(famsize, ncontr, estTypeIndex)
-# 2.14: added corrmat arg, dunnettx & mvt adjustments
+# lsmeans >= 2.14: added corrmat arg, dunnettx & mvt adjustments
+# emmeans > 1.3.4: we have sch.rank of same length as by.rows
 # NOTE: corrmat is NULL unless adjust == "mvt"
-.adj.p.value = function(t, DF, adjust, fam.info, tail, corrmat, by.rows) {
+.adj.p.value = function(t, DF, adjust, fam.info, tail, corrmat, by.rows, sch.rank) {
     fam.size = fam.info[1]
     n.contr = fam.info[2]
     et = as.numeric(fam.info[3])
@@ -624,7 +649,7 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     if ((et != 3) && adjust == "tukey") # not pairwise
         adjust = "sidak"
     
-    ragged.by = (is.character(fam.size) || adjust == "mvt")   # flag that we need to do groups separately
+    ragged.by = (is.character(fam.size) || adjust %in% c("mvt", p.adjust.methods))   # flag that we need to do groups separately
     if (!ragged.by)
         by.rows = list(seq_along(t))       # not ragged, we can do all as one by group
     
@@ -633,13 +658,16 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     
     # if estType is "prediction", use #contrasts + 1 as family size
     # (produces right Scheffe CV; Tukey ones are a bit strange)
-    scheffe.adj = ifelse(et == 1, 0, - 1)
+    # deprecated - used to try to keep track of scheffe.adj = ifelse(et == 1, 0, - 1)
     if (tail == 0)
         p.unadj = 2*pt(abs(t), DF, lower.tail=FALSE)
     else
         p.unadj = pt(t, DF, lower.tail = (tail<0))
     
-    pvals = lapply(by.rows, function(rows) {
+#    pvals = lapply(by.rows, function(rows) {
+    pval = numeric(length(t))
+    for(jj in seq_along(by.rows)) { ####(rows in by.rows) {
+        rows = by.rows[[jj]]
         unadj.p = p.unadj[rows]
         abst = abs(t[rows])
         df = DF[rows]
@@ -649,23 +677,22 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
         }
         if (adjust %in% p.adjust.methods) {
             if (n.contr == length(unadj.p))
-                pval = p.adjust(unadj.p, adjust, n = n.contr)
+                pval[rows] = p.adjust(unadj.p, adjust, n = n.contr)
             else # only will happen when by.rows is length 1
-                pval = as.numeric(apply(matrix(unadj.p, nrow=n.contr), 2, 
+                pval[rows] = as.numeric(apply(matrix(unadj.p, nrow=n.contr), 2, 
                                         function(pp) p.adjust(pp, adjust, n=sum(!is.na(pp)))))
         }
-        else pval = switch(adjust,
+        else pval[rows] = switch(adjust,
                            sidak = 1 - (1 - unadj.p)^n.contr,
                            # NOTE: tukey, scheffe, dunnettx all assumed 2-sided!
                            tukey = ptukey(sqrt(2)*abst, fam.size, zapsmall(df), lower.tail=FALSE),
-                           scheffe = pf(t[rows]^2 / (fam.size + scheffe.adj), fam.size + scheffe.adj, 
+                           scheffe = pf(t[rows]^2 / (sch.rank[jj]), sch.rank[jj], 
                                         df, lower.tail = FALSE),
                            dunnettx = 1 - .pdunnx(abst, n.contr, df),
                            mvt = 1 - .my.pmvt(t[rows], df, corrmat[rows,rows,drop=FALSE], -tail) # tricky - reverse the tail because we're subtracting from 1 
         )
-    })
-    pval = unlist(pvals)
-    
+    }
+
     chk.adj = match(adjust, c("none", "tukey", "scheffe"), nomatch = 99)
     
     if (ragged.by) {
@@ -676,7 +703,7 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     else {
         nc = n.contr
         fs = fam.size
-        scheffe.dim = fs + scheffe.adj
+        scheffe.dim = sch.rank[1]
     }
     do.msg = (chk.adj > 1) && (nc > 1) && !((fs < 3) && (chk.adj < 10)) 
     if (do.msg) {
@@ -690,14 +717,15 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
         mesg = paste("P value adjustment:", adjust, "method", xtra)
     }
     else mesg = NULL
-    list(pval=pval, mesg=mesg, adjust=adjust)
+    list(pval = pval, mesg = mesg, adjust = adjust)
 }
 
 # Code needed for an adjusted critical value
 # returns a list similar to .adj.p.value
-# 2.14: Added tail & corrmat args, dunnettx & mvt adjustments
+# lsmeans >= 2.14: Added tail & corrmat args, dunnettx & mvt adjustments
+# emmeans > 1.3.4: Added sch.rank
 # NOTE: corrmat is NULL unless adjust == "mvt"
-.adj.critval = function(level, DF, adjust, fam.info, tail, corrmat, by.rows) {
+.adj.critval = function(level, DF, adjust, fam.info, tail, corrmat, by.rows, sch.rank) {
     mesg = NULL
     
     fam.size = fam.info[1]
@@ -714,7 +742,7 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
         k = which(adj.meths == "bonferroni") 
     adjust = adj.meths[k]
     
-    if (!ragged.by && adjust != "mvt")
+    if (!ragged.by && (adjust != "mvt") && (length(unique(DF)) == 1))
         by.rows = list(seq_along(DF))       # not ragged, we can do all as one by group
     
     if ((et != 3) && adjust == "tukey") # not pairwise
@@ -726,7 +754,7 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     
     # asymptotic results when df is NA
     DF[is.na(DF)] = Inf
-    scheffe.adj = ifelse(et == 1, 0, - 1)
+    #### No longer used scheffe.adj = ifelse(et == 1, 0, - 1)
     
     chk.adj = match(adjust, c("none", "tukey", "scheffe"), nomatch = 99)
     if (ragged.by) {
@@ -737,7 +765,7 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     else {
         nc = n.contr
         fs = fam.size
-        scheffe.dim = fs + scheffe.adj
+        scheffe.dim = sch.rank[1]
     }
     do.msg = (chk.adj > 1) && (nc > 1) && 
         !((fs < 3) && (chk.adj < 10)) 
@@ -755,24 +783,27 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     
     adiv = ifelse(tail == 0, 2, 1) # divisor for alpha where needed
     
-    cvs = lapply(by.rows, function(rows) {
+    ###cvs = lapply(by.rows, function(rows) {
+    cv = numeric(sum(sapply(by.rows, length)))
+    for (jj in seq_along(by.rows)) { ####(rows in by.rows) {
+        rows = by.rows[[jj]]
         df = DF[rows]
         if (ragged.by) {
             n.contr = length(rows)
             fam.size = (1 + sqrt(1 + 8*n.contr)) / 2   # tukey family size - e.g., 6 pairs -> family of 4
         }
-        switch(adjust,
+        cv[rows] = switch(adjust,
                none = -qt((1-level)/adiv, df),
                sidak = -qt((1 - level^(1/n.contr))/adiv, df),
                bonferroni = -qt((1-level)/n.contr/adiv, df),
                tukey = qtukey(level, fam.size, df) / sqrt(2),
-               scheffe = sqrt((fam.size + scheffe.adj) * qf(level, fam.size + scheffe.adj, df)),
+               scheffe = sqrt((sch.rank[jj]) * qf(level, sch.rank[jj], df)),
                dunnettx = .qdunnx(level, n.contr, df),
-               mvt = .my.qmvt(level, df, corrmat[rows,rows,drop=FALSE], tail)
+               mvt = .my.qmvt(level, df, corrmat[rows, rows, drop = FALSE], tail)
         )
-    })
+    }
     
-    list(cv = unlist(cvs), mesg = mesg, adjust = adjust)
+    list(cv = cv, mesg = mesg, adjust = adjust)
 }
 
 
@@ -932,7 +963,7 @@ print.summary_emm = function(x, ..., digits=NULL, quote=FALSE, right=TRUE) {
     if (!is.null(x$z.ratio)) 
         x$z.ratio = format(round(x$z.ratio, 3), nsmall = 3, sci = FALSE)
     if (!is.null(x$p.value)) {
-        fp = x$p.value = format(round(x$p.value,4), nsmall=4, sci=FALSE)
+        fp = x$p.value = format(round(x$p.value, 4), nsmall = 4, sci = FALSE)
         x$p.value[fp=="0.0000"] = "<.0001"
     }
     estn = attr(x, "estName")
@@ -966,7 +997,7 @@ print.summary_emm = function(x, ..., digits=NULL, quote=FALSE, right=TRUE) {
     }
     else { # separate listing for each by variable
         m = .just.labs(m[, setdiff(names(x), by.vars), drop = FALSE], just)
-        pargs = as.list(x[,by.vars, drop=FALSE])
+        pargs = unname(as.list(x[,by.vars, drop=FALSE]))
         pargs$sep = ", "
         lbls = do.call(paste, pargs)
         for (lb in unique(lbls)) {

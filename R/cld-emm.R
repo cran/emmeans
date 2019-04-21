@@ -41,11 +41,17 @@
 ###if (!requireNamespace("multcomp", quietly = TRUE))
 #' @rdname CLD.emmGrid
 #' @export
-CLD = function (object, ...) UseMethod("CLD")
+CLD = function (object, ...) {
+    ### Uncomment this in the May (or later) release of emmeans
+    # dmsg = c("'CLD' will be deprecated. Its use is discouraged.\n", 
+    #          "See '? CLD' for an explanation. Use 'pwpp' or 'multcomp::cld' instead.")
+    # .Deprecated(new = "pwpp", msg = dmsg, old = "CLD")
+    UseMethod("CLD")
+}
 
 
 # S3 method for emmGrid 
-#' Extract and display information on all pairwise comparisons of least-squares means.
+#' Extract and display information on all pairwise comparisons of estimated marginal means.
 #'
 #' @aliases CLD
 #' 
@@ -70,7 +76,7 @@ CLD = function (object, ...) UseMethod("CLD")
 #'
 #' This function uses the Piepho (2004) algorithm (as implemented in the 
 #' \pkg{multcompView} package) to generate a compact letter display of all
-#' pairwise comparisons of least-squares means. The function obtains (possibly
+#' pairwise comparisons of estimated marginal means. The function obtains (possibly
 #' adjusted) P values for all pairwise comparisons of means, using the
 #' \code{\link{contrast}} function with \code{method = "pairwise"}. When a P
 #' value exceeds \code{alpha}, then the two means have at least one letter in
@@ -82,8 +88,24 @@ CLD = function (object, ...) UseMethod("CLD")
 #'   When \code{details == TRUE}, a \code{list} with the object just described, 
 #'   as well as the summary of the contrast results showing each comparison, 
 #'   its estimate, standard error, t ratio, and adjusted P value.
+#'   
+#' @section Deprecated:
+#'   The \code{CLD} function and methods are deprecated.
+#'   Compact-letter displays (CLDs) encourage a misleading
+#'   interpretation of significance testing by visually grouping means whose comparisons
+#'   have \emph{P} > \code{alpha} as though they are equal. However, failing to
+#'   prove two means are different does not prove that they are the same. 
+#'   In addition, CLDs make
+#'   a hard distinction between \emph{P} values nearly equal to \code{alpha}
+#'   but on opposite sides.
+#'   
+#'   Some users may find \code{\link{pwpp}} to be a useful alternative. It produces a
+#'   plot showing all P values for all pairwise comparisons (or other set of comparisons),
+#'   and can also show one-sided P values and tests of equivalence or noninferiority.
+#'   Also, if you insist, \code{\link[multcomp]{cld}} is still available in the 
+#'   \pkg{multcomp} package, and \code{multcomp::cld(emm)} still works.
 #' 
-#' @references Hans-Peter Piepho (2004) An algorithm for a letter-based representation 
+#' @references Piepho, Hans-Peter (2004) An algorithm for a letter-based representation 
 #'   of all pairwise comparisons, Journal of Computational and Graphical Statistics, 13(2), 
 #'   456-466.
 #' 
@@ -92,15 +114,6 @@ CLD = function (object, ...) UseMethod("CLD")
 #' 
 #' @method CLD emmGrid
 #' @export
-#' 
-#' @examples
-#' warp.lm <- lm(breaks ~ wool * tension, data = warpbreaks)
-#' warp.emm <- emmeans(warp.lm, ~ tension | wool)
-#' CLD(warp.emm)                  # implicitly uses by = "wool"
-#' CLD(warp.emm, by = "tension")  # overrides implicit 'by'
-#' 
-#' # Mimic grouping bars and compare all 6 means
-#' CLD(warp.emm, by = NULL, Letters = "||||||||", alpha = .01)
 CLD.emmGrid = function(object, details=FALSE, sort=TRUE, 
                     by, alpha=.05, 
                     Letters = c("1234567890",LETTERS,letters), 
@@ -116,7 +129,7 @@ CLD.emmGrid = function(object, details=FALSE, sort=TRUE,
         args = list()
         for (nm in by) args[[nm]] = emmtbl[[nm]]
         args$.emmGrid. = emmtbl[[attr(emmtbl, "estName")]]
-        ord = do.call("order", args)
+        ord = do.call("order", unname(args))
         emmtbl = emmtbl[ord, , as.df = FALSE]
         if (!is.null(object@misc$display)) {
             use = which(object@misc$display)
@@ -196,17 +209,8 @@ cld.emmGrid = function(object, ...) {
 
 
 # Temporary hack while downstream dependencies have a chance to fix it:
-#' Temporary continued 'cld' support
-#' 
-#' This generic is temporarily provided to keep downstream packages from breaking.
-#' It will be removed in future versions to avoid masking issues with \code{multcomp::cld}.
-#' Please use \code{CLD} instead when working with \code{emmMeans} objects.
-#' 
-#' @param object an emmGrid object
-#' @param ... other arguments passed to \code{\link{CLD}}
-#' 
-#' @export cld
-#' @rdname old.cld
+#' @rdname CLD.emmGrid
+#' @export
 cld = function (object, ...) {
     if(requireNamespace("multcomp", quietly = TRUE))
         multcomp::cld(object, ...)

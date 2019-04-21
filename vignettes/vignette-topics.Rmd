@@ -26,14 +26,16 @@ vignette: >
   * [`afex_aov` objects](models.html#V)
   * [Analysis of subsets of data](FAQs.html#model)
   * Analysis of variance
-      * [versus *pos hoc* comparisons](FAQs.html#anova)
+      * [versus *post hoc* comparisons](FAQs.html#anova)
       * [Type III](confidence-intervals.html#joint_tests)
   * [`aovList` objects](models.html#V)
   * [`as.data.frame()`](utilities.html#data)
   * `as.mcmc()`
       * [in *models: S*](models.html#S)
       * [in *sophisticated: bayesxtra*](sophisticated.html#bayesxtra)
+  * [ASA Statement on *P* values](basics.html#pvalues)
   * [Asymptotic tests](sophisticated.html#dfoptions)
+  * [ATOM](basics.html#pvalues)
   * [`averaging` models](models.html#I)
 
 
@@ -62,17 +64,21 @@ vignette: >
 ### C {#c}
 
 
-  * [`CLD()`](comparisons.html#pairwise)
-      * [versus `multcomp::cld()`](comparisons.html#pairwise)
+  * `CLD()
+      * [and why it is deprecated`](comparisons.html#CLD)
   * [`clm` models](models.html#O)
   * [**coda** package](sophisticated.html#bayesxtra)
   * [`coef()`](comparisons.html#contrasts)
+  * [Compact letter displays](comparisons.html#CLD)
   * Comparisons
       * [Back-transforming](comparisons.html#logs)
-      * [Displaying as groups](comparisons.html#pairwise)
-      * [Graphical](comparisons.html#pairwise)
+      * [Displaying as groups](comparisons.html#CLD)
+      * [Displaying *P* values](comparisons.html#pwpp)
+      * [Graphical](comparisons.html#graphical)
       * [with logs](comparisons.html#logs)
+      * [with overlapping CIs](FAQs.html#CIerror)
   * [Confidence intervals](confidence-intervals.html#summary)
+      * [Overlapping](FAQs.html#CIerror)
   * [`confint()`](confidence-intervals.html#summary)
   * [`consec` contrasts](comparisons.html#contrasts)
   * [Containment d.f.](models.html#K)
@@ -93,8 +99,6 @@ vignette: >
       * [Polynomial](comparisons.html#contrasts)
       * Tests of
           * [with transformations](comparisons.html#logs)
-  * [`convert_scripts()`](transition-from-lsmeans.html#scripts)
-  * [`convert_workspace()`](transition-from-lsmeans.html#workspaces)
   * [Count regression](models.html#C)
   * [`cov.reduce`](messy-data.html#med.covred)
   * Covariates
@@ -187,7 +191,10 @@ vignette: >
       * [Robust regression](xtending.html#rlm)
       * [Split-plot experiment](sophisticated.html#lmer)
       * [Unbalanced data](basics.html#motivation)
-      * [`warpbreaks`](transformations.html#tranlink)
+      * `warpbreaks`
+          * [in *transformations: tranlink*](transformations.html#tranlink)
+          * [in *utilities: relevel*](utilities.html#relevel)
+      * [Welch's *t* comparisons](utilities.html#relevel)
       * [`wine`](sophisticated.html#ordinal)
 
 
@@ -272,7 +279,11 @@ vignette: >
 ### L {#l}
 
 
+  * Labels
+      * [Changing](utilities.html#relevel)
   * [Least-squares means](FAQs.html#what)
+  * Levels
+      * [Changing](utilities.html#relevel)
   * [Linear functions](comparisons.html#linfct)
   * [Link functions](transformations.html#links)
   * [`lme` models](models.html#K)
@@ -284,10 +295,6 @@ vignette: >
       * [Odds ratios](transformations.html#oddsrats)
       * [Surprising results](FAQs.html#transformations)
   * [**lsmeans**](basics.html#backstory)
-  * **lsmeans** package
-      * [Converting scripts](transition-from-lsmeans.html#scripts)
-      * [Converting workspaces](transition-from-lsmeans.html#workspaces)
-      * [Transitioning from](transition-from-lsmeans.html)
 
 
 [Back to top](#topnav)
@@ -365,9 +372,12 @@ vignette: >
 ### P {#p}
 
 
+  * *P* values
+      * [Interpreting](basics.html#pvalues)
   * [`pairs()`](comparisons.html#pairwise)
   * [Pairwise comparisons](comparisons.html#pairwise)
   * [`pairwise` contrasts](comparisons.html#contrasts)
+  * [Pairwise *P*-value plots](comparisons.html#pwpp)
   * [`plot.emmGrid()`](basics.html#plot.emmGrid)
   * Plots
       * [of confidence intervals](basics.html#plot.emmGrid)
@@ -382,6 +392,7 @@ vignette: >
       * [Instead of Welch's *t*](FAQs.html#nowelch)
   * [`postGridHook`](xtending.html#hooks)
   * [`print.summary_emm()`](confidence-intervals.html#emmobj)
+  * [`pwpp()`](comparisons.html#pwpp)
 
 
 [Back to top](#topnav)
@@ -399,6 +410,7 @@ vignette: >
 
 
   * [`rbind()`](utilities.html#rbind)
+  * [Re-labeling](utilities.html#relevel)
   * [`recover_data()`](xtending.html#intro)
       * [`data` and `params` arguments](xtending.html#rdargs)
       * [Error handling](xtending.html#rderrs)
@@ -432,6 +444,10 @@ vignette: >
       * [in *models: L*](models.html#L)
   * [Selecting results](utilities.html#brackets)
   * [Sidak adjustment](confidence-intervals.html#adjust)
+  * Significance
+      * [Assessing](basics.html#pvalues)
+  * "Significant"@significant
+      * [Why you shouldn't say this](basics.html#pvalues)
   * [`simple = "each"`](confidence-intervals.html#simple)
   * Simple comparisons
       * [in *confidence-intervals: simple*](confidence-intervals.html#simple)
@@ -440,7 +456,7 @@ vignette: >
   * `specs`
       * [Formula](comparisons.html#formulas)
   * [`stanreg` objects](models.html#S)
-  * [* gazing](interactions.html#factors)
+  * [* gazing (star gazing)](interactions.html#factors)
   * [Startup options](utilities.html#startup)
   * [`str()`](confidence-intervals.html#emmobj)
   * [Subsets of data](FAQs.html#model)
@@ -520,7 +536,6 @@ vignette: >
       * [Models](models.html)
       * [Sophisticated models](sophisticated.html)
       * [Transformations and link functions](transformations.html)
-      * [Transitioning from **lsmeans**](transition-from-lsmeans.html)
       * [Utilities and options](utilities.html)
 
 
@@ -531,6 +546,7 @@ vignette: >
 
   * [`weights`](messy-data.html#weights)
   * [Welch's *t* comparisons](FAQs.html#nowelch)
+      * [Example](utilities.html#relevel)
 
 
 [Back to top](#topnav)
