@@ -79,7 +79,7 @@ along with \code{"adjust"} to determine appropriate adjustments to P values
 and confidence intervals.}
 
 \item{\code{famSize}}{(integer) is the number of means involved in a family of
-inferences; used in Tukey and Scheffe adjustments}
+inferences; used in Tukey adjustment}
 
 \item{\code{infer}}{(\code{logical} vector of length 2) is the default value
 of \code{infer} in \code{\link{summary.emmGrid}}.}
@@ -96,6 +96,9 @@ specified single value.}
 
 \item{\code{side}}{(numeric or character) \code{side} specification for for
 \code{summary} or \code{test} (taken to be zero if missing).}
+
+\item{\code{sigma}}{(numeric) Error SD to use in predictions and for bias-adjusted
+back-transformations}
 
 \item{\code{delta}}{(numeric) \code{delta} specification for \code{summary}
 or \code{test} (taken to be zero if missing).}

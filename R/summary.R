@@ -89,8 +89,17 @@
 #' @param frequentist Ignored except if a Bayesian model was fitted. If missing
 #'   or \code{FALSE}, the object is passed to \code{\link{hpd.summary}}. Otherwise, 
 #'   a logical value of \code{TRUE} will have it return a frequentist summary.
-#' @param ... (Not used by \code{summary.emmGrid} or \code{predict.emmGrid}.) In
-#'   \code{as.data.frame.emmGrid}, \code{confint.emmGrid}, and 
+#' @param bias.adjust Logical value for whether to adjust for bias in
+#'   back-transforming (\code{type = "response"}). This requires a value of 
+#'   \code{sigma} to exist in the object or be specified.
+#' @param sigma Error SD assumed for bias correction (when 
+#'   \code{type = "response"} and a transformation
+#'   is in effect), or for constructing prediction intervals. If not specified,
+#'   \code{object@misc$sigma} is used, and an error is thrown if it is not found.
+#'   \emph{Note:} \code{sigma} may be a vector, as long as it conforms to the number of rows
+#'   of the reference grid.
+#' @param ... (Not used by \code{summary.emmGrid}.) In
+#'   \code{as.data.frame.emmGrid}, \code{confint.emmGrid}, \code{predict.emmGrid}, and 
 #'   \code{test.emmGrid}, these arguments are passed to
 #'   \code{summary.emmGrid}.
 #'
@@ -119,6 +128,13 @@
 #'   on the scale of the linear predictor, not the inverse-transformed one.
 #'   Similarly, confidence intervals are computed on the linear-predictor scale,
 #'   then inverse-transformed.
+#'   
+#'   When \code{bias.adjust} is \code{TRUE}, then back-transformed estimates
+#'   are adjusted by adding 
+#'   \eqn{0.5 h''(u)\sigma^2}, where \eqn{h} is the inverse transformation and
+#'   \eqn{u} is the linear predictor. This is based on a second-order Taylor
+#'   expansion. There are better or exact adjustments for certain specific
+#'   cases, and these may be incorporated in future updates.
 #' 
 #' @section P-value adjustments:
 #'   The \code{adjust} argument specifies a multiplicity adjustment for tests or
@@ -261,10 +277,15 @@
 #' test(contrast(pigs.emm, "consec"), joint = TRUE)
 #'
 summary.emmGrid <- function(object, infer, level, adjust, by, type, df, 
-                        null, delta, side, frequentist, ...) {
+                        null, delta, side, frequentist, 
+                        bias.adjust = get_emm_option("back.bias.adj"),
+                        sigma, ...) {
+    if(missing(sigma))
+        sigma = object@misc$sigma
 
     if(!is.na(object@post.beta[1]) && (missing(frequentist) || !frequentist))
-        return (hpd.summary(object, prob = level, by = by, type = type, ...))
+        return (hpd.summary(object, prob = level, by = by, type = type, 
+                            bias.adjust = bias.adjust, sigma = sigma, ...))
     
     # Any "summary" options override built-in
     opt = get_emm_option("summary")
@@ -272,6 +293,9 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df,
         opt$object = object
         object = do.call("update.emmGrid", opt)
     }
+    
+    if(!missing(sigma))
+        object = update(object, sigma = sigma)  # we'll keep sigma in misc
     
     misc = object@misc
     use.elts = .reconcile.elts(object)
@@ -371,6 +395,8 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df,
         inv = FALSE
         link = NULL
     }
+    if(inv && bias.adjust && !is.null(link)) 
+        link = .make.bias.adj.link(link, sigma)
     
     # et = 1 if a prediction, 2 if a contrast (or unmatched or NULL), 3 if pairs
     et = pmatch(c(misc$estType, "c"), c("prediction", "contrast", "pairs"), nomatch = 2)[1]
@@ -386,6 +412,7 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df,
     }
     fam.info = c(misc$famSize, by.size, et)
     cnm = NULL
+    adjust = tolower(adjust)
     
     # get vcov matrix only if needed (adjust == "mvt")
     corrmat = sch.rank = NULL
@@ -405,6 +432,14 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df,
         cv = acv$cv
         cv = switch(side + 2, cbind(-Inf, cv), cbind(-cv, cv), cbind(-cv, Inf))
         cnm = if (zFlag) c("asymp.LCL", "asymp.UCL") else c("lower.CL","upper.CL")
+        if(!is.null(misc$.predFlag)) {
+            cnm = c("lower.PL", "upper.PL")
+            sigma = misc$sigma
+            mesg = c(mesg, paste0(
+                "Prediction intervals and SEs are based on an error SD of ", 
+                .fmt.sigma(sigma)))
+            estName = names(result)[1] = "prediction"
+        }
         result[[cnm[1]]] = result[[1]] + cv[, 1]*result$SE
         result[[cnm[2]]] = result[[1]] + cv[, 2]*result$SE
         mesg = c(mesg, paste("Confidence level used:", level), acv$mesg)
@@ -450,6 +485,9 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df,
     if (inv) {
         result[["SE"]] = with(link, abs(mu.eta(result[[1]]) * result[["SE"]]))
         result[[1]] = with(link, linkinv(result[[1]]))
+        if(bias.adjust)
+            mesg = c(mesg, paste("Bias adjustment applied based on sigma =", 
+                                 .fmt.sigma(sigma)))
     }
     
     if (length(misc$avgd.over) > 0) {
@@ -478,14 +516,32 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df,
 
 #' @rdname summary.emmGrid
 #' @method predict emmGrid
+#' @param interval Type of interval desired (partial matching is allowed): 
+#' \code{"none"} for no intervals,
+#'   otherwise confidence or prediction intervals with given arguments, 
+#'   via \code{\link{confint.emmGrid}}.
+#'   
 #' @export
 #' @return \code{predict} returns a vector of predictions for each row of \code{object@grid}.
-predict.emmGrid <- function(object, type, ...) {
+predict.emmGrid <- function(object, type, 
+                            interval = c("none", "confidence", "prediction"),
+                            level = 0.95,
+                            bias.adjust = get_emm_option("back.bias.adj"), sigma, 
+                            ...) 
+{
     # update with any "summary" options
     opt = get_emm_option("summary")
     if(!is.null(opt)) {
         opt$object = object
         object = do.call("update.emmGrid", opt)
+    }
+
+    interval = match.arg(interval)
+    if (interval %in% c( "confidence", "prediction")) {
+        if (interval == "prediction")
+            object@misc$.predFlag = TRUE
+        return(confint.emmGrid(object, type = type, level = level, 
+                               bias.adjust = bias.adjust, sigma = sigma, ...))
     }
     
     if (missing(type))
@@ -497,12 +553,17 @@ predict.emmGrid <- function(object, type, ...) {
     if ((type == "response") && (!is.null(object@misc$tran2)))
         object = regrid(object, transform = "mu")
     
-    pred = .est.se.df(object, do.se=FALSE)
+    pred = .est.se.df(object, do.se = FALSE)
     result = pred[[1]]
     
     if (type %in% c("response", "mu", "unlink")) {
         link = attr(pred, "link")
         if (!is.null(link)) {
+            if (bias.adjust) {
+                if(missing(sigma))
+                    sigma = object@misc$sigma
+                link = .make.bias.adj.link(link, sigma)
+            }
             result = link$linkinv(result)
             if (is.logical(link$unknown) && link$unknown)
                 warning("Unknown transformation: \"", link$name, "\" -- no transformation applied.")
@@ -589,6 +650,12 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     result[1] = as.numeric(result[1]) # silly bit of code to avoid getting a data.frame of logicals if all are NA
     result = as.data.frame(result)
     names(result) = c(misc$estName, "SE", "df")
+    if (!is.null(misc$.predFlag)) {
+        if (is.null(misc$sigma))
+            stop("No 'sigma' is available for obtaining Prediction intervals.", 
+                 call. = FALSE)
+        result$SE = sqrt(result$SE^2 + misc$sigma^2)
+    }
     if (!is.null(misc$tran)) {
         attr(result, "link") = .get.link(misc)
         if(is.character(misc$tran) && (misc$tran == "none"))
@@ -621,6 +688,21 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     link
 }
 
+# patch-in alternative back-transform stuff for bias adjustment
+# Currently, we just use a 2nd-order approx for everybody:
+#   E(h(nu + E))  ~=  h(nu) + 0.5*h"(nu)*var(E)
+.make.bias.adj.link = function(link, sigma) {
+    if (is.null(sigma))
+        stop("Must specify 'sigma' to obtain bias-adjusted back transformations", call. = FALSE)
+    link$inv = link$linkinv
+    link$der = link$mu.eta
+    link$sigma22 = sigma^2 / 2
+    link$der2 = function(eta) with(link, 1000 * (der(eta + .0005) - der(eta - .0005)))
+    link$linkinv = function(eta) with(link, inv(eta) + sigma22 * der2(eta))
+    link$mu.eta = function(eta) with(link, der(eta) +
+                                         1000 * sigma22 * (der2(eta + .0005) - der2(eta - .0005)))
+    link
+}
 ####!!!!! TODO: Re-think whether we are handling Scheffe adjustments correctly
 ####!!!!!       if/when we shift around 'by' specs, etc.
 

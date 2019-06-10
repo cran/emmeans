@@ -73,3 +73,26 @@ piglog.emm.s <- regrid(emmeans(pigroot.lm, "source"), transform = "log")
 confint(piglog.emm.s, type = "response")
 pairs(piglog.emm.s, type = "response")
 
+## ---- message = FALSE----------------------------------------------------
+require(lme4)
+cbpp <- transform(cbpp, unit = 1:nrow(cbpp))
+cbpp.glmer <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd) +  (1|unit),
+                    family = binomial, data = cbpp)
+
+emm <- emmeans(cbpp.glmer, "period")
+summary(emm, type = "response")
+
+## ------------------------------------------------------------------------
+lme4::VarCorr(cbpp.glmer)
+
+## ------------------------------------------------------------------------
+total.SD = sqrt(0.89107^2 + 0.18396^2)
+
+## ------------------------------------------------------------------------
+summary(emm, type = "response", bias.adjust = TRUE, sigma = total.SD)
+
+## ------------------------------------------------------------------------
+cases <- with(cbpp, tapply(incidence, period, sum))
+trials <- with(cbpp, tapply(size, period, sum))
+cases / trials
+

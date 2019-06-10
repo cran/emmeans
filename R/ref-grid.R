@@ -97,6 +97,9 @@
 #'   A common usage would be to specify \code{offset = 0} for a Poisson
 #'   regression model, so that predictions from the reference grid become
 #'   rates relative to the offset that had been specified in the model.
+#' @param sigma Numeric value to use for subsequent predictions
+#'   or back-transformation bias adjustments. If not specified, we
+#'   use \code{sigma(object)}, if available, and \code{NULL} otherwise.
 #' @param ... Optional arguments passed to \code{\link{emm_basis}}, such as
 #'   \code{vcov.} (see Details below) or options for certain models (see
 #'   \href{../doc/models.html}{vignette("models", "emmeans")}).
@@ -284,12 +287,18 @@
 ref_grid <- function(object, at, cov.reduce = mean, mult.names, mult.levs, 
                      options = get_emm_option("ref_grid"), data, df, type, 
                      transform = c("none", "response", "mu", "unlink", "log"), 
-                     nesting, covnest = FALSE, offset, ...) 
+                     nesting, covnest = FALSE, offset, sigma, ...) 
 {
     transform = match.arg(transform)
     if (!missing(df)) {
         if(is.null(options)) options = list()
         options$df = df
+    }
+    
+    if(missing(sigma)) { # Get 'sigma(object)' if available, else NULL
+        sigma = suppressWarnings(try(stats::sigma(object), silent = TRUE))
+        if (inherits(sigma, "try-error"))
+            sigma = NULL
     }
     
     # recover the data
@@ -426,7 +435,7 @@ ref_grid <- function(object, at, cov.reduce = mean, mult.names, mult.levs,
     if (!is.null(attr(data, "pass.it.on")))   # a hook needed by emm_basis.gamlss
         attr(object, "data") = data
     
-    basis = emm_basis(object, trms, xlev, grid, ...)
+    basis = emm_basis(object, trms, xlev, grid, misc = attr(data, "misc"), ...)
     if(length(basis$bhat) != ncol(basis$X))
         stop("Non-conformable elements in reference grid.\n",
              " Probably due to rank deficiency not handled as expected.",
@@ -571,6 +580,7 @@ ref_grid <- function(object, at, cov.reduce = mean, mult.names, mult.levs,
     misc$adjust = "none"
     misc$famSize = nrow(grid)
     misc$avgd.over = character(0)
+    misc$sigma = sigma
 
     post.beta = basis$post.beta
     if (is.null(post.beta))
@@ -636,7 +646,7 @@ ref_grid <- function(object, at, cov.reduce = mean, mult.names, mult.levs,
         result = hook(result)
     }
     if(transform != "none")
-        result = regrid(result, transform = transform)
+        result = regrid(result, transform = transform, sigma = sigma, ...)
     
     .save.ref_grid(result)
     result

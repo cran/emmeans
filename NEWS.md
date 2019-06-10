@@ -1,5 +1,23 @@
 ## NEWS for the emmeans package
 
+emmeans 1.3.5
+-------------
+
+   * First steps to take prediction seriously. This includes
+     * Addition of a `sigma` argument to `ref_grid()` (defaults to
+       `sigma(object)` if available)
+     * Addition of an `interval` argument in `predict.emmGrid()`
+     * Addition of a `likelihood` argument in `as.mcmc` to allow
+       for simulating from the posterior predictive distribution
+     * Crude provisions for bias adjustment when back-transforming. This
+       is not really prediction, but it is made possible by availability
+       of `sigma` in object
+  * Further steps to lower the profile of `cld()` and `CLD()`
+  * Family size for Tukey adjustment was wrong when using `exclude` (#107)
+  * Provided for direct passing of info from `recover_data` to `emm_basis`
+  * Attempts to broaden `MCMCglmm` support
+
+
 emmeans 1.3.4
 -------------
 

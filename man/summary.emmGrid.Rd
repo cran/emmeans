@@ -11,9 +11,12 @@
 \title{Summaries, predictions, intervals, and tests for \code{emmGrid} objects}
 \usage{
 \method{summary}{emmGrid}(object, infer, level, adjust, by, type, df, null,
-  delta, side, frequentist, ...)
+  delta, side, frequentist,
+  bias.adjust = get_emm_option("back.bias.adj"), sigma, ...)
 
-\method{predict}{emmGrid}(object, type, ...)
+\method{predict}{emmGrid}(object, type, interval = c("none",
+  "confidence", "prediction"), level = 0.95,
+  bias.adjust = get_emm_option("back.bias.adj"), sigma, ...)
 
 \method{as.data.frame}{emmGrid}(x, row.names = NULL, optional = FALSE,
   ...)
@@ -85,10 +88,26 @@ more details.}
 or \code{FALSE}, the object is passed to \code{\link{hpd.summary}}. Otherwise, 
 a logical value of \code{TRUE} will have it return a frequentist summary.}
 
-\item{...}{(Not used by \code{summary.emmGrid} or \code{predict.emmGrid}.) In
-\code{as.data.frame.emmGrid}, \code{confint.emmGrid}, and 
+\item{bias.adjust}{Logical value for whether to adjust for bias in
+back-transforming (\code{type = "response"}). This requires a value of 
+\code{sigma} to exist in the object or be specified.}
+
+\item{sigma}{Error SD assumed for bias correction (when 
+\code{type = "response"} and a transformation
+is in effect), or for constructing prediction intervals. If not specified,
+\code{object@misc$sigma} is used, and an error is thrown if it is not found.
+\emph{Note:} \code{sigma} may be a vector, as long as it conforms to the number of rows
+of the reference grid.}
+
+\item{...}{(Not used by \code{summary.emmGrid}.) In
+\code{as.data.frame.emmGrid}, \code{confint.emmGrid}, \code{predict.emmGrid}, and 
 \code{test.emmGrid}, these arguments are passed to
 \code{summary.emmGrid}.}
+
+\item{interval}{Type of interval desired (partial matching is allowed): 
+\code{"none"} for no intervals,
+  otherwise confidence or prediction intervals with given arguments, 
+  via \code{\link{confint.emmGrid}}.}
 
 \item{x}{object of the given class}
 
@@ -190,6 +209,13 @@ The default \code{show} method for \code{emmGrid} objects (with the
   on the scale of the linear predictor, not the inverse-transformed one.
   Similarly, confidence intervals are computed on the linear-predictor scale,
   then inverse-transformed.
+  
+  When \code{bias.adjust} is \code{TRUE}, then back-transformed estimates
+  are adjusted by adding 
+  \eqn{0.5 h''(u)\sigma^2}, where \eqn{h} is the inverse transformation and
+  \eqn{u} is the linear predictor. This is based on a second-order Taylor
+  expansion. There are better or exact adjustments for certain specific
+  cases, and these may be incorporated in future updates.
 }
 
 \section{P-value adjustments}{
