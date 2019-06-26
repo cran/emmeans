@@ -1,5 +1,11 @@
 ## NEWS for the emmeans package
 
+emmeans 1.3.5.1
+-------------
+  * Bug fix for `gls` objects with non-matrix `apVar` member (#119)
+  * Repairs faulty links in 1.3.5 vignettes
+
+
 emmeans 1.3.5
 -------------
 

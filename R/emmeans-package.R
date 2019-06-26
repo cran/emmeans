@@ -115,7 +115,7 @@
 #' @import mvtnorm
 #' @import stats
 #' @importFrom graphics pairs plot
-#' @importFrom methods as is new slot slot<- slotNames
+#' @importFrom methods as is new slot slot<- slotNames 
 #' @importFrom utils installed.packages methods str
 #' @name emmeans-package
 NULL

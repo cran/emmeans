@@ -1,348 +1,121 @@
 <!DOCTYPE html>
-<html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-<title>Contents {#contents}</title>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
 
-<script type="text/javascript">
-window.onload = function() {
-  var imgs = document.getElementsByTagName('img'), i, img;
-  for (i = 0; i < imgs.length; i++) {
-    img = imgs[i];
-    // center an image if it is the only element of its parent
-    if (img.parentElement.childElementCount === 1)
-      img.parentElement.style.textAlign = 'center';
-  }
-};
-</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Styles for R syntax highlighter -->
-<style type="text/css">
-   pre .operator,
-   pre .paren {
-     color: rgb(104, 118, 135)
-   }
+<meta name="author" content="emmeans package, Version 1.3.5.1" />
 
-   pre .literal {
-     color: #990073
-   }
 
-   pre .number {
-     color: #099;
-   }
-
-   pre .comment {
-     color: #998;
-     font-style: italic
-   }
-
-   pre .keyword {
-     color: #900;
-     font-weight: bold
-   }
-
-   pre .identifier {
-     color: rgb(0, 0, 0);
-   }
-
-   pre .string {
-     color: #d14;
-   }
-</style>
-
-<!-- R syntax highlighter -->
-<script type="text/javascript">
-var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
-hljs.initHighlightingOnLoad();
-</script>
+<title>Utilities and options for emmeans</title>
 
 
 
-<style type="text/css">
-body, td {
-   font-family: sans-serif;
-   background-color: white;
-   font-size: 13px;
-}
 
-body {
-  max-width: 800px;
-  margin: auto;
-  padding: 1em;
-  line-height: 20px;
-}
 
-tt, code, pre {
-   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
-}
 
-h1 {
-   font-size:2.2em;
-}
+<style type="text/css">body {font-size: 11pt; font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;margin: 30px 50px 30px 50px; }h1,h2,h3,h4,h5,h6 { font-family: Arial,Helvetica,Sans-serif; }a { text-decoration: none; }a:link { color:darkblue; } a:visited { color:darkblue; } a:hover { color:dodgerblue; }a:active { color:dodgerblue; } code {color: #602000;font-family: "Lucida Console", Monaco, monospace; font-size: 90%;}.r { color: darkred; }.ro { color: darkgreen; background-color: #eeeeee; }.r code, a code, .ro code { color: inherit; }.vigindex ul { list-style-type: none; }.vigindex ul li { list-style: none; }.vigindex a code { color: inherit; }.vigindex li code { color: inherit; }</style>
 
-h2 {
-   font-size:1.8em;
-}
-
-h3 {
-   font-size:1.4em;
-}
-
-h4 {
-   font-size:1.0em;
-}
-
-h5 {
-   font-size:0.9em;
-}
-
-h6 {
-   font-size:0.8em;
-}
-
-a:visited {
-   color: rgb(50%, 0%, 50%);
-}
-
-pre, img {
-  max-width: 100%;
-}
-pre {
-  overflow-x: auto;
-}
-pre code {
-   display: block; padding: 0.5em;
-}
-
-code {
-  font-size: 92%;
-  border: 1px solid #ccc;
-}
-
-code[class] {
-  background-color: #F8F8F8;
-}
-
-table, td, th {
-  border: none;
-}
-
-blockquote {
-   color:#666666;
-   margin:0;
-   padding-left: 1em;
-   border-left: 0.5em #EEE solid;
-}
-
-hr {
-   height: 0px;
-   border-bottom: none;
-   border-top-width: thin;
-   border-top-style: dotted;
-   border-top-color: #999999;
-}
-
-@media print {
-   * {
-      background: transparent !important;
-      color: black !important;
-      filter:none !important;
-      -ms-filter: none !important;
-   }
-
-   body {
-      font-size:12pt;
-      max-width:100%;
-   }
-
-   a, a:visited {
-      text-decoration: underline;
-   }
-
-   hr {
-      visibility: hidden;
-      page-break-before: always;
-   }
-
-   pre, blockquote {
-      padding-right: 1em;
-      page-break-inside: avoid;
-   }
-
-   tr, img {
-      page-break-inside: avoid;
-   }
-
-   img {
-      max-width: 100% !important;
-   }
-
-   @page :left {
-      margin: 15mm 20mm 15mm 10mm;
-   }
-
-   @page :right {
-      margin: 15mm 10mm 15mm 20mm;
-   }
-
-   p, h2, h3 {
-      orphans: 3; widows: 3;
-   }
-
-   h2, h3 {
-      page-break-after: avoid;
-   }
-}
-</style>
 
 
 
 </head>
 
 <body>
+
+
+
+
+<h1 class="title toc-ignore">Utilities and options for emmeans</h1>
+<h4 class="author">emmeans package, Version 1.3.5.1</h4>
+
+
+
 <!-- @index Vignettes!Utilities and options -->
-
-<h2>Contents {#contents}</h2>
-
-<ol>
+<div id="contents" class="section level2">
+<h2>Contents</h2>
+<ol style="list-style-type: decimal">
 <li><a href="#update">Updating an <code>emmGrid</code> object</a></li>
 <li><a href="#options">Setting options</a>
-  a. <a href="#defaults">Setting and viewing defaults</a>
-  b. <a href="#digits">Optimal digits to display</a>
-  c. <a href="#startup">Startup options</a></li>
+<ol style="list-style-type: lower-alpha">
+<li><a href="#defaults">Setting and viewing defaults</a></li>
+<li><a href="#digits">Optimal digits to display</a></li>
+<li><a href="#startup">Startup options</a></li>
+</ol></li>
 <li><a href="#rbind">Combining and subsetting <code>emmGrid</code> objects</a></li>
 <li><a href="#data">Accessing results to use elsewhere</a></li>
 <li><a href="#groups">Adding grouping factors</a></li>
 <li><a href="#relevel">Re-labeling and re-leveling an <code>emmGrid</code></a></li>
 </ol>
-
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
-
-<h2>Updating an <code>emmGrid</code> object {#update}</h2>
-
+</div>
+<div id="update" class="section level2">
+<h2>Updating an <code>emmGrid</code> object</h2>
 <!-- @index `update()`; `emmGrid` objects!Modifying -->
-
-<p>Several internal settings are saved when functions like <code>ref_grid()</code>, <code>emmeans()</code>,
-<code>contrast()</code>, etc. are run. Those settings can be manipulated via the <code>update()</code>
-method for <code>emmGrid</code>s. To illustrate, consider the <code>pigs</code> dataset and model yet again:</p>
-
-<pre><code class="r">pigs.lm &lt;- lm(log(conc) ~ source + factor(percent), data = pigs)
+<p>Several internal settings are saved when functions like <code>ref_grid()</code>, <code>emmeans()</code>, <code>contrast()</code>, etc. are run. Those settings can be manipulated via the <code>update()</code> method for <code>emmGrid</code>s. To illustrate, consider the <code>pigs</code> dataset and model yet again:</p>
+<pre class="r"><code>pigs.lm &lt;- lm(log(conc) ~ source + factor(percent), data = pigs)
 pigs.emm &lt;- emmeans(pigs.lm, &quot;source&quot;)
-pigs.emm
-</code></pre>
-
-<pre><code class="ro">##  source emmean     SE df lower.CL upper.CL
+pigs.emm</code></pre>
+<pre class="ro"><code>##  source emmean     SE df lower.CL upper.CL
 ##  fish     3.39 0.0367 23     3.32     3.47
 ##  soy      3.67 0.0374 23     3.59     3.74
 ##  skim     3.80 0.0394 23     3.72     3.88
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
-## Confidence level used: 0.95
-</code></pre>
-
-<p>We see confidence intervals but not tests, by default. This happens as a result
-of internal settings in <code>pigs.emm.s</code> that are passed to <code>summary()</code> when the
-object is displayed. If we are going to work with this object a lot, we might
-want to change its internal settings rather than having to rely on explicitly
-calling <code>summary()</code> with several arguments. If so, just update the internal
-settings to what is desired; for example:</p>
-
-<pre><code class="r">pigs.emm.s &lt;- update(pigs.emm, infer = c(TRUE, TRUE), null = log(35))
-pigs.emm.s
-</code></pre>
-
-<pre><code class="ro">##  source emmean     SE df lower.CL upper.CL null t.ratio p.value
+## Confidence level used: 0.95</code></pre>
+<p>We see confidence intervals but not tests, by default. This happens as a result of internal settings in <code>pigs.emm.s</code> that are passed to <code>summary()</code> when the object is displayed. If we are going to work with this object a lot, we might want to change its internal settings rather than having to rely on explicitly calling <code>summary()</code> with several arguments. If so, just update the internal settings to what is desired; for example:</p>
+<pre class="r"><code>pigs.emm.s &lt;- update(pigs.emm, infer = c(TRUE, TRUE), null = log(35))
+pigs.emm.s</code></pre>
+<pre class="ro"><code>##  source emmean     SE df lower.CL upper.CL null t.ratio p.value
 ##  fish     3.39 0.0367 23     3.32     3.47 3.56 -4.385  0.0002 
 ##  soy      3.67 0.0374 23     3.59     3.74 3.56  2.988  0.0066 
 ##  skim     3.80 0.0394 23     3.72     3.88 3.56  6.130  &lt;.0001 
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
-## Confidence level used: 0.95
-</code></pre>
-
-<p>See <code>help(&quot;update.emmGrid&quot;)</code> for details on the keywords
-that can be changed. Mostly, they are the same as the names of arguments
-in the functions that construct these objects.</p>
-
-<p>Of course, we can always get what we want via calls to <code>test()</code>, <code>confint()</code> or
-<code>summary()</code> with appropriate arguments. But the <code>update()</code> function is more
-useful in sophisticated manipulations of objects, or called implicitly via the
-<code>options</code> argument in <code>emmeans()</code> and other functions. Those options are passed
-to <code>update()</code> just before the object is returned. For example, we could have
-done the above update within the <code>emmeans()</code> call as follows:</p>
-
-<pre><code class="r">emmeans(pigs.lm, &quot;source&quot;, options = list(infer = c(TRUE, TRUE), null = log(35)))
-</code></pre>
-
+## Confidence level used: 0.95</code></pre>
+<p>See <code>help(&quot;update.emmGrid&quot;)</code> for details on the keywords that can be changed. Mostly, they are the same as the names of arguments in the functions that construct these objects.</p>
+<p>Of course, we can always get what we want via calls to <code>test()</code>, <code>confint()</code> or <code>summary()</code> with appropriate arguments. But the <code>update()</code> function is more useful in sophisticated manipulations of objects, or called implicitly via the <code>options</code> argument in <code>emmeans()</code> and other functions. Those options are passed to <code>update()</code> just before the object is returned. For example, we could have done the above update within the <code>emmeans()</code> call as follows:</p>
+<pre class="r"><code>emmeans(pigs.lm, &quot;source&quot;, options = list(infer = c(TRUE, TRUE), null = log(35)))</code></pre>
 <p><a href="#contents">Back to contents</a></p>
-
-<h2>Setting options {#options}</h2>
-
+</div>
+<div id="options" class="section level2">
+<h2>Setting options</h2>
 <!-- @index `get_emm_option()`; Options -->
-
-<p>Speaking of the <code>options</code> argument, note that the default in <code>emmeans()</code> 
-is <code>options = get_emm_option(&quot;emmeans&quot;)</code>. Let&#39;s see what that is:</p>
-
-<pre><code class="r">get_emm_option(&quot;emmeans&quot;)
-</code></pre>
-
-<pre><code class="ro">## $infer
-## [1]  TRUE FALSE
-</code></pre>
-
-<p>So, by default, confidence intervals, but not tests, are displayed
-when the result is summarized. The reverse is true for results of 
-<code>contrast()</code> (and also the default for <code>pairs()</code> which calls <code>contrast()</code>):</p>
-
-<pre><code class="r">get_emm_option(&quot;contrast&quot;)
-</code></pre>
-
-<pre><code class="ro">## $infer
-## [1] FALSE  TRUE
-</code></pre>
-
+<p>Speaking of the <code>options</code> argument, note that the default in <code>emmeans()</code> is <code>options = get_emm_option(&quot;emmeans&quot;)</code>. Let’s see what that is:</p>
+<pre class="r"><code>get_emm_option(&quot;emmeans&quot;)</code></pre>
+<pre class="ro"><code>## $infer
+## [1]  TRUE FALSE</code></pre>
+<p>So, by default, confidence intervals, but not tests, are displayed when the result is summarized. The reverse is true for results of <code>contrast()</code> (and also the default for <code>pairs()</code> which calls <code>contrast()</code>):</p>
+<pre class="r"><code>get_emm_option(&quot;contrast&quot;)</code></pre>
+<pre class="ro"><code>## $infer
+## [1] FALSE  TRUE</code></pre>
 <p>There are also defaults for a newly constructed reference grid:</p>
-
-<pre><code class="r">get_emm_option(&quot;ref_grid&quot;)
-</code></pre>
-
-<pre><code class="ro">## $is.new.rg
+<pre class="r"><code>get_emm_option(&quot;ref_grid&quot;)</code></pre>
+<pre class="ro"><code>## $is.new.rg
 ## [1] TRUE
 ## 
 ## $infer
-## [1] FALSE FALSE
-</code></pre>
-
-<p>The default is to display neither intervals nor tests when summarizing.
-In addition, the flag <code>is.new.rg</code> is set to <code>TRUE</code>, and that is why one 
-sees a <code>str()</code> listing rather than a summary as the default when the object
-is simply shown by typing its name at the console.</p>
-
-<h3>Setting and viewing defaults {#defaults}</h3>
-
+## [1] FALSE FALSE</code></pre>
+<p>The default is to display neither intervals nor tests when summarizing. In addition, the flag <code>is.new.rg</code> is set to <code>TRUE</code>, and that is why one sees a <code>str()</code> listing rather than a summary as the default when the object is simply shown by typing its name at the console.</p>
+<div id="defaults" class="section level3">
+<h3>Setting and viewing defaults</h3>
 <!-- @index `emm_options()`; `emmGrid` objects!Setting defaults for
      `emmeans()`!Changing defaults; `contrast()`!Changing defaults -->
-
-<p>The user may have other preferences. She may want to see both intervals 
-and tests whenever contrasts are produced; and perhaps she also wants to
-always default to the response scale when transformations or links
-are present. We can change the defaults by setting the corresponding options;
-and that is done via the <code>emm_options()</code> function:</p>
-
-<pre><code class="r">emm_options(emmeans = list(type = &quot;response&quot;),
-            contrast = list(infer = c(TRUE, TRUE)))
-</code></pre>
-
+<p>The user may have other preferences. She may want to see both intervals and tests whenever contrasts are produced; and perhaps she also wants to always default to the response scale when transformations or links are present. We can change the defaults by setting the corresponding options; and that is done via the <code>emm_options()</code> function:</p>
+<pre class="r"><code>emm_options(emmeans = list(type = &quot;response&quot;),
+            contrast = list(infer = c(TRUE, TRUE)))</code></pre>
 <p>Now, new <code>emmeans()</code> results and contrasts follow the new defaults:</p>
-
-<pre><code class="r">pigs.anal.p &lt;- emmeans(pigs.lm, consec ~ percent)
-pigs.anal.p
-</code></pre>
-
-<pre><code class="ro">## $emmeans
+<pre class="r"><code>pigs.anal.p &lt;- emmeans(pigs.lm, consec ~ percent)
+pigs.anal.p</code></pre>
+<pre class="ro"><code>## $emmeans
 ##  percent emmean     SE df lower.CL upper.CL
 ##        9   3.45 0.0409 23     3.36     3.53
 ##       12   3.62 0.0384 23     3.55     3.70
@@ -363,100 +136,46 @@ pigs.anal.p
 ## Results are given on the log (not the response) scale. 
 ## Confidence level used: 0.95 
 ## Conf-level adjustment: mvt method for 3 estimates 
-## P value adjustment: mvt method for 3 tests
-</code></pre>
-
-<p>Observe that the contrasts &ldquo;inherited&rdquo; the <code>type = &quot;response&quot;</code> default from
-the EMMs.</p>
-
-<p>NOTE: Setting the above options does <em>not</em> change how existing <code>emmGrid</code> objects
-are displayed; it only affects ones constructed in the future.</p>
-
-<p>There is one more option &ndash; <code>summary</code> &ndash; that overrides all other display 
-defaults for both existing and future objects. For example, specifying 
-<code>emm_options(summary = list(infer = c(TRUE, TRUE)))</code> will result in both
-intervals and tests being displayed, regardless of their internal defaults,
-unless <code>infer</code> is explicitly specified in a call to <code>summary()</code>.</p>
-
-<p>To temporarily revert to factory defaults in a single call to <code>emmeans()</code> or
-<code>contrast()</code> or <code>pairs()</code>, specify <code>options = NULL</code> in the call. To reset
-everything to factory defaults (which we do presently), null-out all of the
-<strong>emmeans</strong> package options:</p>
-
-<pre><code class="r">options(emmeans = NULL)
-</code></pre>
-
-<h3>Optimal digits to display {#digits}</h3>
-
+## P value adjustment: mvt method for 3 tests</code></pre>
+<p>Observe that the contrasts “inherited” the <code>type = &quot;response&quot;</code> default from the EMMs.</p>
+<p>NOTE: Setting the above options does <em>not</em> change how existing <code>emmGrid</code> objects are displayed; it only affects ones constructed in the future.</p>
+<p>There is one more option – <code>summary</code> – that overrides all other display defaults for both existing and future objects. For example, specifying <code>emm_options(summary = list(infer = c(TRUE, TRUE)))</code> will result in both intervals and tests being displayed, regardless of their internal defaults, unless <code>infer</code> is explicitly specified in a call to <code>summary()</code>.</p>
+<p>To temporarily revert to factory defaults in a single call to <code>emmeans()</code> or <code>contrast()</code> or <code>pairs()</code>, specify <code>options = NULL</code> in the call. To reset everything to factory defaults (which we do presently), null-out all of the <strong>emmeans</strong> package options:</p>
+<pre class="r"><code>options(emmeans = NULL)</code></pre>
+</div>
+<div id="digits" class="section level3">
+<h3>Optimal digits to display</h3>
 <!-- @index Digits, optimizing; `opt.digits` option -->
-
-<p>When an <code>emmGrid</code> object is summarized and displayed, the factory default is to
-display it with just enough digits as is justified by the standard errors or HPD
-intervals of the estimates displayed. You may use the <code>&quot;opt.digits&quot;</code> option to
-change this. If it is <code>TRUE</code> (the default), we display only enough digits as is
-justified (but at least 3). If it is set to <code>FALSE</code>, the number of digits is set
-using the R system&#39;s default, <code>getOption(&quot;digits&quot;)</code>; this is often much more
-precision than is justified. To illustrate, here is the summary of <code>pigs.emm</code>
-displayed without optimizing digits. Compare it with the first summary in this 
-vignette.</p>
-
-<pre><code class="r">emm_options(opt.digits = FALSE)
-pigs.emm
-</code></pre>
-
-<pre><code class="ro">##  source   emmean         SE df lower.CL upper.CL
+<p>When an <code>emmGrid</code> object is summarized and displayed, the factory default is to display it with just enough digits as is justified by the standard errors or HPD intervals of the estimates displayed. You may use the <code>&quot;opt.digits&quot;</code> option to change this. If it is <code>TRUE</code> (the default), we display only enough digits as is justified (but at least 3). If it is set to <code>FALSE</code>, the number of digits is set using the R system’s default, <code>getOption(&quot;digits&quot;)</code>; this is often much more precision than is justified. To illustrate, here is the summary of <code>pigs.emm</code> displayed without optimizing digits. Compare it with the first summary in this vignette.</p>
+<pre class="r"><code>emm_options(opt.digits = FALSE)
+pigs.emm</code></pre>
+<pre class="ro"><code>##  source   emmean         SE df lower.CL upper.CL
 ##  fish   3.394492 0.03668122 23 3.318612 3.470373
 ##  soy    3.667260 0.03744798 23 3.589793 3.744727
 ##  skim   3.796770 0.03938283 23 3.715300 3.878240
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
-## Confidence level used: 0.95
-</code></pre>
-
-<pre><code class="r">emm_options(opt.digits = TRUE)  # revert to optimal digits
-</code></pre>
-
-<p>By the way, setting this option does
-<em>not</em> round the calculated values computed by <code>summary.emmGrid()</code> or saved in a
-<code>summary)emm</code> object; it simply controls the precision displayed by
-<code>print.summary_emm()</code>.</p>
-
-<h3>Startup options {#startup}</h3>
-
+## Confidence level used: 0.95</code></pre>
+<pre class="r"><code>emm_options(opt.digits = TRUE)  # revert to optimal digits</code></pre>
+<p>By the way, setting this option does <em>not</em> round the calculated values computed by <code>summary.emmGrid()</code> or saved in a <code>summary)emm</code> object; it simply controls the precision displayed by <code>print.summary_emm()</code>.</p>
+</div>
+<div id="startup" class="section level3">
+<h3>Startup options</h3>
 <!-- @index Startup options; Options!Startup -->
-
-<p>The options accessed by <code>emm_options()</code> and <code>get_emm_option()</code> are stored in a
-list named <code>emmeans</code> within R&#39;s options environment. Therefore, if you desire
-options other than the defaults provided on a regular basis, this can be
-easily arranged by specifying them in your startup script for R. For example,
-if you want to default to Satterthwaite degrees of freedom for <code>lmer</code> models,
-and display confidence intervals rather than tests for contrasts,
-your <code>.Rprofile</code> file could contain the line</p>
-
-<pre><code class="r">options(emmeans = list(lmer.df = &quot;satterthwaite&quot;, 
-                       contrast = list(infer = c(TRUE, FALSE))))
-</code></pre>
-
+<p>The options accessed by <code>emm_options()</code> and <code>get_emm_option()</code> are stored in a list named <code>emmeans</code> within R’s options environment. Therefore, if you desire options other than the defaults provided on a regular basis, this can be easily arranged by specifying them in your startup script for R. For example, if you want to default to Satterthwaite degrees of freedom for <code>lmer</code> models, and display confidence intervals rather than tests for contrasts, your <code>.Rprofile</code> file could contain the line</p>
+<pre class="r"><code>options(emmeans = list(lmer.df = &quot;satterthwaite&quot;, 
+                       contrast = list(infer = c(TRUE, FALSE))))</code></pre>
 <p><a href="#contents">Back to contents</a></p>
-
-<h2>Combining and subsetting <code>emmGrid</code> objects {#rbind}</h2>
-
+</div>
+</div>
+<div id="rbind" class="section level2">
+<h2>Combining and subsetting <code>emmGrid</code> objects</h2>
 <!-- @index `emmGrid` objects!Combining and subsetting
      `rbind()`; `+` operator@plus -->
-
-<p>Two or more <code>emmGrid</code> objects may be combined using the <code>rbind()</code> or <code>+</code>
-methods. The most common reason (or perhaps the only good reason) to do this
-is to combine EMMs or contrasts into one family for purposes of applying
-a multiplicity adjustment to tests or intervals. 
-A user may want to combine the three pairwise comparisons of sources 
-with the three comparisons above of consecutive percents into a single family of six tests with a suitable 
-multiplicity adjustment. This is done quite simply:</p>
-
-<pre><code class="r">rbind(pairs(pigs.emm.s), pigs.anal.p[[2]])
-</code></pre>
-
-<pre><code class="ro">##  contrast    estimate     SE df t.ratio p.value
+<p>Two or more <code>emmGrid</code> objects may be combined using the <code>rbind()</code> or <code>+</code> methods. The most common reason (or perhaps the only good reason) to do this is to combine EMMs or contrasts into one family for purposes of applying a multiplicity adjustment to tests or intervals. A user may want to combine the three pairwise comparisons of sources with the three comparisons above of consecutive percents into a single family of six tests with a suitable multiplicity adjustment. This is done quite simply:</p>
+<pre class="r"><code>rbind(pairs(pigs.emm.s), pigs.anal.p[[2]])</code></pre>
+<pre class="ro"><code>##  contrast    estimate     SE df t.ratio p.value
 ##  fish - soy   -0.2728 0.0529 23 -5.153  0.0002 
 ##  fish - skim  -0.4023 0.0542 23 -7.428  &lt;.0001 
 ##  soy - skim   -0.1295 0.0530 23 -2.442  0.1364 
@@ -466,17 +185,10 @@ multiplicity adjustment. This is done quite simply:</p>
 ## 
 ## Results are averaged over some or all of the levels of: percent, source 
 ## Results are given on the log (not the response) scale. 
-## P value adjustment: bonferroni method for 6 tests
-</code></pre>
-
-<p>The default adjustment is <code>&quot;bonferroni&quot;</code>; we could have specified something different via the <code>adjust</code> argument. An equivalent way to combine <code>emmGrid</code>s is via the addition
-operator. Any options may be provided by <code>update()</code>. Below, we combine the same
-results into a family but ask for the &ldquo;exact&rdquo; multiplicity adjustment.</p>
-
-<pre><code class="r">update(pigs.anal.p[[2]] + pairs(pigs.emm.s), adjust = &quot;mvt&quot;)
-</code></pre>
-
-<pre><code class="ro">##  contrast    estimate     SE df lower.CL upper.CL t.ratio p.value
+## P value adjustment: bonferroni method for 6 tests</code></pre>
+<p>The default adjustment is <code>&quot;bonferroni&quot;</code>; we could have specified something different via the <code>adjust</code> argument. An equivalent way to combine <code>emmGrid</code>s is via the addition operator. Any options may be provided by <code>update()</code>. Below, we combine the same results into a family but ask for the “exact” multiplicity adjustment.</p>
+<pre class="r"><code>update(pigs.anal.p[[2]] + pairs(pigs.emm.s), adjust = &quot;mvt&quot;)</code></pre>
+<pre class="ro"><code>##  contrast    estimate     SE df lower.CL upper.CL t.ratio p.value
 ##  12 - 9        0.1796 0.0561 23   0.0214   0.3377  3.202  0.0212 
 ##  15 - 12       0.0378 0.0582 23  -0.1263   0.2020  0.650  0.9681 
 ##  18 - 15       0.0825 0.0691 23  -0.1124   0.2773  1.194  0.7305 
@@ -488,95 +200,51 @@ results into a family but ask for the &ldquo;exact&rdquo; multiplicity adjustmen
 ## Results are given on the log (not the response) scale. 
 ## Confidence level used: 0.95 
 ## Conf-level adjustment: mvt method for 6 estimates 
-## P value adjustment: mvt method for 6 tests
-</code></pre>
-
-<p>Also evident in comparing these results is that settings are obtained from the
-first object combined. So in the second output, where they are combined in
-reverse order, we get both confidence intervals and tests, and transformation to
-the response scale.</p>
-
-<h6>{#brackets}</h6>
-
+## P value adjustment: mvt method for 6 tests</code></pre>
+<p>Also evident in comparing these results is that settings are obtained from the first object combined. So in the second output, where they are combined in reverse order, we get both confidence intervals and tests, and transformation to the response scale.</p>
+<div id="brackets" class="section level6">
+<h6></h6>
 <!-- @index Selecting results; `[ ]` and `[[ ]]` operators@brackets -->
-
-<p>To subset an <code>emmGrid</code> object, just use the subscripting operator <code>[]</code>.
-For instance,</p>
-
-<pre><code class="r">pigs.emm[2:3]
-</code></pre>
-
-<pre><code class="ro">##  source emmean     SE df lower.CL upper.CL
+<p>To subset an <code>emmGrid</code> object, just use the subscripting operator <code>[]</code>. For instance,</p>
+<pre class="r"><code>pigs.emm[2:3]</code></pre>
+<pre class="ro"><code>##  source emmean     SE df lower.CL upper.CL
 ##  soy      3.67 0.0374 23     3.59     3.74
 ##  skim     3.80 0.0394 23     3.72     3.88
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
-## Confidence level used: 0.95
-</code></pre>
-
-<h2>Accessing results to use elsewhere {#data}</h2>
-
+## Confidence level used: 0.95</code></pre>
+</div>
+</div>
+<div id="data" class="section level2">
+<h2>Accessing results to use elsewhere</h2>
 <!-- @index `as.data.frame()`; `emmGrid` objects!Accessing data; Using results 
      `summary_emm` object!As a data frame; `as.data.frame()` -->
-
-<p>Sometimes, users want to use the results of an analysis (say, an <code>emmeans()</code> call)
-in other computations. The <code>summary()</code> method creates a <code>summary_emm</code> object
-that inherits from the <code>data.frame</code> class; so one may use the variables therein
-just as those in a data frame.</p>
-
-<p>Another way is to use the <code>as.data.frame()</code> method for <code>emmGrid</code> objects.
-This is provided to implement the standard way to coerce an object to a data frame.
-For illustration, let&#39;s compute the widths of the confidence intervals in our example.</p>
-
-<pre><code class="r">transform(pigs.emm, CI.width = upper.CL - lower.CL)
-</code></pre>
-
-<pre><code class="ro">##   source   emmean         SE df lower.CL upper.CL  CI.width
+<p>Sometimes, users want to use the results of an analysis (say, an <code>emmeans()</code> call) in other computations. The <code>summary()</code> method creates a <code>summary_emm</code> object that inherits from the <code>data.frame</code> class; so one may use the variables therein just as those in a data frame.</p>
+<p>Another way is to use the <code>as.data.frame()</code> method for <code>emmGrid</code> objects. This is provided to implement the standard way to coerce an object to a data frame. For illustration, let’s compute the widths of the confidence intervals in our example.</p>
+<pre class="r"><code>transform(pigs.emm, CI.width = upper.CL - lower.CL)</code></pre>
+<pre class="ro"><code>##   source   emmean         SE df lower.CL upper.CL  CI.width
 ## 1   fish 3.394492 0.03668122 23 3.318612 3.470373 0.1517618
 ## 2    soy 3.667260 0.03744798 23 3.589793 3.744727 0.1549341
-## 3   skim 3.796770 0.03938283 23 3.715300 3.878240 0.1629392
-</code></pre>
-
-<p>This implicitly converted <code>pigs.emm</code> to a data frame by passing it to the
-<code>as.data.frame()</code> method, then performed the required computation. But sometimes
-you have to explicitly call <code>as.data.frame()</code>. [Note that the <code>opt.digits</code>
-option is ignored here, because this is a regular data frame, not the summary of
-an <code>emmGrid</code>.]</p>
-
+## 3   skim 3.796770 0.03938283 23 3.715300 3.878240 0.1629392</code></pre>
+<p>This implicitly converted <code>pigs.emm</code> to a data frame by passing it to the <code>as.data.frame()</code> method, then performed the required computation. But sometimes you have to explicitly call <code>as.data.frame()</code>. [Note that the <code>opt.digits</code> option is ignored here, because this is a regular data frame, not the summary of an <code>emmGrid</code>.]</p>
 <p><a href="#contents">Back to contents</a></p>
-
-<h2>Adding grouping factors {#groups}</h2>
-
+</div>
+<div id="groups" class="section level2">
+<h2>Adding grouping factors</h2>
 <!-- @index Grouping factors; `add_grouping()`; Nesting factors!Creating  -->
-
-<p>Sometimes, users want to group levels of a factor into a smaller number of groups.
-Those groups may then be, say, averaged separately and compared, or used as a
-<code>by</code> factor. The <code>add_grouping()</code> function serves this purpose. The function
-takes four arguments: the object, the name of the grouping factor to be created,
-the name of the reference factor that is being grouped, and a vector of level 
-names of the grouping factor corresponding to levels of the reference factor.
-Suppose for example that we want to distinguish animal and non-animal sources of
-protein in the <code>pigs</code> example:</p>
-
-<pre><code class="r">pigs.emm.ss &lt;- add_grouping(pigs.emm.s, &quot;type&quot;, &quot;source&quot;,
+<p>Sometimes, users want to group levels of a factor into a smaller number of groups. Those groups may then be, say, averaged separately and compared, or used as a <code>by</code> factor. The <code>add_grouping()</code> function serves this purpose. The function takes four arguments: the object, the name of the grouping factor to be created, the name of the reference factor that is being grouped, and a vector of level names of the grouping factor corresponding to levels of the reference factor. Suppose for example that we want to distinguish animal and non-animal sources of protein in the <code>pigs</code> example:</p>
+<pre class="r"><code>pigs.emm.ss &lt;- add_grouping(pigs.emm.s, &quot;type&quot;, &quot;source&quot;,
                             c(&quot;animal&quot;, &quot;vegetable&quot;, &quot;animal&quot;))
-str(pigs.emm.ss)
-</code></pre>
-
-<pre><code class="ro">## &#39;emmGrid&#39; object with variables:
+str(pigs.emm.ss)</code></pre>
+<pre class="ro"><code>## &#39;emmGrid&#39; object with variables:
 ##     source = fish, soy, skim
 ##     type = animal, vegetable
 ## Nesting structure:  source %in% type
-## Transformation: &quot;log&quot;
-</code></pre>
-
-<p>Note that the new object has a nesting structure (see more about this in the <a href="messy-data.html#nesting">&ldquo;messy-data&rdquo; vignette</a>), with the reference factor nested in the new grouping factor. Now we can obtain means and comparisons for each group</p>
-
-<pre><code class="r">emmeans(pigs.emm.ss, pairwise ~ type)
-</code></pre>
-
-<pre><code class="ro">## $emmeans
+## Transformation: &quot;log&quot;</code></pre>
+<p>Note that the new object has a nesting structure (see more about this in the <a href="messy-data.html#nesting">“messy-data” vignette</a>), with the reference factor nested in the new grouping factor. Now we can obtain means and comparisons for each group</p>
+<pre class="r"><code>emmeans(pigs.emm.ss, pairwise ~ type)</code></pre>
+<pre class="ro"><code>## $emmeans
 ##  type      emmean     SE df lower.CL upper.CL
 ##  animal      3.60 0.0267 23     3.54     3.65
 ##  vegetable   3.67 0.0374 23     3.59     3.74
@@ -590,46 +258,28 @@ str(pigs.emm.ss)
 ##  animal - vegetable  -0.0716 0.0455 23 -1.573  0.1295 
 ## 
 ## Results are averaged over the levels of: percent, source 
-## Results are given on the log (not the response) scale.
-</code></pre>
-
+## Results are given on the log (not the response) scale.</code></pre>
 <p><a href="#contents">Back to contents</a></p>
-
-<h2>Re-labeling or re-leveling an <code>emmGrid</code> {#relevel}</h2>
-
+</div>
+<div id="relevel" class="section level2">
+<h2>Re-labeling or re-leveling an <code>emmGrid</code></h2>
 <!-- @index Re-labeling; Levels!Changing; Labels!Changing; Examples!`warpbreaks`;
     Examples!Welch's *t* comparisons; Welch's *t* comparisons!Example    -->
-
-<p>Sometimes it is desirable to re-label the rows of an <code>emmGrid</code>, or cast it in terms of
-other factor(s). This can be done via the <code>levels</code> argument in <code>update()</code>. </p>
-
-<p>As an example, sometimes a fitted model has a treatment factor that comprises combinations of other factors. In subsequent analysis, we may well want to break it down into the
-individual factors&#39; contributions. Consider, for example, the <code>warpbreaks</code> data provided with R.
-We will define a single factor and fit a nonhomogeneous-variance model:</p>
-
-<pre><code class="r">warp &lt;- transform(warpbreaks, treat = interaction(wool, tension))
-library(nlme)
-</code></pre>
-
+<p>Sometimes it is desirable to re-label the rows of an <code>emmGrid</code>, or cast it in terms of other factor(s). This can be done via the <code>levels</code> argument in <code>update()</code>.</p>
+<p>As an example, sometimes a fitted model has a treatment factor that comprises combinations of other factors. In subsequent analysis, we may well want to break it down into the individual factors’ contributions. Consider, for example, the <code>warpbreaks</code> data provided with R. We will define a single factor and fit a nonhomogeneous-variance model:</p>
+<pre class="r"><code>warp &lt;- transform(warpbreaks, treat = interaction(wool, tension))
+library(nlme)</code></pre>
 <pre><code>## 
-## Attaching package: &#39;nlme&#39;
-</code></pre>
-
+## Attaching package: &#39;nlme&#39;</code></pre>
 <pre><code>## The following objects are masked from &#39;package:ordinal&#39;:
 ## 
-##     VarCorr, ranef
-</code></pre>
-
+##     VarCorr, ranef</code></pre>
 <pre><code>## The following object is masked from &#39;package:lme4&#39;:
 ## 
-##     lmList
-</code></pre>
-
-<pre><code class="r">warp.gls &lt;- gls(breaks ~ treat, weights = varIdent(form = ~ 1|treat), data = warp)
-( warp.emm &lt;- emmeans(warp.gls, &quot;treat&quot;) )
-</code></pre>
-
-<pre><code class="ro">##  treat emmean   SE   df lower.CL upper.CL
+##     lmList</code></pre>
+<pre class="r"><code>warp.gls &lt;- gls(breaks ~ treat, weights = varIdent(form = ~ 1|treat), data = warp)
+( warp.emm &lt;- emmeans(warp.gls, &quot;treat&quot;) )</code></pre>
+<pre class="ro"><code>##  treat emmean   SE   df lower.CL upper.CL
 ##  A.L     44.6 6.03 8.01     30.6     58.5
 ##  B.L     28.2 3.29 8.00     20.6     35.8
 ##  A.M     24.0 2.89 8.00     17.3     30.7
@@ -638,28 +288,17 @@ library(nlme)
 ##  B.H     18.8 1.63 8.00     15.0     22.5
 ## 
 ## d.f. method: satterthwaite 
-## Confidence level used: 0.95
-</code></pre>
-
-<p>But now we want to re-cast this <code>emmGrid</code> into one that has separate factors for <code>wool</code> 
-and <code>tension</code>. We can do this as follows:</p>
-
-<pre><code class="r">warp.fac &lt;- update(warp.emm, levels = list(
+## Confidence level used: 0.95</code></pre>
+<p>But now we want to re-cast this <code>emmGrid</code> into one that has separate factors for <code>wool</code> and <code>tension</code>. We can do this as follows:</p>
+<pre class="r"><code>warp.fac &lt;- update(warp.emm, levels = list(
                 wool = c(&quot;A&quot;, &quot;B&quot;), tension = c(&quot;L&quot;, &quot;M&quot;, &quot;H&quot;)))
-str(warp.fac)
-</code></pre>
-
-<pre><code class="ro">## &#39;emmGrid&#39; object with variables:
+str(warp.fac)</code></pre>
+<pre class="ro"><code>## &#39;emmGrid&#39; object with variables:
 ##     wool = A, B
-##     tension = L, M, H
-</code></pre>
-
+##     tension = L, M, H</code></pre>
 <p>So now we can do various contrasts involving the separate factors:</p>
-
-<pre><code class="r">contrast(warp.fac, &quot;consec&quot;, by = &quot;wool&quot;)
-</code></pre>
-
-<pre><code class="ro">## wool = A:
+<pre class="r"><code>contrast(warp.fac, &quot;consec&quot;, by = &quot;wool&quot;)</code></pre>
+<pre class="ro"><code>## wool = A:
 ##  contrast estimate   SE   df t.ratio p.value
 ##  M - L     -20.556 6.69 11.5 -3.074  0.0203 
 ##  H - M       0.556 4.48 15.6  0.124  0.9899 
@@ -669,20 +308,23 @@ str(warp.fac)
 ##  M - L       0.556 4.55 16.0  0.122  0.9881 
 ##  H - M     -10.000 3.54 12.0 -2.824  0.0269 
 ## 
-## P value adjustment: mvt method for 2 tests
-</code></pre>
-
-<p>Note: When re-leveling to more than one factor, you have to be careful to anticipate
-that the levels will be expanded using <code>expand.grid()</code>: the first factor in the list
-varies the fastest and the last varies the slowest. That was the case in our example, 
-but in others, it may not be. Had the levels of <code>treat</code> been
-ordered as <code>A.L, A.M, A.H, B.L, B.M, B.H</code>, then we would have had to specify the levels
-of <code>tension</code> first and the levels of <code>wool</code> second.</p>
-
+## P value adjustment: mvt method for 2 tests</code></pre>
+<p>Note: When re-leveling to more than one factor, you have to be careful to anticipate that the levels will be expanded using <code>expand.grid()</code>: the first factor in the list varies the fastest and the last varies the slowest. That was the case in our example, but in others, it may not be. Had the levels of <code>treat</code> been ordered as <code>A.L, A.M, A.H, B.L, B.M, B.H</code>, then we would have had to specify the levels of <code>tension</code> first and the levels of <code>wool</code> second.</p>
 <p><a href="#contents">Back to contents</a></p>
-
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 
 </body>
-
 </html>

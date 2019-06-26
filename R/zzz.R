@@ -46,7 +46,8 @@ hasName = function(x, name)
                          highlight = NULL,  ...) {
     rmarkdown::html_document(theme = NULL, highlight = highlight,
                              fig_width = 3, fig_height = 3, 
-                             css = css, ...)
+                             css = css, pandoc_args = "", ...)
+###    css = css, pandoc_args = "--strip-comments", ...)
 }
 
 

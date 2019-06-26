@@ -1,439 +1,160 @@
 <!DOCTYPE html>
-<html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-<title>Contents {#contents}</title>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
 
-<script type="text/javascript">
-window.onload = function() {
-  var imgs = document.getElementsByTagName('img'), i, img;
-  for (i = 0; i < imgs.length; i++) {
-    img = imgs[i];
-    // center an image if it is the only element of its parent
-    if (img.parentElement.childElementCount === 1)
-      img.parentElement.style.textAlign = 'center';
-  }
-};
-</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Styles for R syntax highlighter -->
-<style type="text/css">
-   pre .operator,
-   pre .paren {
-     color: rgb(104, 118, 135)
-   }
+<meta name="author" content="emmeans package, Version 1.3.5.1" />
 
-   pre .literal {
-     color: #990073
-   }
 
-   pre .number {
-     color: #099;
-   }
-
-   pre .comment {
-     color: #998;
-     font-style: italic
-   }
-
-   pre .keyword {
-     color: #900;
-     font-weight: bold
-   }
-
-   pre .identifier {
-     color: rgb(0, 0, 0);
-   }
-
-   pre .string {
-     color: #d14;
-   }
-</style>
-
-<!-- R syntax highlighter -->
-<script type="text/javascript">
-var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
-hljs.initHighlightingOnLoad();
-</script>
+<title>Confidence intervals and tests in emmeans</title>
 
 
 
-<style type="text/css">
-body, td {
-   font-family: sans-serif;
-   background-color: white;
-   font-size: 13px;
-}
 
-body {
-  max-width: 800px;
-  margin: auto;
-  padding: 1em;
-  line-height: 20px;
-}
 
-tt, code, pre {
-   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
-}
 
-h1 {
-   font-size:2.2em;
-}
+<style type="text/css">body {font-size: 11pt; font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;margin: 30px 50px 30px 50px; }h1,h2,h3,h4,h5,h6 { font-family: Arial,Helvetica,Sans-serif; }a { text-decoration: none; }a:link { color:darkblue; } a:visited { color:darkblue; } a:hover { color:dodgerblue; }a:active { color:dodgerblue; } code {color: #602000;font-family: "Lucida Console", Monaco, monospace; font-size: 90%;}.r { color: darkred; }.ro { color: darkgreen; background-color: #eeeeee; }.r code, a code, .ro code { color: inherit; }.vigindex ul { list-style-type: none; }.vigindex ul li { list-style: none; }.vigindex a code { color: inherit; }.vigindex li code { color: inherit; }</style>
 
-h2 {
-   font-size:1.8em;
-}
-
-h3 {
-   font-size:1.4em;
-}
-
-h4 {
-   font-size:1.0em;
-}
-
-h5 {
-   font-size:0.9em;
-}
-
-h6 {
-   font-size:0.8em;
-}
-
-a:visited {
-   color: rgb(50%, 0%, 50%);
-}
-
-pre, img {
-  max-width: 100%;
-}
-pre {
-  overflow-x: auto;
-}
-pre code {
-   display: block; padding: 0.5em;
-}
-
-code {
-  font-size: 92%;
-  border: 1px solid #ccc;
-}
-
-code[class] {
-  background-color: #F8F8F8;
-}
-
-table, td, th {
-  border: none;
-}
-
-blockquote {
-   color:#666666;
-   margin:0;
-   padding-left: 1em;
-   border-left: 0.5em #EEE solid;
-}
-
-hr {
-   height: 0px;
-   border-bottom: none;
-   border-top-width: thin;
-   border-top-style: dotted;
-   border-top-color: #999999;
-}
-
-@media print {
-   * {
-      background: transparent !important;
-      color: black !important;
-      filter:none !important;
-      -ms-filter: none !important;
-   }
-
-   body {
-      font-size:12pt;
-      max-width:100%;
-   }
-
-   a, a:visited {
-      text-decoration: underline;
-   }
-
-   hr {
-      visibility: hidden;
-      page-break-before: always;
-   }
-
-   pre, blockquote {
-      padding-right: 1em;
-      page-break-inside: avoid;
-   }
-
-   tr, img {
-      page-break-inside: avoid;
-   }
-
-   img {
-      max-width: 100% !important;
-   }
-
-   @page :left {
-      margin: 15mm 20mm 15mm 10mm;
-   }
-
-   @page :right {
-      margin: 15mm 10mm 15mm 20mm;
-   }
-
-   p, h2, h3 {
-      orphans: 3; widows: 3;
-   }
-
-   h2, h3 {
-      page-break-after: avoid;
-   }
-}
-</style>
 
 
 
 </head>
 
 <body>
+
+
+
+
+<h1 class="title toc-ignore">Confidence intervals and tests in emmeans</h1>
+<h4 class="author">emmeans package, Version 1.3.5.1</h4>
+
+
+
 <!-- @index Vignettes!Confidence intervals and tests -->
-
-<h2>Contents {#contents}</h2>
-
+<div id="contents" class="section level2">
+<h2>Contents</h2>
 <p>This vignette describes various ways of summarizing <code>emmGrid</code> objects.</p>
-
-<ol>
+<ol style="list-style-type: decimal">
 <li><a href="#emmobj"><code>emmGrid</code> objects, described</a></li>
 <li><a href="#summary"><code>summary()</code>, <code>confint()</code>, and <code>test()</code></a></li>
-<li><a href="#tran">Back-transforming to response scale</a>
- (See also the <a href="transformations.html">&ldquo;transformations&rdquo; vignette</a>)</li>
+<li><a href="#tran">Back-transforming to response scale</a> (See also the <a href="transformations.html">“transformations” vignette</a>)</li>
 <li><a href="#adjust">Multiplicity adjustments</a></li>
-<li><a href="#byvars">Using &ldquo;by&rdquo; variables</a></li>
+<li><a href="#byvars">Using “by” variables</a></li>
 <li><a href="#joint">Joint (omnibus) tests</a></li>
 <li><a href="#equiv">Testing equivalence, noninferiority, nonsuperiority</a></li>
-<li>Graphics (in <a href="basics.html#plots">&ldquo;basics&rdquo; vignette</a>)</li>
+<li>Graphics (in <a href="basics.html#plots">“basics” vignette</a>)</li>
 </ol>
-
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
-
-<h2>Objects, structures, and methods {#emmobj}</h2>
-
+</div>
+<div id="emmobj" class="section level2">
+<h2>Objects, structures, and methods</h2>
 <!-- @index `emmGrid` objects -->
-
-<p>The <code>ref_grid()</code> and <code>emmeans()</code> functions are introduced in 
-<a href="basics.html">the &ldquo;Basics&rdquo; vignette</a>. These functions, and a few related ones,
-return an object of class <code>emmGrid</code>:</p>
-
-<pre><code class="r">pigs.lm &lt;- lm(log(conc) ~ source + factor(percent), data = pigs)
+<p>The <code>ref_grid()</code> and <code>emmeans()</code> functions are introduced in <a href="basics.html">the “Basics” vignette</a>. These functions, and a few related ones, return an object of class <code>emmGrid</code>:</p>
+<pre class="r"><code>pigs.lm &lt;- lm(log(conc) ~ source + factor(percent), data = pigs)
 pigs.rg &lt;- ref_grid(pigs.lm)
-class(pigs.rg)
-</code></pre>
-
-<pre><code class="ro">## [1] &quot;emmGrid&quot;
+class(pigs.rg)</code></pre>
+<pre class="ro"><code>## [1] &quot;emmGrid&quot;
 ## attr(,&quot;package&quot;)
-## [1] &quot;emmeans&quot;
-</code></pre>
-
-<pre><code class="r">pigs.emm.s &lt;- emmeans(pigs.rg, &quot;source&quot;)
-class(pigs.emm.s)
-</code></pre>
-
-<pre><code class="ro">## [1] &quot;emmGrid&quot;
+## [1] &quot;emmeans&quot;</code></pre>
+<pre class="r"><code>pigs.emm.s &lt;- emmeans(pigs.rg, &quot;source&quot;)
+class(pigs.emm.s)</code></pre>
+<pre class="ro"><code>## [1] &quot;emmGrid&quot;
 ## attr(,&quot;package&quot;)
-## [1] &quot;emmeans&quot;
-</code></pre>
-
+## [1] &quot;emmeans&quot;</code></pre>
 <p>If you simply show these objects, you get different-looking results:</p>
-
-<pre><code class="r">pigs.rg
-</code></pre>
-
-<pre><code class="ro">## &#39;emmGrid&#39; object with variables:
+<pre class="r"><code>pigs.rg</code></pre>
+<pre class="ro"><code>## &#39;emmGrid&#39; object with variables:
 ##     source = fish, soy, skim
 ##     percent =  9, 12, 15, 18
-## Transformation: &quot;log&quot;
-</code></pre>
-
-<pre><code class="r">pigs.emm.s
-</code></pre>
-
-<pre><code class="ro">##  source emmean     SE df lower.CL upper.CL
+## Transformation: &quot;log&quot;</code></pre>
+<pre class="r"><code>pigs.emm.s</code></pre>
+<pre class="ro"><code>##  source emmean     SE df lower.CL upper.CL
 ##  fish     3.39 0.0367 23     3.32     3.47
 ##  soy      3.67 0.0374 23     3.59     3.74
 ##  skim     3.80 0.0394 23     3.72     3.88
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
-## Confidence level used: 0.95
-</code></pre>
-
-<p>This is based on guessing what users most need to see when displaying the object.
-You can override these defaults; for example to just see a quick summary of
-what is there, do</p>
-
-<pre><code class="r">str(pigs.emm.s)
-</code></pre>
-
-<pre><code class="ro">## &#39;emmGrid&#39; object with variables:
+## Confidence level used: 0.95</code></pre>
+<p>This is based on guessing what users most need to see when displaying the object. You can override these defaults; for example to just see a quick summary of what is there, do</p>
+<pre class="r"><code>str(pigs.emm.s)</code></pre>
+<pre class="ro"><code>## &#39;emmGrid&#39; object with variables:
 ##     source = fish, soy, skim
-## Transformation: &quot;log&quot;
-</code></pre>
-
+## Transformation: &quot;log&quot;</code></pre>
 <!-- @index `str()`; `summary_emm` object; `print.summary_emm()` -->
-
-<p>The most important method for <code>emmGrid</code> objects is <code>summary()</code>. It is used as the
-default for displaying an <code>emmeans()</code> result like <code>pigs.emm.s</code>. This <code>summary()</code>
-method for <code>emmGrid</code> objects) actually produces a <code>data.frame</code>, but with extra bells 
-and whistles:</p>
-
-<pre><code class="r">class(summary(pigs.emm.s))
-</code></pre>
-
-<pre><code class="ro">## [1] &quot;summary_emm&quot; &quot;data.frame&quot;
-</code></pre>
-
-<p>This can be useful to know because if you want to actually <em>use</em> <code>emmeans()</code> results
-in other computations, you should save its summary, and then you can access those
-results just like you would access data in a data frame. The <code>emmGrid</code> object itself
-is not so accessible. There is a <code>print.summary_emm()</code> function that is what
-actually produces the output you see above &ndash; a data frame with extra
-annotations.</p>
-
+<p>The most important method for <code>emmGrid</code> objects is <code>summary()</code>. It is used as the default for displaying an <code>emmeans()</code> result like <code>pigs.emm.s</code>. This <code>summary()</code> method for <code>emmGrid</code> objects) actually produces a <code>data.frame</code>, but with extra bells and whistles:</p>
+<pre class="r"><code>class(summary(pigs.emm.s))</code></pre>
+<pre class="ro"><code>## [1] &quot;summary_emm&quot; &quot;data.frame&quot;</code></pre>
+<p>This can be useful to know because if you want to actually <em>use</em> <code>emmeans()</code> results in other computations, you should save its summary, and then you can access those results just like you would access data in a data frame. The <code>emmGrid</code> object itself is not so accessible. There is a <code>print.summary_emm()</code> function that is what actually produces the output you see above – a data frame with extra annotations.</p>
 <p><a href="#contents">Back to Contents</a></p>
-
-<h2><code>summary()</code> and its relatives {#summary}</h2>
-
+</div>
+<div id="summary" class="section level2">
+<h2><code>summary()</code> and its relatives</h2>
 <!-- @index `summary()`; `summary()`!`infer`; `confint()`; `test()`; Confidence intervals;
             Tests!One- and two-sided; Tests!Nonzero null -->
-
-<p>As you may have gathered, the most important method for <code>emmGrid</code> objects is <code>summary()</code>.
-It has a lot of options, and the detailed documentation via 
-<code>help(&quot;summary.emm&quot;)</code> is worth a look.</p>
-
-<p>Just <code>summary(&lt;object&gt;)</code> by itself will produce a summary that varies somewhat
-according to context. It does this by setting different defaults for the <code>infer</code>
-argument, which consists of two logical values, specifying confidence intervals 
-and tests, respectively. 
-The summary of a newly made reference grid will show just estimates and
-standard errors, but not confidence intervals or tests (that is, <code>infer =
-c(FALSE, FALSE)</code>). The summary of an <code>emmeans()</code> result, as we see above, will
-have intervals, but no tests (i.e., <code>infer = c(TRUE, FALSE)</code>); and the result of
-a <code>contrast()</code> call (see <a href="comparisons.html">comparisons and contrasts</a>) will
-show test statistics and <em>P</em> values, but not intervals (i.e., <code>infer = c(FALSE,
-TRUE)</code>). There are courtesy methods <code>confint()</code> and <code>test()</code> that just call
-<code>summary()</code> with the appropriate <code>infer</code> setting; for example,</p>
-
-<pre><code class="r">test(pigs.emm.s)
-</code></pre>
-
-<pre><code class="ro">##  source emmean     SE df t.ratio p.value
+<p>As you may have gathered, the most important method for <code>emmGrid</code> objects is <code>summary()</code>. It has a lot of options, and the detailed documentation via <code>help(&quot;summary.emm&quot;)</code> is worth a look.</p>
+<p>Just <code>summary(&lt;object&gt;)</code> by itself will produce a summary that varies somewhat according to context. It does this by setting different defaults for the <code>infer</code> argument, which consists of two logical values, specifying confidence intervals and tests, respectively. The summary of a newly made reference grid will show just estimates and standard errors, but not confidence intervals or tests (that is, <code>infer = c(FALSE, FALSE)</code>). The summary of an <code>emmeans()</code> result, as we see above, will have intervals, but no tests (i.e., <code>infer = c(TRUE, FALSE)</code>); and the result of a <code>contrast()</code> call (see <a href="comparisons.html">comparisons and contrasts</a>) will show test statistics and <em>P</em> values, but not intervals (i.e., <code>infer = c(FALSE, TRUE)</code>). There are courtesy methods <code>confint()</code> and <code>test()</code> that just call <code>summary()</code> with the appropriate <code>infer</code> setting; for example,</p>
+<pre class="r"><code>test(pigs.emm.s)</code></pre>
+<pre class="ro"><code>##  source emmean     SE df t.ratio p.value
 ##  fish     3.39 0.0367 23 92.540  &lt;.0001 
 ##  soy      3.67 0.0374 23 97.929  &lt;.0001 
 ##  skim     3.80 0.0394 23 96.407  &lt;.0001 
 ## 
 ## Results are averaged over the levels of: percent 
-## Results are given on the log (not the response) scale.
-</code></pre>
-
-<p>It is not particularly useful, though, to test these EMMs against the default of 
-zero &ndash; which is why tests are not usually shown. It makes a lot more sense
-to test them against some target concentration, say 40. And suppose we want to do a one-sided test to see if the concentration is greater than 40. Remembering that the
-response is log-transformed in this model, </p>
-
-<pre><code class="r">test(pigs.emm.s, null = log(40), side = &quot;&gt;&quot;)
-</code></pre>
-
-<pre><code class="ro">##  source emmean     SE df null t.ratio p.value
+## Results are given on the log (not the response) scale.</code></pre>
+<p>It is not particularly useful, though, to test these EMMs against the default of zero – which is why tests are not usually shown. It makes a lot more sense to test them against some target concentration, say 40. And suppose we want to do a one-sided test to see if the concentration is greater than 40. Remembering that the response is log-transformed in this model,</p>
+<pre class="r"><code>test(pigs.emm.s, null = log(40), side = &quot;&gt;&quot;)</code></pre>
+<pre class="ro"><code>##  source emmean     SE df null t.ratio p.value
 ##  fish     3.39 0.0367 23 3.69 -8.026  1.0000 
 ##  soy      3.67 0.0374 23 3.69 -0.577  0.7153 
 ##  skim     3.80 0.0394 23 3.69  2.740  0.0058 
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
-## P values are right-tailed
-</code></pre>
-
+## P values are right-tailed</code></pre>
 <p><a href="#contents">Back to Contents</a></p>
-
-<h2>Back-transforming {#tran}</h2>
-
+</div>
+<div id="tran" class="section level2">
+<h2>Back-transforming</h2>
 <!-- @index Transformations!Back-transforming; `type`; Response scale -->
-
-<p>Transformations and link functions are supported an several ways in <strong>emmeans</strong>,
-making this a complex topic worthy of <a href="transformations.html">its own vignette</a>.
-Here, we show just the most basic approach. Namely, specifying the argument
-<code>type = &quot;response&quot;</code> will cause the displayed results to be back-transformed
-to the response scale, when a transformation or link function is incorporated
-in the model. For example, let&#39;s try the preceding <code>test()</code> call again:</p>
-
-<pre><code class="r">test(pigs.emm.s, null = log(40), side = &quot;&gt;&quot;, type = &quot;response&quot;)
-</code></pre>
-
-<pre><code class="ro">##  source response   SE df null t.ratio p.value
+<p>Transformations and link functions are supported an several ways in <strong>emmeans</strong>, making this a complex topic worthy of <a href="transformations.html">its own vignette</a>. Here, we show just the most basic approach. Namely, specifying the argument <code>type = &quot;response&quot;</code> will cause the displayed results to be back-transformed to the response scale, when a transformation or link function is incorporated in the model. For example, let’s try the preceding <code>test()</code> call again:</p>
+<pre class="r"><code>test(pigs.emm.s, null = log(40), side = &quot;&gt;&quot;, type = &quot;response&quot;)</code></pre>
+<pre class="ro"><code>##  source response   SE df null t.ratio p.value
 ##  fish       29.8 1.09 23   40 -8.026  1.0000 
 ##  soy        39.1 1.47 23   40 -0.577  0.7153 
 ##  skim       44.6 1.75 23   40  2.740  0.0058 
 ## 
 ## Results are averaged over the levels of: percent 
 ## P values are right-tailed 
-## Tests are performed on the log scale
-</code></pre>
-
-<p>Note what changes and what doesn&#39;t change. In the <code>test()</code> call, we <em>still</em> use
-the log of 40 as the null value; <code>null</code> must always be specified on the
-linear-prediction scale, in this case the log. In the output, the displayed
-estimates, as well as the <code>null</code> value, are shown back-transformed. As well, the
-standard errors are altered (using the delta method). However, the <em>t</em> ratios
-and <em>P</em> values are identical to the preceding results. That is, the tests
-themselves are still conducted on the linear-predictor scale (as is noted in the
-output).</p>
-
+## Tests are performed on the log scale</code></pre>
+<p>Note what changes and what doesn’t change. In the <code>test()</code> call, we <em>still</em> use the log of 40 as the null value; <code>null</code> must always be specified on the linear-prediction scale, in this case the log. In the output, the displayed estimates, as well as the <code>null</code> value, are shown back-transformed. As well, the standard errors are altered (using the delta method). However, the <em>t</em> ratios and <em>P</em> values are identical to the preceding results. That is, the tests themselves are still conducted on the linear-predictor scale (as is noted in the output).</p>
 <p>Similar statements apply to confidence intervals on the response scale:</p>
-
-<pre><code class="r">confint(pigs.emm.s, side = &quot;&gt;&quot;, level = .90, type = &quot;response&quot;)
-</code></pre>
-
-<pre><code class="ro">##  source response   SE df lower.CL upper.CL
+<pre class="r"><code>confint(pigs.emm.s, side = &quot;&gt;&quot;, level = .90, type = &quot;response&quot;)</code></pre>
+<pre class="ro"><code>##  source response   SE df lower.CL upper.CL
 ##  fish       29.8 1.09 23     28.4      Inf
 ##  soy        39.1 1.47 23     37.3      Inf
 ##  skim       44.6 1.75 23     42.3      Inf
 ## 
 ## Results are averaged over the levels of: percent 
 ## Confidence level used: 0.9 
-## Intervals are back-transformed from the log scale
-</code></pre>
-
-<p>With <code>side = &quot;&gt;&quot;</code>, a <em>lower</em> confidence limit is computed on the log scale, then
-that limit is back-transformed to the response scale. (We have also illustrated 
-how to change the confidence level.)</p>
-
+## Intervals are back-transformed from the log scale</code></pre>
+<p>With <code>side = &quot;&gt;&quot;</code>, a <em>lower</em> confidence limit is computed on the log scale, then that limit is back-transformed to the response scale. (We have also illustrated how to change the confidence level.)</p>
 <p><a href="#contents">Back to Contents</a></p>
-
-<h2>Multiplicity adjustments {#adjust}</h2>
-
+</div>
+<div id="adjust" class="section level2">
+<h2>Multiplicity adjustments</h2>
 <!-- @index Multiplicity adjustments; `adjust`; 
      Tukey adjustment; Sidak adjustment -->
-
-<p>Both tests and confidence intervals may be adjusted for simultaneous inference. 
-Such adjustments ensure that the confidence coefficient for a whole set of 
-intervals is at least the specified level, or to control for multiplicity
-in a whole family of tests. This is done via the <code>adjust</code>
-argument. For <code>ref_grid()</code> and <code>emmeans()</code> results, the default is <code>adjust =
-&quot;none&quot;</code>. For most <code>contrast()</code> results, <code>adjust</code> is often something else,
-depending on what type of contrasts are created. For example, pairwise
-comparisons default to <code>adjust = &quot;tukey&quot;</code>, i.e., the Tukey HSD method.
-The <code>summary()</code> function sometimes <em>changes</em> <code>adjust</code> if it is inappropriate.
-For example, with</p>
-
-<pre><code class="r">confint(pigs.emm.s, adjust = &quot;tukey&quot;)
-</code></pre>
-
-<pre><code class="ro">##  source emmean     SE df lower.CL upper.CL
+<p>Both tests and confidence intervals may be adjusted for simultaneous inference. Such adjustments ensure that the confidence coefficient for a whole set of intervals is at least the specified level, or to control for multiplicity in a whole family of tests. This is done via the <code>adjust</code> argument. For <code>ref_grid()</code> and <code>emmeans()</code> results, the default is <code>adjust = &quot;none&quot;</code>. For most <code>contrast()</code> results, <code>adjust</code> is often something else, depending on what type of contrasts are created. For example, pairwise comparisons default to <code>adjust = &quot;tukey&quot;</code>, i.e., the Tukey HSD method. The <code>summary()</code> function sometimes <em>changes</em> <code>adjust</code> if it is inappropriate. For example, with</p>
+<pre class="r"><code>confint(pigs.emm.s, adjust = &quot;tukey&quot;)</code></pre>
+<pre class="ro"><code>##  source emmean     SE df lower.CL upper.CL
 ##  fish     3.39 0.0367 23     3.30     3.49
 ##  soy      3.67 0.0374 23     3.57     3.76
 ##  skim     3.80 0.0394 23     3.70     3.90
@@ -441,33 +162,16 @@ For example, with</p>
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
 ## Confidence level used: 0.95 
-## Conf-level adjustment: sidak method for 3 estimates
-</code></pre>
-
+## Conf-level adjustment: sidak method for 3 estimates</code></pre>
 <p>the adjustment is changed to the Sidak method because the Tukey adjustment is inappropriate unless you are doing pairwise comparisons.</p>
-
-<p>####### {#adjmore}</p>
-
+<div id="adjmore" class="section level7">
+<p class="heading"></p>
 <!-- @index **mvtnorm** package; Bonferroni adjustment
      Multivariate *t* (`"mvt"`) adjustment; Unadjusted tests -->
-
-<p>An adjustment method that is usually appropriate is Bonferroni; however, it can
-be quite conservative. Using <code>adjust = &quot;mvt&quot;</code> is the closest to being the
-&ldquo;exact&rdquo; all-around method &ldquo;single-step&rdquo; method, as it uses the multivariate <em>t</em>
-distribution (and the <strong>mvtnorm</strong> package) with the same covariance structure as
-the estimates to determine the adjustment. However, this comes at high
-computational expense as the computations are done using simulation techniques.
-For a large set of tests (and especially confidence intervals), the
-computational lag becomes noticeable if not intolerable.</p>
-
-<p>For tests, <code>adjust</code> increases the <em>P</em> values over those otherwise obtained with
-<code>adjust = &quot;none&quot;</code>. Compare the following adjusted tests with the unadjusted ones
-previously computed.</p>
-
-<pre><code class="r">test(pigs.emm.s, null = log(40), side = &quot;&gt;&quot;, adjust = &quot;bonferroni&quot;)
-</code></pre>
-
-<pre><code class="ro">##  source emmean     SE df null t.ratio p.value
+<p>An adjustment method that is usually appropriate is Bonferroni; however, it can be quite conservative. Using <code>adjust = &quot;mvt&quot;</code> is the closest to being the “exact” all-around method “single-step” method, as it uses the multivariate <em>t</em> distribution (and the <strong>mvtnorm</strong> package) with the same covariance structure as the estimates to determine the adjustment. However, this comes at high computational expense as the computations are done using simulation techniques. For a large set of tests (and especially confidence intervals), the computational lag becomes noticeable if not intolerable.</p>
+<p>For tests, <code>adjust</code> increases the <em>P</em> values over those otherwise obtained with <code>adjust = &quot;none&quot;</code>. Compare the following adjusted tests with the unadjusted ones previously computed.</p>
+<pre class="r"><code>test(pigs.emm.s, null = log(40), side = &quot;&gt;&quot;, adjust = &quot;bonferroni&quot;)</code></pre>
+<pre class="ro"><code>##  source emmean     SE df null t.ratio p.value
 ##  fish     3.39 0.0367 23 3.69 -8.026  1.0000 
 ##  soy      3.67 0.0374 23 3.69 -0.577  1.0000 
 ##  skim     3.80 0.0394 23 3.69  2.740  0.0175 
@@ -475,22 +179,16 @@ previously computed.</p>
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
 ## P value adjustment: bonferroni method for 3 tests 
-## P values are right-tailed
-</code></pre>
-
+## P values are right-tailed</code></pre>
 <p><a href="#contents">Back to Contents</a></p>
-
-<h2>&ldquo;By&rdquo; variables {#byvars}</h2>
-
+</div>
+</div>
+<div id="byvars" class="section level2">
+<h2>“By” variables</h2>
 <!-- @index `by` groups; Grouping into separate sets -->
-
-<p>Sometimes you want to break a summary down into smaller pieces; for this
-purpose, the <code>by</code> argument in <code>summary()</code> is useful. For example,</p>
-
-<pre><code class="r">confint(pigs.rg, by = &quot;source&quot;)
-</code></pre>
-
-<pre><code class="ro">## source = fish:
+<p>Sometimes you want to break a summary down into smaller pieces; for this purpose, the <code>by</code> argument in <code>summary()</code> is useful. For example,</p>
+<pre class="r"><code>confint(pigs.rg, by = &quot;source&quot;)</code></pre>
+<pre class="ro"><code>## source = fish:
 ##  percent prediction     SE df lower.CL upper.CL
 ##        9       3.22 0.0536 23     3.11     3.33
 ##       12       3.40 0.0493 23     3.30     3.50
@@ -512,151 +210,84 @@ purpose, the <code>by</code> argument in <code>summary()</code> is useful. For e
 ##       18       3.92 0.0646 23     3.79     4.06
 ## 
 ## Results are given on the log (not the response) scale. 
-## Confidence level used: 0.95
-</code></pre>
-
-<p>If there is also an <code>adjust</code> in force when <code>by</code> variables are used, the 
-adjustment is made <em>separately</em> on each <code>by</code> group; e.g., in the above, we would
-be adjusting for sets of 4 intervals, not all 12 together.</p>
-
-<p>There can be a <code>by</code> specification in <code>emmeans()</code> (or equivalently, a <code>|</code> in the
-formula); and if so, it is passed on to <code>summary()</code> and used unless overridden
-by another <code>by</code>. Here are examples, not run:</p>
-
-<pre><code class="r">emmeans(pigs.lm, ~ percent | source)     ### same results as above
-summary(.Last.value, by = percent)       ### grouped the other way
-</code></pre>
-
+## Confidence level used: 0.95</code></pre>
+<p>If there is also an <code>adjust</code> in force when <code>by</code> variables are used, the adjustment is made <em>separately</em> on each <code>by</code> group; e.g., in the above, we would be adjusting for sets of 4 intervals, not all 12 together.</p>
+<p>There can be a <code>by</code> specification in <code>emmeans()</code> (or equivalently, a <code>|</code> in the formula); and if so, it is passed on to <code>summary()</code> and used unless overridden by another <code>by</code>. Here are examples, not run:</p>
+<pre class="r"><code>emmeans(pigs.lm, ~ percent | source)     ### same results as above
+summary(.Last.value, by = percent)       ### grouped the other way</code></pre>
 <p>Specifying <code>by = NULL</code> will remove all grouping.</p>
-
-<h3>Simple comparisons {#simple}</h3>
-
+<div id="simple" class="section level3">
+<h3>Simple comparisons</h3>
 <!-- @index Simple comparisons; `contrast()`!`simple`; `simple = "each"` -->
-
-<p>There is also a <code>simple</code> argument for <code>contrast()</code> that is in essence 
-the inverse of <code>by</code>; the contrasts are run using everything <em>except</em> the
-specified variables as <code>by</code> variables. To illustrate, let&#39;s consider 
-the model for <code>pigs</code> that includes the interaction (so that the levels
-of one factor compare differently at levels of the other factor).</p>
-
-<pre><code class="r">pigsint.lm &lt;- lm(log(conc) ~ source * factor(percent), data = pigs)
+<p>There is also a <code>simple</code> argument for <code>contrast()</code> that is in essence the inverse of <code>by</code>; the contrasts are run using everything <em>except</em> the specified variables as <code>by</code> variables. To illustrate, let’s consider the model for <code>pigs</code> that includes the interaction (so that the levels of one factor compare differently at levels of the other factor).</p>
+<pre class="r"><code>pigsint.lm &lt;- lm(log(conc) ~ source * factor(percent), data = pigs)
 pigsint.rg &lt;- ref_grid(pigsint.lm)
-contrast(pigsint.rg, &quot;consec&quot;, simple = &quot;percent&quot;)
-</code></pre>
-
-<pre><code class="ro">## source = fish:
+contrast(pigsint.rg, &quot;consec&quot;, simple = &quot;percent&quot;)</code></pre>
+<pre class="ro"><code>## source = fish:
 ##  contrast estimate     SE df t.ratio p.value
-##  12 - 9     0.1849 0.1061 17  1.742  0.2359 
+##  12 - 9     0.1849 0.1061 17  1.742  0.2355 
 ##  15 - 12    0.0045 0.1061 17  0.042  0.9999 
 ##  18 - 15    0.0407 0.1061 17  0.383  0.9626 
 ## 
 ## source = soy:
 ##  contrast estimate     SE df t.ratio p.value
-##  12 - 9     0.1412 0.0949 17  1.487  0.3591 
+##  12 - 9     0.1412 0.0949 17  1.487  0.3593 
 ##  15 - 12   -0.0102 0.0949 17 -0.108  0.9992 
 ##  18 - 15    0.0895 0.1342 17  0.666  0.8571 
 ## 
 ## source = skim:
 ##  contrast estimate     SE df t.ratio p.value
-##  12 - 9     0.2043 0.0949 17  2.152  0.1184 
-##  15 - 12    0.1398 0.1061 17  1.317  0.4519 
-##  18 - 15    0.1864 0.1424 17  1.309  0.4570 
+##  12 - 9     0.2043 0.0949 17  2.152  0.1183 
+##  15 - 12    0.1398 0.1061 17  1.317  0.4521 
+##  18 - 15    0.1864 0.1424 17  1.309  0.4567 
 ## 
 ## Results are given on the log (not the response) scale. 
-## P value adjustment: mvt method for 3 tests
-</code></pre>
-
-<p>In fact, we may do <em>all</em> one-factor comparisons by specifying <code>simple = &quot;each&quot;</code>.
-This typically produces a lot of output, so use it with care.</p>
-
+## P value adjustment: mvt method for 3 tests</code></pre>
+<p>In fact, we may do <em>all</em> one-factor comparisons by specifying <code>simple = &quot;each&quot;</code>. This typically produces a lot of output, so use it with care.</p>
 <p><a href="#contents">Back to Contents</a></p>
-
-<h2>Joint tests {#joint}</h2>
-
+</div>
+</div>
+<div id="joint" class="section level2">
+<h2>Joint tests</h2>
 <!-- @index `test()`!`joint = TRUE`; `joint`; Type III tests -->
-
-<p>From the above, we already know how to test individual results. For pairwise comparisons (details in <a href="comparisons.html">the &ldquo;comparisons&rdquo; vignette</a>), we might do</p>
-
-<pre><code class="r">pigs.prs.s &lt;- pairs(pigs.emm.s)
-pigs.prs.s
-</code></pre>
-
-<pre><code class="ro">##  contrast    estimate     SE df t.ratio p.value
+<p>From the above, we already know how to test individual results. For pairwise comparisons (details in <a href="comparisons.html">the “comparisons” vignette</a>), we might do</p>
+<pre class="r"><code>pigs.prs.s &lt;- pairs(pigs.emm.s)
+pigs.prs.s</code></pre>
+<pre class="ro"><code>##  contrast    estimate     SE df t.ratio p.value
 ##  fish - soy    -0.273 0.0529 23 -5.153  0.0001 
 ##  fish - skim   -0.402 0.0542 23 -7.428  &lt;.0001 
 ##  soy - skim    -0.130 0.0530 23 -2.442  0.0570 
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
-## P value adjustment: tukey method for comparing a family of 3 estimates
-</code></pre>
-
-<p>But suppose we want an <em>omnibus</em> test that all these comparisons are zero.
-Easy enough, using the <code>joint</code> argument in <code>test</code> (note: the <code>joint</code> argument
-is <em>not</em> available in <code>summary()</code>; only in <code>test()</code>):</p>
-
-<pre><code class="r">test(pigs.prs.s, joint = TRUE)
-</code></pre>
-
-<pre><code class="ro">##  df1 df2 F.ratio p.value note
+## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre>
+<p>But suppose we want an <em>omnibus</em> test that all these comparisons are zero. Easy enough, using the <code>joint</code> argument in <code>test</code> (note: the <code>joint</code> argument is <em>not</em> available in <code>summary()</code>; only in <code>test()</code>):</p>
+<pre class="r"><code>test(pigs.prs.s, joint = TRUE)</code></pre>
+<pre class="ro"><code>##  df1 df2 F.ratio p.value note
 ##    2  23  28.849 &lt;.0001   d  
 ## 
-## d: df1 reduced due to linear dependence
-</code></pre>
-
-<p>Notice that there are three comparisons, but only 2 d.f. for the test,
-as cautioned in the message.</p>
-
-<p>The test produced with <code>joint = TRUE</code> is a &ldquo;type III&rdquo; test (assuming the default
-equal weights are used to obtain the EMMs). See more on these types of tests for
-higher-order effects in the <a href="interactions.html#contrasts">&ldquo;interactions&rdquo; vignette section on
-contrasts</a>.</p>
-
-<p>####### {#joint_tests}</p>
-
+## d: df1 reduced due to linear dependence</code></pre>
+<p>Notice that there are three comparisons, but only 2 d.f. for the test, as cautioned in the message.</p>
+<p>The test produced with <code>joint = TRUE</code> is a “type III” test (assuming the default equal weights are used to obtain the EMMs). See more on these types of tests for higher-order effects in the <a href="interactions.html#contrasts">“interactions” vignette section on contrasts</a>.</p>
+<div id="joint_tests" class="section level7">
+<p class="heading"></p>
 <!-- @index `joint_tests()`; Type III tests; Analysis of variance!Type III -->
-
-<p>For convenience, there is also a <code>joint_tests()</code> function that performs
-joint tests of contrasts among each term in a model or <code>emmGrid</code> object.</p>
-
-<pre><code class="r">joint_tests(pigsint.rg)
-</code></pre>
-
-<pre><code class="ro">##  model term     df1 df2 F.ratio p.value
+<p>For convenience, there is also a <code>joint_tests()</code> function that performs joint tests of contrasts among each term in a model or <code>emmGrid</code> object.</p>
+<pre class="r"><code>joint_tests(pigsint.rg)</code></pre>
+<pre class="ro"><code>##  model term     df1 df2 F.ratio p.value
 ##  source           2  17  30.256 &lt;.0001 
 ##  percent          3  17   8.214 0.0013 
-##  source:percent   6  17   0.926 0.5011
-</code></pre>
-
-<p>The tests of main effects are of families of contrasts; those for interaction
-effects are for interaction contrasts. These results are essentially the same as
-a &ldquo;Type-III ANOVA&rdquo;, but may differ in situations where there are empty cells or
-other non-estimability issues, or if generalizations are present such as unequal
-weighting. (Another distinction is that sums of squares and mean squares are not
-shown; that is because these really are tests of contrasts among predictions,
-and they may or may not corresopond to model sums of squares.) One may use <code>by</code>
-variables to obtain separate tables of joint tests.</p>
-
+##  source:percent   6  17   0.926 0.5011</code></pre>
+<p>The tests of main effects are of families of contrasts; those for interaction effects are for interaction contrasts. These results are essentially the same as a “Type-III ANOVA”, but may differ in situations where there are empty cells or other non-estimability issues, or if generalizations are present such as unequal weighting. (Another distinction is that sums of squares and mean squares are not shown; that is because these really are tests of contrasts among predictions, and they may or may not corresopond to model sums of squares.) One may use <code>by</code> variables to obtain separate tables of joint tests.</p>
 <p><a href="#contents">Back to Contents</a></p>
-
-<h2>Testing equivalence, noninferiority, and nonsuperiority {#equiv}</h2>
-
+</div>
+</div>
+<div id="equiv" class="section level2">
+<h2>Testing equivalence, noninferiority, and nonsuperiority</h2>
 <!-- @index Tests!Equivalence; Tests!Noninferiority; `test()`!`delta` -->
-
-<p>The <code>delta</code> argument in <code>summary()</code> or <code>test()</code> allows the user to
-specify a threshold value to use in a test of equivalence, noninferiority, 
-or nonsuperiority. An equivalence test is kind of a backwards significance 
-test, where <em>P</em> values <em>decrease</em> as differences decrease below a specified
-threshold value <code>delta</code>.
-The help page for <code>summary.emmGrid</code> gives the details of 
-these tests.
-Suppose in the present example, we consider two sources to be equivalent if they 
-are within 25% of each other. We can test this as follows:</p>
-
-<pre><code class="r">test(pigs.prs.s, delta = log(1.25), adjust = &quot;none&quot;)
-</code></pre>
-
-<pre><code class="ro">##  contrast    estimate     SE df t.ratio p.value
+<p>The <code>delta</code> argument in <code>summary()</code> or <code>test()</code> allows the user to specify a threshold value to use in a test of equivalence, noninferiority, or nonsuperiority. An equivalence test is kind of a backwards significance test, where <em>P</em> values <em>decrease</em> as differences decrease below a specified threshold value <code>delta</code>. The help page for <code>summary.emmGrid</code> gives the details of these tests. Suppose in the present example, we consider two sources to be equivalent if they are within 25% of each other. We can test this as follows:</p>
+<pre class="r"><code>test(pigs.prs.s, delta = log(1.25), adjust = &quot;none&quot;)</code></pre>
+<pre class="ro"><code>##  contrast    estimate     SE df t.ratio p.value
 ##  fish - soy    -0.273 0.0529 23  0.937  0.8209 
 ##  fish - skim   -0.402 0.0542 23  3.308  0.9985 
 ##  soy - skim    -0.130 0.0530 23 -1.765  0.0454 
@@ -664,22 +295,27 @@ are within 25% of each other. We can test this as follows:</p>
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
 ## Statistics are tests of equivalence with a threshold of 0.22314 
-## P values are left-tailed
-</code></pre>
-
-<p>By our 25% standard, the <em>P</em> value is quite small for comparing soy and skim, 
-providing statistical evidence that their difference is enough smaller than the
-threshold to consider them equivalent.</p>
-
+## P values are left-tailed</code></pre>
+<p>By our 25% standard, the <em>P</em> value is quite small for comparing soy and skim, providing statistical evidence that their difference is enough smaller than the threshold to consider them equivalent.</p>
 <p><a href="#contents">Back to Contents</a></p>
-
-<h2>Graphics {#graphics}</h2>
-
-<p>Graphical displays of <code>emmGrid</code> objects are described in the 
-<a href="basics.html#plots">&ldquo;basics&rdquo; vignette</a></p>
-
+</div>
+<div id="graphics" class="section level2">
+<h2>Graphics</h2>
+<p>Graphical displays of <code>emmGrid</code> objects are described in the <a href="basics.html#plots">“basics” vignette</a></p>
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 
 </body>
-
 </html>
