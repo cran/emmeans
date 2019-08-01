@@ -5,9 +5,10 @@
 \alias{plot.summary_emm}
 \title{Plot an \code{emmGrid} or \code{summary_emm} object}
 \usage{
-\method{plot}{emmGrid}(x, y, type, intervals = TRUE,
-  comparisons = FALSE, alpha = 0.05, adjust = "tukey",
-  int.adjust = "none", frequentist, ...)
+\method{plot}{emmGrid}(x, y, type, CIs = TRUE, PIs = FALSE,
+  comparisons = FALSE, colors = c("black", "blue", "blue", "red"),
+  alpha = 0.05, adjust = "tukey", int.adjust = "none", intervals,
+  frequentist, ...)
 
 \method{plot}{summary_emm}(x, y, horizontal = TRUE, xlab, ylab, layout,
   ...)
@@ -21,13 +22,24 @@
 (matching \code{"linear.predictor"}, \code{"link"}, or \code{"response"}).
 See details under \code{\link{summary.emmGrid}}.}
 
-\item{intervals}{Logical value. If \code{TRUE}, confidence intervals are
+\item{CIs}{Logical value. If \code{TRUE}, confidence intervals are
 plotted for each estimate.}
+
+\item{PIs}{Logical value. If \code{TRUE}, prediction intervals are
+plotted for each estimate. If \code{objecct} is a Bayesian model,
+this requires \code{frequentist = TRUE} and \code{sigma =} (some value). 
+Prediction intervals are not available
+with \code{engine = "lattice"}.}
 
 \item{comparisons}{Logical value. If \code{TRUE}, \dQuote{comparison arrows}
 are added to the plot, in such a way that the degree to which arrows
 overlap reflects as much as possible the significance of the comparison of
 the two estimates. (A warning is issued if this can't be done.)}
+
+\item{colors}{Character vector of color names to use for estimates, CIs, PIs, 
+and comparison arrows, respectively. CIs and PIs are rendered with some
+transparency, and colors are recycled if the length is less than four;
+so all plot elements are visible even if a single color is specified.}
 
 \item{alpha}{The significance level to use in constructing comparison arrows}
 
@@ -35,12 +47,16 @@ the two estimates. (A warning is issued if this can't be done.)}
 
 \item{int.adjust}{Character value: Multiplicity adjustment method for the plotted confidence intervals \emph{only}.}
 
+\item{intervals}{If specified, it is used to set \code{CIs}. This is the previous
+name of \code{CIs} and is provided for backward compatibility.}
+
 \item{frequentist}{Logical value. If there is a posterior MCMC sample and 
 \code{frequentist} is non-missing and TRUE, a frequentist summary is used for
 obtaining the plot data, rather than the posterior point estimate and HPD
 intervals. This argument is ignored when it is not a Bayesian model.}
 
-\item{...}{Additional arguments passed to \code{\link{update.emmGrid}} or
+\item{...}{Additional arguments passed to \code{\link{update.emmGrid}}, 
+\code{\link{predict.emmGrid}}, or
 \code{\link[lattice:xyplot]{dotplot}}}
 
 \item{horizontal}{Logical value specifying whether the intervals should be
@@ -53,7 +69,7 @@ plotted horizontally or vertically}
 \item{layout}{Numeric value passed to \code{\link[lattice:xyplot]{dotplot}}}
 }
 \description{
-Methods are provided to plot EMMs as side-by-side intervals, and optionally to display 
+Methods are provided to plot EMMs as side-by-side CIs, and optionally to display 
   \dQuote{comparison arrows} for displaying pairwise comparisons.
 }
 \section{Details}{
@@ -83,5 +99,5 @@ warp.lm <- lm(breaks ~ wool * tension, data = warpbreaks)
 warp.emm <- emmeans(warp.lm, ~ tension | wool)
 plot(warp.emm)
 plot(warp.emm, by = NULL, comparisons = TRUE, adjust = "mvt", 
-     horizontal = FALSE)
+     horizontal = FALSE, colors = "darkgreen")
 }

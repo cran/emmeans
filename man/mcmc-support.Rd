@@ -58,13 +58,13 @@ results. The \code{as.mcmc.list} method is guaranteed to return an
 
 When \code{likelihood} is specified, it is used to simulate values from the
 posterior predictive distribution corresponding to the given likelihood and
-the posterior distribution of parameter values. Denote the the likelihood 
-function as\eqn{f(y|\theta,\phi)}, where \code{y} is a response, \eqn{\theta}
+the posterior distribution of parameter values. Denote the likelihood 
+function as \eqn{f(y|\theta,\phi)}, where \eqn{y} is a response, \eqn{\theta}
 is the parameter estimated in \code{object}, and \eqn{\phi} comprises zero or
 more additional parameters to be specified. If \code{likelihood} is a 
 function, that function should take as its first argument a vector of 
 \eqn{\theta} values (each corresponding to one row of \code{object@grid}).
-Any \eqn{\phi} valuyes should be specified as additional named function
+Any \eqn{\phi} values should be specified as additional named function
 arguments, and passed to \code{likelihood} via \code{...}. This function should 
 simulate values of \eqn{y}.
 
@@ -82,3 +82,13 @@ a character value. They are:
 }
 }
 
+\examples{
+require("coda")
+
+### A saved reference grid for a mixed logistic model (see lme4::cbpp)
+cbpp.rg <- do.call(emmobj, 
+    readRDS(system.file("extdata", "cbpplist", package = "emmeans")))
+# Predictive distribution for herds of size 20
+# (perhaps a bias adjustment should be applied; see "sophisticated" vignette)
+pred.incidence <- as.mcmc(regrid(cbpp.rg), likelihood = "binomial", trials = 20)
+}

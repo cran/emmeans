@@ -29,8 +29,11 @@
 #' @importFrom graphics plot
 #' @method plot emmGrid
 #' @export
-plot.emmGrid = function(x, y, type, intervals = TRUE, comparisons = FALSE, 
-                    alpha = .05, adjust = "tukey", int.adjust = "none", frequentist, ...) {
+plot.emmGrid = function(x, y, type, CIs = TRUE, PIs = FALSE, comparisons = FALSE, 
+                    colors = c("black", "blue", "blue", "red"),
+                    alpha = .05, adjust = "tukey", int.adjust = "none", intervals, frequentist, ...) {
+    if(!missing(intervals))
+        CIs = intervals
     if(!missing(type))
         object = update(x, predict.type = type, ..., silent = TRUE)
     else
@@ -54,6 +57,11 @@ plot.emmGrid = function(x, y, type, intervals = TRUE, comparisons = FALSE,
             pv = pv[len > 1]
         attr(summ, "pri.vars") = pv
     }
+    if (PIs) {
+        prd = predict(object, interval = "pred", frequentist = frequentist, ...)
+        summ$lpl = prd$lower.PL
+        summ$upl = prd$upper.PL
+    }
     
     estName = attr(summ, "estName")
     extra = NULL
@@ -65,7 +73,7 @@ plot.emmGrid = function(x, y, type, intervals = TRUE, comparisons = FALSE,
         extra@misc$comp.alpha = alpha
         extra@misc$comp.adjust = adjust
     }
-    .plot.srg(x=summ, intervals = intervals, extra = extra, ...)
+    .plot.srg(x = summ, CIs = CIs, PIs = PIs, colors = colors, extra = extra, ...)
 }
 
 # May use in place of plot.emmGrid but no control over level etc.
@@ -75,7 +83,7 @@ plot.emmGrid = function(x, y, type, intervals = TRUE, comparisons = FALSE,
 
 #' Plot an \code{emmGrid} or \code{summary_emm} object
 #' 
-#' Methods are provided to plot EMMs as side-by-side intervals, and optionally to display 
+#' Methods are provided to plot EMMs as side-by-side CIs, and optionally to display 
 #'   \dQuote{comparison arrows} for displaying pairwise comparisons.
 #'
 #' @rdname plot
@@ -89,20 +97,32 @@ plot.emmGrid = function(x, y, type, intervals = TRUE, comparisons = FALSE,
 #' @param type Character value specifying the type of prediction desired
 #'   (matching \code{"linear.predictor"}, \code{"link"}, or \code{"response"}).
 #'   See details under \code{\link{summary.emmGrid}}.
-#' @param intervals Logical value. If \code{TRUE}, confidence intervals are
+#' @param CIs Logical value. If \code{TRUE}, confidence intervals are
 #'   plotted for each estimate.
+#' @param PIs Logical value. If \code{TRUE}, prediction intervals are
+#'   plotted for each estimate. If \code{objecct} is a Bayesian model,
+#'   this requires \code{frequentist = TRUE} and \code{sigma =} (some value). 
+#'   Prediction intervals are not available
+#'   with \code{engine = "lattice"}.
 #' @param comparisons Logical value. If \code{TRUE}, \dQuote{comparison arrows}
 #'   are added to the plot, in such a way that the degree to which arrows
 #'   overlap reflects as much as possible the significance of the comparison of
 #'   the two estimates. (A warning is issued if this can't be done.)
+#' @param colors Character vector of color names to use for estimates, CIs, PIs, 
+#'   and comparison arrows, respectively. CIs and PIs are rendered with some
+#'   transparency, and colors are recycled if the length is less than four;
+#'   so all plot elements are visible even if a single color is specified. 
 #' @param alpha The significance level to use in constructing comparison arrows
 #' @param adjust Character value: Multiplicity adjustment method for comparison arrows \emph{only}.
 #' @param int.adjust Character value: Multiplicity adjustment method for the plotted confidence intervals \emph{only}.
+#' @param intervals If specified, it is used to set \code{CIs}. This is the previous
+#'   name of \code{CIs} and is provided for backward compatibility.
 #' @param frequentist Logical value. If there is a posterior MCMC sample and 
 #'   \code{frequentist} is non-missing and TRUE, a frequentist summary is used for
 #'   obtaining the plot data, rather than the posterior point estimate and HPD
 #'   intervals. This argument is ignored when it is not a Bayesian model.
-#' @param ... Additional arguments passed to \code{\link{update.emmGrid}} or
+#' @param ... Additional arguments passed to \code{\link{update.emmGrid}}, 
+#'   \code{\link{predict.emmGrid}}, or
 #'   \code{\link[lattice:xyplot]{dotplot}}
 #'
 #' @section Details:
@@ -134,22 +154,24 @@ plot.emmGrid = function(x, y, type, intervals = TRUE, comparisons = FALSE,
 #' warp.emm <- emmeans(warp.lm, ~ tension | wool)
 #' plot(warp.emm)
 #' plot(warp.emm, by = NULL, comparisons = TRUE, adjust = "mvt", 
-#'      horizontal = FALSE)
+#'      horizontal = FALSE, colors = "darkgreen")
 plot.summary_emm = function(x, y, horizontal = TRUE, xlab, ylab, layout, ...) {
     .plot.srg (x, y, horizontal, xlab, ylab, layout, ...)
 }
 
 # Workhorse for plot.summary_emm
 .plot.srg = function(x, y, 
-                     horizontal = TRUE, xlab, ylab, layout, 
+                     horizontal = TRUE, xlab, ylab, layout, colors,
                      engine = get_emm_option("graphics.engine"),
-                     intervals = TRUE, extra = NULL, ...) {
+                     CIs = TRUE, PIs = FALSE, extra = NULL, ...) {
     
     engine = match.arg(engine, c("ggplot", "lattice"))
-    if ((engine == "ggplot") && !requireNamespace("ggplot2", quietly = TRUE))
-        stop("The 'ggplot' engine requires the 'ggplot2' package be installed.")
-    if ((engine == "lattice") && !requireNamespace("lattice", quietly = TRUE))
-        stop("The 'lattice' engine requires the 'lattice' package be installed.")
+    if (engine == "ggplot") 
+        .requireNS("ggplot2", 
+                   "The 'ggplot' engine requires the 'ggplot2' package be installed.")
+    if (engine == "lattice")
+        .requireNS("lattice", 
+                   "The 'lattice' engine requires the 'lattice' package be installed.")
     
     summ = x # so I don't get confused
     estName = "the.emmean"
@@ -167,19 +189,19 @@ plot.summary_emm = function(x, y, horizontal = TRUE, xlab, ylab, layout, ...) {
     if (engine == "lattice") { # ---------- lattice-specific stuff ----------
         
         # Panel functions...
-        prepanel.ci = function(x, y, horizontal=TRUE, intervals=TRUE,
+        prepanel.ci = function(x, y, horizontal=TRUE, CIs=TRUE,
                                lcl, ucl, subscripts, ...) {
             x = as.numeric(x)
             lcl = as.numeric(lcl[subscripts])
             ucl = as.numeric(ucl[subscripts])
-            if (!intervals) # no special scaling needed
+            if (!CIs) # no special scaling needed
                 list()
             else if (horizontal)
                 list(xlim = range(x, ucl, lcl, finite = TRUE)) 
             else
                 list(ylim = range(y, ucl, lcl, finite = TRUE)) 
         }
-        panel.ci <- function(x, y, horizontal=TRUE, intervals=TRUE,
+        panel.ci <- function(x, y, horizontal=TRUE, CIs=TRUE,
                              lcl, ucl, lcmpl, rcmpl,                          subscripts, pch = 16, 
                              lty = dot.line$lty, lwd = dot.line$lwd, 
                              col = dot.symbol$col, col.line = dot.line$col, ...) {
@@ -196,7 +218,7 @@ plot.summary_emm = function(x, y, horizontal = TRUE, xlab, ylab, layout, ...) {
             }
             if(horizontal) {
                 lattice::panel.abline(h = unique(y), col = col.line, lty = lty, lwd = lwd)
-                if(intervals) 
+                if(CIs) 
                     lattice::panel.arrows(lcl, y, ucl, y, col = col, length = .6, unit = "char", angle = 90, code = 3)
                 if(compare) {
                     s = (x > min(x))
@@ -207,7 +229,7 @@ plot.summary_emm = function(x, y, horizontal = TRUE, xlab, ylab, layout, ...) {
             }
             else {
                 lattice::panel.abline(v = unique(x), col = col.line, lty = lty, lwd = lwd)
-                if(intervals)
+                if(CIs)
                     lattice::panel.arrows(x, lcl, x, ucl, col=col, length = .6, unit = "char", angle = 90, code = 3)
                 if(compare) {
                     s = (y > min(y))
@@ -346,6 +368,13 @@ plot.summary_emm = function(x, y, horizontal = TRUE, xlab, ylab, layout, ...) {
     
     facName = paste(priv, collapse=":")
     
+    if(length(colors) < 4)
+        colors = rep(colors, 4)
+    dot.col = colors[1]
+    CI.col = colors[2]
+    PI.col = colors[3]
+    comp.col = colors[4]
+    
     if (engine == "lattice") {
         if (missing(layout)) {
             layout = c(1, length(ubv))
@@ -360,7 +389,7 @@ plot.summary_emm = function(x, y, horizontal = TRUE, xlab, ylab, layout, ...) {
             lattice::dotplot(form, prepanel=prepanel.ci, panel=panel.ci, 
                              strip = my.strip, horizontal = TRUE,
                              ylab = ylab, xlab = xlab,
-                             data = summ, intervals = intervals, lcl=lcl, ucl=ucl, 
+                             data = summ, CIs = CIs, lcl=lcl, ucl=ucl, 
                              lcmpl=lcmpl, rcmpl=rcmpl, layout = layout, ...)
         }
         else {
@@ -369,7 +398,7 @@ plot.summary_emm = function(x, y, horizontal = TRUE, xlab, ylab, layout, ...) {
             lattice::dotplot(form, prepanel=prepanel.ci, panel=panel.ci, 
                              strip = my.strip, horizontal = FALSE,
                              xlab = xlab, ylab = ylab,
-                             data = summ, intervals = intervals, lcl=lcl, ucl=ucl, 
+                             data = summ, CIs = CIs, lcl=lcl, ucl=ucl, 
                              lcmpl=lcmpl, rcmpl=rcmpl, layout = layout, ...)
         }
     } # --- end lattice plot
@@ -377,38 +406,46 @@ plot.summary_emm = function(x, y, horizontal = TRUE, xlab, ylab, layout, ...) {
         summ$lcl = lcl
         summ$ucl = ucl
         if (horizontal) {
-            grobj = ggplot2::ggplot(summ, ggplot2::aes_(x = ~the.emmean, y = ~pri.fac)) + 
-                ggplot2::geom_point(size = 2)
-            if (intervals) 
+            grobj = ggplot2::ggplot(summ, ggplot2::aes_(x = ~the.emmean, y = ~pri.fac)) 
+            if (PIs) 
+                grobj = grobj + ggplot2::geom_segment(ggplot2::aes_(x = ~lpl, xend = ~upl, 
+                                    y = ~pri.fac, yend = ~pri.fac), 
+                                    color = PI.col, lwd = 2.5, alpha = .15)
+            if (CIs) 
                 grobj = grobj + ggplot2::geom_segment(ggplot2::aes_(x = ~lcl, xend = ~ucl, 
-                        y = ~pri.fac, yend = ~pri.fac), 
-                    color = "blue", lwd = 4, alpha = .25)
+                                    y = ~pri.fac, yend = ~pri.fac), 
+                                    color = CI.col, lwd = 4, alpha = .25)
             if (!is.null(extra))
                 grobj = grobj + ggplot2::geom_segment(ggplot2::aes_(x = ~lcmpl, xend = ~rcmpl, 
                         y = ~pri.fac, yend = ~pri.fac), 
                     arrow = ggplot2::arrow(length = ggplot2::unit(.07, "inches"), 
-                        ends = "both", type = "closed"), color = "red")
+                        ends = "both", type = "closed"), color = comp.col)
             if (length(byv) > 0)
                 grobj = grobj + ggplot2::facet_grid(as.formula(paste(paste(byv, collapse = "+"), " ~ .")), 
                                            labeller = "label_both")
+            grobj = grobj + ggplot2::geom_point(color = dot.col, size = 2)
             if (missing(xlab)) xlab = attr(summ, "estName")
             if (missing(ylab)) ylab = facName
         }
         else {
-            grobj = ggplot2::ggplot(summ, ggplot2::aes_(y = ~the.emmean, x = ~pri.fac)) + 
-                ggplot2::geom_point(size = 2)
-            if (intervals) 
+            grobj = ggplot2::ggplot(summ, ggplot2::aes_(y = ~the.emmean, x = ~pri.fac)) 
+            if (PIs) 
+                grobj = grobj + ggplot2::geom_segment(ggplot2::aes_(y = ~lpl, yend = ~upl, 
+                            x = ~pri.fac, xend = ~pri.fac), 
+                            color = PI.col, lwd = 2.5, alpha = .15)
+            if (CIs) 
                 grobj = grobj + ggplot2::geom_segment(ggplot2::aes_(y = ~lcl, yend = ~ucl, 
-                        x = ~pri.fac, xend = ~pri.fac), 
-                    color = "blue", lwd = 4, alpha = .25)
+                            x = ~pri.fac, xend = ~pri.fac), 
+                            color = CI.col, lwd = 4, alpha = .25)
             if (!is.null(extra))
                 grobj = grobj + ggplot2::geom_segment(ggplot2::aes_(y = ~lcmpl, yend = ~rcmpl, 
                         x = ~pri.fac, xend = ~pri.fac), 
                     arrow = ggplot2::arrow(length = ggplot2::unit(.07, "inches"), ends = "both", 
-                        type = "closed"), color = "red")
+                        type = "closed"), color = comp.col)
             if (length(byv) > 0)
-                grobj = grobj + ggplot2::facet_grid(as.formula(paste(". ~ ", paste(byv, collapse = "+"))), 
-                                           labeller = "label_both")
+                grobj = grobj + ggplot2::facet_grid(as.formula(paste(". ~ ", 
+                            paste(byv, collapse = "+"))), labeller = "label_both")
+            grobj = grobj + ggplot2::geom_point(color = dot.col, size = 2)
             if (missing(ylab)) ylab = attr(summ, "estName")
             if (missing(xlab)) xlab = facName
         }

@@ -68,13 +68,13 @@
 #' @section Prediction:
 #' When \code{likelihood} is specified, it is used to simulate values from the
 #' posterior predictive distribution corresponding to the given likelihood and
-#' the posterior distribution of parameter values. Denote the the likelihood 
-#' function as\eqn{f(y|\theta,\phi)}, where \code{y} is a response, \eqn{\theta}
+#' the posterior distribution of parameter values. Denote the likelihood 
+#' function as \eqn{f(y|\theta,\phi)}, where \eqn{y} is a response, \eqn{\theta}
 #' is the parameter estimated in \code{object}, and \eqn{\phi} comprises zero or
 #' more additional parameters to be specified. If \code{likelihood} is a 
 #' function, that function should take as its first argument a vector of 
 #' \eqn{\theta} values (each corresponding to one row of \code{object@grid}).
-#' Any \eqn{\phi} valuyes should be specified as additional named function
+#' Any \eqn{\phi} values should be specified as additional named function
 #' arguments, and passed to \code{likelihood} via \code{...}. This function should 
 #' simulate values of \eqn{y}.
 #' 
@@ -93,11 +93,20 @@
 #' 
 #' @method as.mcmc emmGrid
 #' @export as.mcmc.emmGrid
+#' @examples
+#' require("coda")
+#'
+#' ### A saved reference grid for a mixed logistic model (see lme4::cbpp)
+#' cbpp.rg <- do.call(emmobj, 
+#'     readRDS(system.file("extdata", "cbpplist", package = "emmeans")))
+#' # Predictive distribution for herds of size 20
+#' # (perhaps a bias adjustment should be applied; see "sophisticated" vignette)
+#' pred.incidence <- as.mcmc(regrid(cbpp.rg), likelihood = "binomial", trials = 20)
 as.mcmc.emmGrid = function(x, names = TRUE, sep.chains = TRUE, 
                            likelihood, ...) {
-    object = x
-    if (is.na(x@post.beta[1]))
+    if (is.na(x@post.beta[1])) {
         stop("No posterior sample -- can't make an 'mcmc' object")
+    }
     mat = x@post.beta %*% t(x@linfct)
     if(!is.null(offset <- x@grid[[".offset."]])) {
         n = nrow(mat)
@@ -105,6 +114,7 @@ as.mcmc.emmGrid = function(x, names = TRUE, sep.chains = TRUE,
     }
     if (!missing(likelihood)) {
         if (is.character(likelihood)) {
+            likelihood = match.arg(likelihood, c("normal", "binomial", "poisson", "gamma"))
             likelihood = switch(likelihood,
                 normal = function(theta, sigma, ...) 
                     rnorm(length(theta), mean = theta, sd = sigma),
@@ -113,10 +123,14 @@ as.mcmc.emmGrid = function(x, names = TRUE, sep.chains = TRUE,
                 poisson = function(theta, ...)
                     rpois(length(theta), lambda = theta),
                 gamma = function(theta, shape, ...)
-                    rgamma(length(theta), scale = theta, shape = shape),
-                stop("There is no predefined likelihood named '", likelihood, "'"))
+                    rgamma(length(theta), scale = theta, shape = shape)
+                #, stop("There is no predefined likelihood named '", likelihood, "'")
+                )
         }
         mat = apply(mat, 2, likelihood, ...)
+##! TODO: Add "multinomial" support. This will require a flag to observe
+##! the 'by' variable(s), then we get parameter values from the columns
+##! corresponding to each 'by' group 
     }
     nm = setdiff(names(x@grid), c(".wgt.",".offset."))
     if (any(names)) {
@@ -197,8 +211,7 @@ hpd.summary = function(object, prob, by, type, point.est = median,
         stop("Prediction intervals for MCMC models should be done using 'frequentist = TRUE'\n",
              "or using 'as.mcmc(object, ..., likelihood = ...)'")
     
-    if (!requireNamespace("coda"))
-        stop("Bayesian summary requires the 'coda' package")
+    .requireNS("coda", "Bayesian summary requires the 'coda' package")
     ### require("coda") ### Nope this is a CRAN no-no
     
     # Steal some init code from summary.emmGrid:

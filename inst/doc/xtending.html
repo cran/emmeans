@@ -7,10 +7,11 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.3.5.1" />
+<meta name="author" content="emmeans package, Version 1.4" />
 
 
 <title>For developers: Extending emmeans</title>
@@ -33,7 +34,7 @@
 
 
 <h1 class="title toc-ignore">For developers: Extending <strong>emmeans</strong></h1>
-<h4 class="author">emmeans package, Version 1.3.5.1</h4>
+<h4 class="author">emmeans package, Version 1.4</h4>
 
 
 
@@ -116,7 +117,7 @@ emmeans(fake.rlm, ~ B | A)</code></pre>
 ##     recover_data(fcall, delete.response(terms(object)), object$na.action, 
 ##         ...)
 ## }
-## &lt;bytecode: 0x00000000204fca40&gt;
+## &lt;bytecode: 0x000000001edb5780&gt;
 ## &lt;environment: namespace:emmeans&gt;</code></pre>
 <p>Note that all it does is obtain the <code>call</code> component and call the method for class <code>call</code>, with additional arguments for its <code>terms</code> component and <code>na.action</code>. It happens that we can access these attributes in exactly the same way as for <code>lm</code> objects; so:</p>
 <pre class="r"><code>recover_data.lqs = emmeans:::recover_data.lm</code></pre>
@@ -165,7 +166,7 @@ head(rec.fake)</code></pre>
 ##     X &lt;- model.matrix(Terms, m, contrasts = object$contrasts)
 ##     drop(X %*% object$coefficients)
 ## }
-## &lt;bytecode: 0x00000000219c3800&gt;
+## &lt;bytecode: 0x0000000024bb3088&gt;
 ## &lt;environment: namespace:MASS&gt;</code></pre>
 <div id="eblqs" class="section level6">
 <h6></h6>
@@ -363,36 +364,14 @@ example(&quot;rsm&quot;)   ### (output is not shown) ###</code></pre>
 <h2>Exporting and registering your methods</h2>
 <!-- @index **emmeans** package!Exporting extensions to 
      Registering `recover_data` and `emm_basis` methods -->
-<p>To make the methods available to users of your package, the methods must be exported. R and CRAN are evolving in a way that having S3 methods in the registry is increasingly important; so it is a good idea to provide for that. The problem is not all of your package users will have <strong>emmeans</strong> installed. Thus, registering the methods must be done conditionally.</p>
-<p>One solution is to list <code>emmeans</code> and <code>estimability</code> in the <code>Imports</code> field of your <code>DESCRIPTION</code> file. Then, in the package <code>NAMESPACE</code> file, insert something like the following, replacing “foo” with your object class name:</p>
-<pre class="r"><code>if (requireNamespace(&quot;emmeans&quot;, quietly = TRUE)) {
-    importFrom(&quot;emmeans&quot;, &quot;recover_data&quot;, &quot;emm_basis&quot;)
-    importFrom(&quot;estimability&quot;, &quot;all.estble&quot;, &quot;nonest.basis&quot;)
-    S3method(recover_data, foo)
-    S3method(emm_basis, foo)
-}</code></pre>
-<p>(You can get by without testing <strong>estimability</strong> since it is already required by <strong>emmeans</strong>.)</p>
-<p>The disadvantage of the above solution is that it adds several other packages as dependencies. An alternative method that avoids those extra dependencies is as follows: Put <code>emmeans</code> and <code>estimability</code> in <code>Suggests</code> rather than <code>Imports</code>, and add code to <em>dynamically</em> register the methods to one of your R source files (typically one named <code>zzz.R</code>, the last source file to be read). Put code like this there:</p>
-<pre class="r"><code>register_s3_method &lt;- function(pkg, generic, class) {
-    fun &lt;- get(paste0(generic, &quot;.&quot;, class), envir = parent.frame())
-    if (isNamespaceLoaded(pkg))
-        registerS3method(generic, class, fun, envir = asNamespace(pkg))
-    # Also ensure registration is done if pkg is loaded later:
-    setHook(
-        packageEvent(pkg, &quot;onLoad&quot;),
-        function(...)
-            registerS3method(generic, class, fun, envir = asNamespace(pkg))
-    )
-}
-
-.onLoad &lt;- function(libname, pkgname) {
-    if (requireNamespace(&quot;emmeans&quot;, quietly = TRUE)) {
-        register_s3_method(&quot;emmeans&quot;, &quot;recover_data&quot;, &quot;foo&quot;)
-        register_s3_method(&quot;emmeans&quot;, &quot;emm_basis&quot;, &quot;foo&quot;)
-    }
+<p>To make the methods available to users of your package, the methods must be exported. R and CRAN are evolving in a way that having S3 methods in the registry is increasingly important; so it is a good idea to provide for that. The problem is not all of your package users will have <strong>emmeans</strong> installed.</p>
+<p>Thus, registering the methods must be done conditionally. We provide a courtesy function <code>.emm_register()</code> to make this simple. Suppose that your package offers two model classes <code>foo</code> and <code>bar</code>, and it includes the corresponding functions <code>recover_data.foo</code>, <code>recover_data.bar</code>, <code>emm_basis.foo</code>, and <code>emm_basis.bar</code>. Then to register these methods, add or modify the <code>.onLoad</code> function in your package (traditionally saved in the source file <code>zzz.R</code>):</p>
+<pre class="r"><code>.onLoad &lt;- function(libname, pkgname) {
+    if (requireNamespace(&quot;emmeans&quot;, quietly = TRUE))
+        emmeans::.emm_register(c(&quot;foo&quot;, &quot;bar&quot;), pkgname)
 }
 </code></pre>
-<p>This code is adapted and simplified from the <strong>hms</strong> package. The original <code>register_s3_method</code> function is more general and includes type-checking of its arguments; but since this is just used internally, that checking seems unnecessary.</p>
+<p>You should also add <code>emmeans (&gt;= 1.4)</code> and <code>estimability</code> (which is required by <strong>emmeans</strong>) to the <code>Suggests</code> field of your <code>DESCRIPTION</code> file.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="concl" class="section level2">
@@ -402,6 +381,9 @@ example(&quot;rsm&quot;)   ### (output is not shown) ###</code></pre>
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
 </div>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

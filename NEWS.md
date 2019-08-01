@@ -1,5 +1,23 @@
 ## NEWS for the emmeans package
 
+
+emmeans 1.4
+-----------
+
+  * Added a courtesy function `.emm_register()` to make it easier for other
+    packages to register their **emmeans** support methods
+  * Clarified the "confidence intervals" vignette discussion of `infer`,
+    explaining that Bayesian models are handled differently (#128)
+  * Added `PIs` option to `plot.emmGrid()` and `emmip()` (#131). Also, in
+    `plot.emmGrid()`, the `intervals` argument has been changed to `CIs`
+    for sake of consistency and less confusion; `intervals` is still
+    supported for backaward compatibility.
+  * `plot.emmGrid` gains a `colors` argument so we can customize colors used.
+  * Bug fix for `glht` support (#132 contributed by Balsz Banfai)
+  * `regrid` gains `sim` and `N.sim` arguments whereby we can generate a
+    fake posterior sample from a frequentist model.
+    
+
 emmeans 1.3.5.1
 -------------
   * Bug fix for `gls` objects with non-matrix `apVar` member (#119)

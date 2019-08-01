@@ -1,5 +1,5 @@
 ##############################################################################
-#    Copyright (c) 2012-2016 Russell V. Lenth                                #
+#    Copyright (c) 2012-2019 Russell V. Lenth                                #
 #                                                                            #
 #    This file is part of the emmeans package for R (*emmeans*)              #
 #                                                                            #
@@ -54,8 +54,8 @@ hasName = function(x, name)
 ### Dynamic registration of S3 methods
 # Code borrowed from hms pkg. I omitted some type checks etc. because
 # this is only for internal use and I solemnly promise to behave myself.
-register_s3_method = function(pkg, generic, class) {
-    fun = get(paste0(generic, ".", class), envir = parent.frame())
+register_s3_method = function(pkg, generic, class, envir = parent.frame()) {
+    fun = get(paste0(generic, ".", class), envir = envir)
     if (isNamespaceLoaded(pkg)) {
         registerS3method(generic, class, fun, envir = asNamespace(pkg))
     }
@@ -69,18 +69,51 @@ register_s3_method = function(pkg, generic, class) {
 }
 
 .onLoad = function(libname, pkgname) {
-    if (requireNamespace("coda", quietly = TRUE)) {
+    if (.requireNS("coda", fail = .nothing)) {
         register_s3_method("coda", "as.mcmc", "emmGrid")
         register_s3_method("coda", "as.mcmc.list", "emmGrid")
     }
-    if (requireNamespace("multcomp", quietly = TRUE)) {
+    if (.requireNS("multcomp", fail = .nothing)) {
         register_s3_method("multcomp", "glht", "emmlf")
         register_s3_method("multcomp", "glht", "emmGrid")
         register_s3_method("multcomp", "cld", "emmGrid")
         register_s3_method("multcomp", "modelparm", "emmwrap")
     }
-    # else
-    #     register_s3_method("emmeans", "cld", "emmGrid")
+}
+
+
+#' @rdname extending-emmeans
+#' @section Registering S3 methods for a model class:
+#' The \code{.emm_register} function is provided as a convenience to conditionally 
+#' register your
+#' S3 methods for a model class, \code{recover_data.foo} and \code{emm_basis.foo},
+#' where \code{foo} is the class name. Your package should implement an
+#' \code{.onLoad} function and call \code{.emm_register} if \pkg{emmeans} is
+#' installed. See the example.
+#'
+#' @param classes Character names of one or more classes to be registered.
+#'   The package must contain the functions \code{recover_data.foo} and
+#'   \code{emm_basis.foo} for each class \code{foo} listed in \code{classes}.
+#' @param pkgname Character name of package providing the methods (usually
+#'    should be the second argument of \code{.onLoad})
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' #--- If your package provides recover_data and emm_grid methods for class 'mymod',
+#' #--- put something like this in your package code -- say in zzz.R:
+#'   .onLoad = function(libname, pkgname) {
+#'     if (requireNamespace("emmeans", quietly = TRUE))
+#'       emmeans::.emm_register("mymod", pkgname)
+#'   }
+#' }
+.emm_register = function(classes, pkgname) {
+    envir = asNamespace(pkgname)
+    for (class in classes) {
+        register_s3_method("emmeans", "recover_data", class, envir)
+        register_s3_method("emmeans", "emm_basis", class, envir)
+    }
 }
 
 ## Here is a utility that we won't export, but can help clean out lsmeans

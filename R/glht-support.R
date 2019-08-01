@@ -75,8 +75,8 @@ glht.emmlf <- function(model, linfct, ...) {
 # Note: model is redundant, really, so can be omitted
 # See related roxygen stuff just before glht.emmlf
 glht.emmGrid <- function(model, linfct, by, ...) {
-    if (!requireNamespace("multcomp"))
-        stop(sQuote("glht")," requires ", dQuote("multcomp"), " to be installed")
+    .requireNS("multcomp", sQuote("glht")," requires ", dQuote("multcomp"), 
+               " to be installed", call. = FALSE)
     object = linfct # so I don't get confused
     if (missing(model)) 
         model = .cls.list("emmwrap", object = object)
@@ -102,14 +102,14 @@ glht.emmGrid <- function(model, linfct, by, ...) {
     
     if (is.null(by)) {
         args$linfct = lf
-        return(do.call("glht", args))
+        return(do.call(multcomp::glht, args))
     }
     
     # (else...)
     by.rows = .find.by.rows(object@grid, by)
     result = lapply(by.rows, function(r) {
         args$linfct = lf[r, , drop=FALSE]
-        do.call("glht", args)
+        do.call(multcomp::glht, args)
     })
     bylevs = lapply(by, function(byv) unique(object@grid[[byv]]))
     names(bylevs) = by
