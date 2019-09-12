@@ -11,7 +11,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4" />
+<meta name="author" content="emmeans package, Version 1.4.1" />
 
 
 <title>Transformations and link functions in emmeans</title>
@@ -34,7 +34,7 @@
 
 
 <h1 class="title toc-ignore">Transformations and link functions in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.4</h4>
+<h4 class="author">emmeans package, Version 1.4.1</h4>
 
 
 
@@ -49,6 +49,7 @@
 <li><a href="#tranlink">Both a response transformation and a link</a></li>
 <li><a href="#special">Special transformations</a></li>
 <li><a href="#after">Specifying a transformation after the fact</a></li>
+<li><a href="#auto">Auto-detected transformations</a></li>
 <li><a href="#logs">Faking a log transformation</a></li>
 <li><a href="#bias-adj">Bias adjustment</a></li>
 </ol>
@@ -243,10 +244,10 @@ ref_grid(warp.glm)</code></pre>
 <h2>Special transformations</h2>
 <!-- @index Transformations!Custom; `make.tran()` -->
 <p>The <code>make.tran()</code> function provides several special transformations and sets things up so they can be handled in <strong>emmeans</strong> with relative ease. (See <code>help(&quot;make.tran&quot;, &quot;emmeans&quot;)</code> for descriptions of what is available.) <code>make.tran()</code> works much like <code>stats::make.link()</code> in that it returns a list of functions <code>linkfun()</code>, <code>linkinv()</code>, etc. that serve in managing results on a transformed scale. The difference is that most transformations with <code>make.tran()</code> require additional arguments.</p>
-<p>To use this capability in <code>emmeans()</code>, it is fortuitous to first obtain the <code>make.tran()</code> result, and then to use it as the enclosing environment for fitting the model, with <code>linkfun</code> as the transformation. For example, suppose we want to use the response transformation <span class="math inline">\(\log(y + \frac12)\)</span>. Then proceed like this:</p>
-<pre class="r"><code>tran &lt;- make.tran(&quot;genlog&quot;, 1/2)
+<p>To use this capability in <code>emmeans()</code>, it is fortuitous to first obtain the <code>make.tran()</code> result, and then to use it as the enclosing environment for fitting the model, with <code>linkfun</code> as the transformation. For example, suppose the response variable is a percentage and we want to use the response transformation <span class="math inline">\(\sin^{-1}\sqrt{y/100}\)</span>. Then proceed like this:</p>
+<pre class="r"><code>tran &lt;- make.tran(&quot;asin.sqrt&quot;, 100)
 my.model &lt;- with(tran, 
-    lmer(linkfun(yield) ~ treatment + (1|Block), data = mydata))</code></pre>
+    lmer(linkfun(percent) ~ treatment + (1|Block), data = mydata))</code></pre>
 <p>Subsequent calls to <code>ref_grid()</code>, <code>emmeans()</code>, <code>regrid()</code>, etc. will then be able to access the transformation information correctly.</p>
 <p>The help page for <code>make.tran()</code> has an example like this using a Box-Cox transformation.</p>
 <p><a href="#contents">Back to Contents</a></p>
@@ -255,13 +256,20 @@ my.model &lt;- with(tran,
 <h2>Specifying a transformation after the fact</h2>
 <!-- @index Transformations!Adding after the fact; `update()`!`tran` -->
 <p>It is not at all uncommon to fit a model using statements like the following:</p>
-<pre class="r"><code>mydata &lt;- transform(mydata, logy.5 = log(yield + .5))
+<pre class="r"><code>mydata &lt;- transform(mydata, logy.5 = log(yield + 0.5))
 my.model &lt;- lmer(logy.5 ~ treatment + (1|Block), data = mydata)</code></pre>
 <p>In this case, there is no way for <code>ref_grid()</code> to figure out that a response transformation was used. What can be done is to update the reference grid with the required information:</p>
 <pre class="r"><code>my.rg &lt;- update(ref_grid(my.model), tran = make.tran(&quot;genlog&quot;, .5))</code></pre>
 <p>Subsequently, use <code>my.rg</code> in place of <code>my.mnodel</code> in any <code>emmeans()</code> analyses, and the transformation information will be there.</p>
 <p>For standard transformations (those in <code>stats::make.link()</code>), just give the name of the transformation; e.g.,</p>
 <pre class="r"><code>model.rg &lt;- update(ref_grid(model), tran = &quot;sqrt&quot;)</code></pre>
+</div>
+<div id="auto" class="section level2">
+<h2>Auto-detected response transformations</h2>
+<!-- @index Transformations!Auto-detected -->
+<p>As can be seen in the initial <code>pigs.lm</code> example in this vignette, certain straightforward response transformations such as <code>log</code>, <code>sqrt</code>, etc. are automatically detected when <code>emmeans()</code> (really, <code>ref_grid()</code>) is called on the model object. In fact, scaling and shifting is supported too; so the preceding example with <code>my.model</code> could have been done more easily by specifying the transformation directly in the model formula:</p>
+<pre class="r"><code>my.better.model &lt;- lmer(log(yield + 0.5) ~ treatment + (1|Block), data = mydata)</code></pre>
+<p>The transformation would be auto-detected, saving you the trouble of adding it later. Similarly, a response transformation of <code>2 * sqrt(y + 1)</code> would be correctly auto-detected. A model with a linearly transformed response, e.g. <code>4*(y - 1)</code>, would <em>not</em> be auto-detected, but <code>4*I(y + -1)</code> would be interpreted as <code>4*identity(y + -1)</code>. Parsing is such that the response expression must be of the form <code>mult * fcn(resp + const)</code>; operators of <code>-</code> and <code>/</code> are not recognized.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="logs" class="section level2">
@@ -297,7 +305,7 @@ confint(piglog.emm.s, type = &quot;response&quot;)</code></pre>
 <!-- @index Transformations!Bias adjustment; Bias adjustment!When back-transforming;
     Means!Generalized; Geometric means; -->
 <p>So far, we have discussed ideas related to back-transforming results as a simple way of expressing results on the same scale as the response. In particular, means obtained in this way are known as <em>generalized means</em>; for example, a log transformation of the response is associated with geometric means. When the goal is simply to make inferences about which means are less than which other means, and a response transformation is used, it is often acceptable to present estimates and comparisons of these generalized means. However, sometimes it is important to report results that actually do reflect expected values of the untransformed response. An example is a financial study, where the response is in some monetary unit. It may be convenient to use a response transformation for modeling purposes, but ultimately we may want to make financial projections in those same units.</p>
-<p>In such settings, we need to make a bias adjustment when we back-transform, because any nonlinear transformation biases the expected values of statistical quantities. More specifically, suppose that we have a response <span class="math inline">\(Y\)</span> and the transformed response is <span class="math inline">\(U\)</span>. To back-transform, we use <span class="math inline">\(Y = h(U)\)</span>; and using a Tayor approximation, <span class="math inline">\(Y \approx h(\eta) + h&#39;(\eta)(U-\eta) + \frac12h&#39;&#39;(\eta)(U-\eta)^2\)</span>, so that <span class="math inline">\(E(Y) \approx h(\eta) + \frac12h&#39;&#39;(\eta)Var(U)\)</span>. This shows that the amount of needed bias adjustment is approximately <span class="math inline">\(\frac12h&#39;&#39;(\eta)\sigma^2\)</span> where <span class="math inline">\(\sigma\)</span> is the error SD in the model for <span class="math inline">\(U\)</span>. It depends on <span class="math inline">\(\sigma\)</span>, and the larger this is, the greater the bias adjustment is needed. This second-order bias adjustment is what is currently used in the <strong>emmeans</strong> package when bias-adjustment is requested. There are better or exact adjustments for certain cases, and future updates may incorporate some of those.</p>
+<p>In such settings, we need to make a bias adjustment when we back-transform, because any nonlinear transformation biases the expected values of statistical quantities. More specifically, suppose that we have a response <span class="math inline">\(Y\)</span> and the transformed response is <span class="math inline">\(U\)</span>. To back-transform, we use <span class="math inline">\(Y = h(U)\)</span>; and using a Taylor approximation, <span class="math inline">\(Y \approx h(\eta) + h&#39;(\eta)(U-\eta) + \frac12h&#39;&#39;(\eta)(U-\eta)^2\)</span>, so that <span class="math inline">\(E(Y) \approx h(\eta) + \frac12h&#39;&#39;(\eta)Var(U)\)</span>. This shows that the amount of needed bias adjustment is approximately <span class="math inline">\(\frac12h&#39;&#39;(\eta)\sigma^2\)</span> where <span class="math inline">\(\sigma\)</span> is the error SD in the model for <span class="math inline">\(U\)</span>. It depends on <span class="math inline">\(\sigma\)</span>, and the larger this is, the greater the bias adjustment is needed. This second-order bias adjustment is what is currently used in the <strong>emmeans</strong> package when bias-adjustment is requested. There are better or exact adjustments for certain cases, and future updates may incorporate some of those.</p>
 <div id="link-bias" class="section level3">
 <h3>Response transformations vs. link functions</h3>
 <!-- @index Transformations!Response versus link functions;

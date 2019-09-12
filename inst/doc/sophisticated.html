@@ -11,7 +11,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4" />
+<meta name="author" content="emmeans package, Version 1.4.1" />
 
 
 <title>Sophisticated models in emmeans</title>
@@ -34,7 +34,7 @@
 
 
 <h1 class="title toc-ignore">Sophisticated models in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.4</h4>
+<h4 class="author">emmeans package, Version 1.4.1</h4>
 
 
 
@@ -105,7 +105,8 @@ Oats.emm.n</code></pre>
 ##  quadratic    -8.27  6.95 44.2 -1.190  0.2402 
 ##  cubic        -6.32 15.21 42.8 -0.415  0.6800 
 ## 
-## Results are averaged over the levels of: Variety</code></pre>
+## Results are averaged over the levels of: Variety 
+## Degrees-of-freedom method: kenward-roger</code></pre>
 <p>The interesting thing here is that the degrees of freedom are much larger than they are for the EMMs. The reason is because <code>nitro</code> within-plot factor, so inter-plot variations have little role in estimating contrasts among <code>nitro</code> levels. On the other hand, <code>Variety</code> is a whole-plot factor, and there is not much of a bump in degrees of freedom for comparisons:</p>
 <pre class="r"><code>emmeans(Oats.lmer, pairwise ~ Variety)</code></pre>
 <pre class="ro"><code>## $emmeans
@@ -125,6 +126,7 @@ Oats.emm.n</code></pre>
 ##  Marvellous - Victory        11.54 6.67 9.80  1.729  0.2431 
 ## 
 ## Results are averaged over the levels of: nitro 
+## Degrees-of-freedom method: kenward-roger 
 ## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre>
 </div>
 <div id="lmerOpts" class="section level3">
@@ -327,6 +329,7 @@ period.emm</code></pre>
 ##  3       -2.88     -3.95     -2.10
 ##  4       -3.32     -4.37     -2.30
 ## 
+## Point estimate displayed: median 
 ## Results are given on the logit (not the response) scale. 
 ## HPD interval probability: 0.95</code></pre>
 <p>The summary for EMMs of Bayesian models shows the median of the posterior distribution of each estimate, along with highest posterior density (HPD) intervals. Under the hood, the posterior sample of parameter estimates is used to compute a corresponding sample of posterior EMMs, and it is those that are summarized. (Technical note: the summary is actually rerouted to the <code>hpd.summary()</code> function.</p>
@@ -386,6 +389,7 @@ summary(cbpp.rgrd)</code></pre>
 ##  3      0.0752    0.0250     0.147
 ##  4      0.0510    0.0129     0.117
 ## 
+## Point estimate displayed: median 
 ## HPD interval probability: 0.95</code></pre>
 <p>Here is a plot of the posterior incidence probabilities, back-transformed:</p>
 <pre class="r"><code>bayesplot::mcmc_areas(as.mcmc(cbpp.rgrd))</code></pre>
@@ -397,6 +401,7 @@ summary(cbpp.rgrd)</code></pre>
 ##  2 - 3      0.0113   -0.0803     0.126
 ##  3 - 4      0.0243   -0.0655     0.128
 ## 
+## Point estimate displayed: median 
 ## HPD interval probability: 0.95</code></pre>
 <p>The only interval that excludes zero is the one that compares periods 1 and 2.</p>
 </div>

@@ -11,7 +11,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4" />
+<meta name="author" content="emmeans package, Version 1.4.1" />
 
 
 <title>Models supported by emmeans</title>
@@ -34,14 +34,14 @@
 
 
 <h1 class="title toc-ignore">Models supported by emmeans</h1>
-<h4 class="author">emmeans package, Version 1.4</h4>
+<h4 class="author">emmeans package, Version 1.4.1</h4>
 
 
 
 <!-- @index Vignettes!Models -->
 <p>Here we document what model objects may be used with <strong>emmeans</strong>, and some special features of some of them that may be accessed by passing additional arguments through <code>ref_grid</code> or <code>emmeans()</code>.</p>
 <p>Certain objects are affected by optional arguments to functions that construct <code>emmGrid</code> objects, including <code>ref_grid()</code>, <code>emmeans()</code>, <code>emtrends()</code>, and <code>emmip()</code>. When “<em>arguments</em>” are mentioned in the subsequent quick reference and object-by-object documentation, we are talking about arguments in these constructors.</p>
-<p>Additional models can be supported by writing appropriate <code>recover_data</code> and <code>emm_basis</code> methods. See the package documentation for <code>extending-emmeans</code> and <code>vignette(&quot;extending&quot;)</code> for details.</p>
+<p>Additional models can be supported by writing appropriate <code>recover_data</code> and <code>emm_basis</code> methods. See the package documentation for <code>extending-emmeans</code> and <code>vignette(&quot;xtending&quot;)</code> for details.</p>
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
 <div id="quickref" class="section level2">
 <h2>Quick reference for supported objects and options</h2>
@@ -460,7 +460,7 @@
 <!-- @index `lme` models; `gls` models; Satterthwaite d.f.; Containment d.f.; 
      `boot-satterthwaite` method -->
 <p>The <code>sigmaAdjust</code> argument is a logical value that defaults to <code>TRUE</code>. It is comparable to the <code>adjustSigma</code> option in <code>nlme::summary.lme</code> (the name-mangling is to avoid conflicts with the often-used <code>adjust</code> argument), and determines whether or not a degrees-of-freedom adjustment is performed with models fitted using the ML method.</p>
-<p>The optional <code>mode</code> argument affects the degrees of freedom. The <code>mode = &quot;satterthwaite&quot;</code> option determines degrees of freedom via the Satterthwaite method: If <code>s^2</code> is the estimate of some variance, then its Satterthwaite d.f. is <code>2*s^4 / Var(s^2)</code>. In case our numerical methods for this fail, we also offer <code>mode = &quot;boot-satterthwaite&quot;</code> as a backup, by which quantities related to <code>Var(s^2)</code> are obtained by randomly perturbing the response values. Currently, only <code>&quot;satterthwaite&quot;</code> is unavailable for <code>lme</code> objects, and it is used if <code>&quot;satterthwaite&quot;</code> is requested.</p>
+<p>The optional <code>mode</code> argument affects the degrees of freedom. The <code>mode = &quot;satterthwaite&quot;</code> option determines degrees of freedom via the Satterthwaite method: If <code>s^2</code> is the estimate of some variance, then its Satterthwaite d.f. is <code>2*s^4 / Var(s^2)</code>. In case our numerical methods for this fail, we also offer <code>mode = &quot;boot-satterthwaite&quot;</code> as a backup, by which quantities related to <code>Var(s^2)</code> are obtained by randomly perturbing the response values. Currently, only <code>&quot;boot-satterthwaite&quot;</code> is available for <code>lme</code> objects, and it is used if <code>&quot;satterthwaite&quot;</code> is requested.</p>
 <p>The alternative method is <code>&quot;df.error&quot;</code> (for <code>gls</code>) and <code>&quot;containment&quot;</code> (for <code>lme</code>). <code>df.error</code> is just the error degrees of freedom for the model, minus the number of extra random effects estimated; it generally over-estimates the degrees of freedom. <code>&quot;containment&quot;</code> determines the degrees of freedom for the coarsest grouping involved in the contrast or linear function involved, so it tends to under-estimate the degrees of freedom. The default is <code>mode = &quot;auto&quot;</code>, which uses Satterthwaite if there are estimated random effects and the non-Satterthwaite option otherwise.</p>
 <p><a href="#quickref">Back to quick reference</a></p>
 </div>
@@ -509,7 +509,7 @@
   `as.mcmc()`; `summary()`!Bayesian models -->
 <p>Models fitted using MCMC methods contain a sample from the posterior distribution of fixed-effect coefficients. In some cases (e.g., results of <code>MCMCpack::MCMCregress()</code> and <code>MCMCpack::MCMCpoisson()</code>), the object may include a <code>&quot;call&quot;</code> attribute that <code>emmeans()</code> can use to reconstruct the data and obtain a basis for the EMMs. If not, a <code>formula</code> and <code>data</code> argument are provided that may help produce the right results. In addition, the <code>contrasts</code> specifications are not necessarily recoverable from the object, so the system default must match what was actually used in fitting the model.</p>
 <p>The <code>summary.emmGrid()</code> method provides credibility intervals (HPD intervals) of the results, and ignores the frequentist-oriented arguments (<code>infer</code>, <code>adjust</code>, etc.) An <code>as.mcmc()</code> method is provided that creates an <code>mcmc</code> object that can be summarized or plotted using the <strong>coda</strong> package (or others that support those objects). It provides a posterior sample of EMMs, or contrasts thereof, for the given reference grid, based on the posterior sample of the fixed effects from the model object.</p>
-<p>In <code>MCMCglmm</code> objects, the <code>data</code> argument is required; however, if you save it as a member of the model object (e.g., <code>object$data = quote(mydata)</code>), that removes the necessity of specifying it in each call. The special keyword <code>trait</code> is used in some models. When the response is multivariate and numeric, <code>trait</code> is generated automatically as a factor in the refernce grid, and the arguments <code>mult.levels</code> can be used to name its levels. In other models such as a multinomial model, use the <code>mode</code> argument to specify the type of model, and <code>trait = &lt;factor name&gt;</code> to specify the name of the data column that contains the levels of the factor response.</p>
+<p>In <code>MCMCglmm</code> objects, the <code>data</code> argument is required; however, if you save it as a member of the model object (e.g., <code>object$data = quote(mydata)</code>), that removes the necessity of specifying it in each call. The special keyword <code>trait</code> is used in some models. When the response is multivariate and numeric, <code>trait</code> is generated automatically as a factor in the reference grid, and the arguments <code>mult.levels</code> can be used to name its levels. In other models such as a multinomial model, use the <code>mode</code> argument to specify the type of model, and <code>trait = &lt;factor name&gt;</code> to specify the name of the data column that contains the levels of the factor response.</p>
 <p>Support for the <strong>brms</strong> package is provided but it is quite rudimentary and usable only for the primary fixed effects and the simpler models.</p>
 <p><a href="#quickref">Back to quick reference</a></p>
 </div>

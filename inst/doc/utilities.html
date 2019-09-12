@@ -11,7 +11,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4" />
+<meta name="author" content="emmeans package, Version 1.4.1" />
 
 
 <title>Utilities and options for emmeans</title>
@@ -34,7 +34,7 @@
 
 
 <h1 class="title toc-ignore">Utilities and options for emmeans</h1>
-<h4 class="author">emmeans package, Version 1.4</h4>
+<h4 class="author">emmeans package, Version 1.4.1</h4>
 
 
 
@@ -267,18 +267,10 @@ str(pigs.emm.ss)</code></pre>
 <!-- @index Re-labeling; Levels!Changing; Labels!Changing; Examples!`warpbreaks`;
     Examples!Welch's *t* comparisons; Welch's *t* comparisons!Example    -->
 <p>Sometimes it is desirable to re-label the rows of an <code>emmGrid</code>, or cast it in terms of other factor(s). This can be done via the <code>levels</code> argument in <code>update()</code>.</p>
-<p>As an example, sometimes a fitted model has a treatment factor that comprises combinations of other factors. In subsequent analysis, we may well want to break it down into the individual factors’ contributions. Consider, for example, the <code>warpbreaks</code> data provided with R. We will define a single factor and fit a nonhomogeneous-variance model:</p>
+<p>As an example, sometimes a fitted model has a treatment factor that comprises combinations of other factors. In subsequent analysis, we may well want to break it down into the individual factors’ contributions. Consider, for example, the <code>warpbreaks</code> data provided with R. We will define a single factor and fit a non homogeneous-variance model:</p>
 <pre class="r"><code>warp &lt;- transform(warpbreaks, treat = interaction(wool, tension))
-library(nlme)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;nlme&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:ordinal&#39;:
-## 
-##     VarCorr, ranef</code></pre>
-<pre><code>## The following object is masked from &#39;package:lme4&#39;:
-## 
-##     lmList</code></pre>
-<pre class="r"><code>warp.gls &lt;- gls(breaks ~ treat, weights = varIdent(form = ~ 1|treat), data = warp)
+library(nlme)
+warp.gls &lt;- gls(breaks ~ treat, weights = varIdent(form = ~ 1|treat), data = warp)
 ( warp.emm &lt;- emmeans(warp.gls, &quot;treat&quot;) )</code></pre>
 <pre class="ro"><code>##  treat emmean   SE   df lower.CL upper.CL
 ##  A.L     44.6 6.03 8.01     30.6     58.5
@@ -288,7 +280,7 @@ library(nlme)</code></pre>
 ##  A.H     24.6 3.42 8.00     16.7     32.5
 ##  B.H     18.8 1.63 8.00     15.0     22.5
 ## 
-## d.f. method: satterthwaite 
+## Degrees-of-freedom method: satterthwaite 
 ## Confidence level used: 0.95</code></pre>
 <p>But now we want to re-cast this <code>emmGrid</code> into one that has separate factors for <code>wool</code> and <code>tension</code>. We can do this as follows:</p>
 <pre class="r"><code>warp.fac &lt;- update(warp.emm, levels = list(
@@ -309,6 +301,7 @@ str(warp.fac)</code></pre>
 ##  M - L       0.556 4.55 16.0  0.122  0.9881 
 ##  H - M     -10.000 3.54 12.0 -2.824  0.0269 
 ## 
+## Degrees-of-freedom method: satterthwaite 
 ## P value adjustment: mvt method for 2 tests</code></pre>
 <p>Note: When re-leveling to more than one factor, you have to be careful to anticipate that the levels will be expanded using <code>expand.grid()</code>: the first factor in the list varies the fastest and the last varies the slowest. That was the case in our example, but in others, it may not be. Had the levels of <code>treat</code> been ordered as <code>A.L, A.M, A.H, B.L, B.M, B.H</code>, then we would have had to specify the levels of <code>tension</code> first and the levels of <code>wool</code> second.</p>
 <p><a href="#contents">Back to contents</a></p>

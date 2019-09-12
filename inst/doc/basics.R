@@ -121,3 +121,21 @@ emmeans(pigs.lm3, "percent")
 MOats.lm <- lm (yield ~ Block + Variety, data = MOats)
 ref_grid (MOats.lm, mult.name = "nitro")
 
+## ------------------------------------------------------------------------
+pigs.rg <- ref_grid(pigs.lm1)
+class(pigs.rg)
+
+pigs.emm.s <- emmeans(pigs.rg, "source")
+class(pigs.emm.s)
+
+## ------------------------------------------------------------------------
+pigs.rg
+
+pigs.emm.s
+
+## ------------------------------------------------------------------------
+str(pigs.emm.s)
+
+## ------------------------------------------------------------------------
+class(summary(pigs.emm.s))
+

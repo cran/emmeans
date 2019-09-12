@@ -11,7 +11,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4" />
+<meta name="author" content="emmeans package, Version 1.4.1" />
 
 
 <title>Basics of estimated marginal means</title>
@@ -34,7 +34,7 @@
 
 
 <h1 class="title toc-ignore">Basics of estimated marginal means</h1>
-<h4 class="author">emmeans package, Version 1.4</h4>
+<h4 class="author">emmeans package, Version 1.4.1</h4>
 
 
 
@@ -53,6 +53,7 @@
 <li><a href="#weights">Weighting</a></li>
 <li><a href="#multiv">Multivariate models</a></li>
 </ol></li>
+<li><a href="#emmobj">Objects, structures, and methods</a></li>
 <li><a href="#pvalues">P values, “significance”, and scientific integrity</a></li>
 <li><a href="#summary">Summary</a></li>
 <li><a href="#backstory">The back story of <strong>emmeans</strong></a></li>
@@ -100,7 +101,7 @@ cell.means</code></pre>
 <h3>The point</h3>
 <!-- @index Means!Weighted; Means!Marginal!of cell means@cell
     EMMs!Appropriateness of -->
-<p>The point is that the marginal means of <code>cell.means</code> give <em>equal weight</em> to each cell. In many situations (especially with experimental data), that is a much fairer way to compute marginal means, in that they are not biased by imbalances in the data. we are, in a sense, estimating what the marginal means <em>would</em> be, had the experiment been balanced. Estimated marginal means (EMMs) serve that need.</p>
+<p>The point is that the marginal means of <code>cell.means</code> give <em>equal weight</em> to each cell. In many situations (especially with experimental data), that is a much fairer way to compute marginal means, in that they are not biased by imbalances in the data. We are, in a sense, estimating what the marginal means <em>would</em> be, had the experiment been balanced. Estimated marginal means (EMMs) serve that need.</p>
 <p>All this said, there are certainly situations where equal weighting is <em>not</em> appropriate. Suppose, for example, we have data on sales of a product given different packaging and features. The data could be unbalanced because customers are more attracted to some combinations than others. If our goal is to understand scientifically what packaging and features are inherently more profitable, then equally weighted EMMs may be appropriate; but if our goal is to predict or maximize profit, the ordinary marginal means provide better estimates of what we can expect in the marketplace.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
@@ -253,7 +254,7 @@ emmeans(mtcars.2, &quot;Cyl&quot;)</code></pre>
 ##     Cyl = 4, 6, 8
 ##     disp = 230.72
 ##     dispsq = 68113</code></pre>
-<p>For both models, the reference grid uses the <code>disp</code> mean of 230.72. But for <code>mtcars.2</code>, we also set <code>dispsq</code> to its mean of 68113. This is not right, because <code>dispsq</code> should be the square of <code>disp</code> (about 53232, not 68113) in order to be consistent. If we use that value of <code>dispsq</code>, we get the same results as for <code>mtcars.1</code> (discrepancies due to rounding of <code>disp</code>):</p>
+<p>For both models, the reference grid uses the <code>disp</code> mean of 230.72. But for <code>mtcars.2</code>, we also set <code>dispsq</code> to its mean of 68113. This is not right, because <code>dispsq</code> should be the square of <code>disp</code> (about 53232, not 68113) in order to be consistent. If we use that value of <code>dispsq</code>, we get the same results (modulus rounding error) as for <code>mtcars.1</code>:</p>
 <pre class="r"><code>emmeans(mtcars.2, &quot;Cyl&quot;, at = list(dispsq = 230.72^2))</code></pre>
 <pre class="ro"><code>##  Cyl emmean   SE df lower.CL upper.CL
 ##  4     19.3 2.66 27     13.9     24.8
@@ -342,9 +343,50 @@ ref_grid (MOats.lm, mult.name = &quot;nitro&quot;)</code></pre>
 ##     Block = VI, V, III, IV, II, I
 ##     Variety = Golden Rain, Marvellous, Victory
 ##     nitro = multivariate response levels: 0, 0.2, 0.4, 0.6</code></pre>
-<p>So, <code>nitro</code> is in essence a factor having 4 levels corresponding to the 4 dimensions of <code>yield</code>. We can subsequently obtain EMMs for any of the factors <code>Block</code>, <code>Variety</code>, <code>nitro</code>, or combinations thereof. The argument <code>mult.name = &quot;nitro&quot;</code> is optional; if it had been excluded, the multivariate levels would have been named <code>rep.meas</code>.</p>
+<p>So, <code>nitro</code> is regarded as a factor having 4 levels corresponding to the 4 dimensions of <code>yield</code>. We can subsequently obtain EMMs for any of the factors <code>Block</code>, <code>Variety</code>, <code>nitro</code>, or combinations thereof. The argument <code>mult.name = &quot;nitro&quot;</code> is optional; if it had been excluded, the multivariate levels would have been named <code>rep.meas</code>.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
+</div>
+<div id="emmobj" class="section level2">
+<h2>Objects, structures, and methods</h2>
+<!-- @index `emmGrid` objects -->
+<p>The <code>ref_grid()</code> and <code>emmeans()</code> functions are introduced previously. These functions, and a few related ones, return an object of class <code>emmGrid</code>:</p>
+<pre class="r"><code>pigs.rg &lt;- ref_grid(pigs.lm1)
+class(pigs.rg)</code></pre>
+<pre class="ro"><code>## [1] &quot;emmGrid&quot;
+## attr(,&quot;package&quot;)
+## [1] &quot;emmeans&quot;</code></pre>
+<pre class="r"><code>pigs.emm.s &lt;- emmeans(pigs.rg, &quot;source&quot;)
+class(pigs.emm.s)</code></pre>
+<pre class="ro"><code>## [1] &quot;emmGrid&quot;
+## attr(,&quot;package&quot;)
+## [1] &quot;emmeans&quot;</code></pre>
+<p>If you simply show these objects, you get different-looking results:</p>
+<pre class="r"><code>pigs.rg</code></pre>
+<pre class="ro"><code>## &#39;emmGrid&#39; object with variables:
+##     source = fish, soy, skim
+##     percent =  9, 12, 15, 18
+## Transformation: &quot;log&quot;</code></pre>
+<pre class="r"><code>pigs.emm.s</code></pre>
+<pre class="ro"><code>##  source emmean     SE df lower.CL upper.CL
+##  fish     3.39 0.0367 23     3.32     3.47
+##  soy      3.67 0.0374 23     3.59     3.74
+##  skim     3.80 0.0394 23     3.72     3.88
+## 
+## Results are averaged over the levels of: percent 
+## Results are given on the log (not the response) scale. 
+## Confidence level used: 0.95</code></pre>
+<p>This is based on guessing what users most need to see when displaying the object. You can override these defaults; for example to just see a quick summary of what is there, do</p>
+<pre class="r"><code>str(pigs.emm.s)</code></pre>
+<pre class="ro"><code>## &#39;emmGrid&#39; object with variables:
+##     source = fish, soy, skim
+## Transformation: &quot;log&quot;</code></pre>
+<!-- @index `str()`; `summary_emm` object; `print.summary_emm()` -->
+<p>The most important method for <code>emmGrid</code> objects is <code>summary()</code>. It is used as the default for displaying an <code>emmeans()</code> result like <code>pigs.emm.s</code>. This <code>summary()</code> method for <code>emmGrid</code> objects) actually produces a <code>data.frame</code>, but with extra bells and whistles:</p>
+<pre class="r"><code>class(summary(pigs.emm.s))</code></pre>
+<pre class="ro"><code>## [1] &quot;summary_emm&quot; &quot;data.frame&quot;</code></pre>
+<p>This can be useful to know because if you want to actually <em>use</em> <code>emmeans()</code> results in other computations, you should save its summary, and then you can access those results just like you would access data in a data frame. The <code>emmGrid</code> object itself is not so accessible. There is a <code>print.summary_emm()</code> function that is what actually produces the output you see above – a data frame with extra annotations.</p>
+<p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="pvalues" class="section level2">
 <h2>P values, “significance”, and scientific integrity</h2>
@@ -354,12 +396,12 @@ ref_grid (MOats.lm, mult.name = &quot;nitro&quot;)</code></pre>
     ASA Statement on *P* values -->
 <p>There is a growing consensus among statisticians and researchers that <em>P</em> values are widely misunderstood, and that the term “statistical significance” is downright misleading. If you have a small <em>P</em> value, it <em>only</em> means that the effect being tested is unlikely to be explained by chance variation alone, in the context of the current study and the current statistical model underlying the test. If you have a large <em>P</em> value, it <em>only</em> means that the observed effect could plausibly be due to chance alone: it is <em>wrong</em> to conclude that there is no effect.</p>
 <p>The American Statistical Association has for some time been advocating very cautious use of <em>P</em> values (Wasserman <em>et al.</em> 2014, 2019). The ASA now <em>advises against ever using the term “statistically significant”</em> (or a related descriptor) because it is too often misinterpreted, and too often used carelessly.</p>
-<p>Wasserman <em>et al.</em> (2019), and the 43 articles it accompanies in the same issue of <em>TAS</em>, recommend a number of alternatives. It is quite dizzying to try to digest them all at once, but the basic ideas are summarized with the help of the acronym <strong>ATOM</strong> for the four highlighted words below:</p>
+<p>Wasserman <em>et al.</em> (2019), and the 43 articles it accompanies in the same issue of <em>TAS</em>, recommend a number of alternatives. I do not agree with all that is said in the main article, and there are portions that are too cutesy or wander off-topic. Further, it is quite dizzying to try to digest all the accompanying articles, and to reconcile their disagreeing viewpoints. But the basic ideas are summarized with the help of the acronym <strong>ATOM</strong>, for the four highlighted words below:</p>
 <ul>
 <li><p><strong>Acceptance</strong> of uncertainty. If you were to repeat your study, you would get somewhat different results and perhaps different effects will stand out. Likewise, there are other reasonable models that you might have chosen, and those would have yielded different results. If the topic is worth studying, others will try to replicate it, perhaps with different study designs and different ways of operationalizing important concepts – again, yielding different results.</p></li>
 <li><p><strong>Thoughtfulness</strong>. Design your study with clear objectives in mind, and spend time considering the best way to address those objectives in your study design. Pilot the study to ensure that the procedures actually work, how much variability to expect, and ensure that the sample size is adequate. How do your results fit in the big picture, scientifically? Think about the importance of the effects you have observed in your model(s)/data in the context of the science. Think carefully about how well your model fits the data and if there are other possibilities.</p></li>
 <li><p><strong>Openness</strong>. Be transparent in disclosing the methods used, and reporting comprehensively all the successes and failures, the small and large effects. If hypothesis tests are used, report the actual <em>P</em> values found (e.g., “<em>P</em> = 0.075”) and don’t suppress or withhold results just because they are “nonsignificant,” because those results may still be useful to other researchers via meta-analysis. Trust in the expert judgment of other researchers.</p></li>
-<li><p><strong>Modesty</strong>. Be clear in examining and expressing the limitations of your work. Understand that other researchers with different subject-area strengths may choose other models that may cast a different light on your work. Encourage others to try to reproduce your work, and be a good scientific colleague to them. Do not exaggerate the importance of your findings. Your study is not final or definitive; recognize that it is just one part of a broader picture. Ironically, the more important the research, the more related research will be undertaken, making that picture bigger and your part of it smaller.</p></li>
+<li><p><strong>Modesty</strong>. Be clear in examining and expressing the limitations of your work. Understand that other researchers with different subject-area strengths may choose other models that may cast a different light on your work. Encourage others to try to reproduce your work, and be a good scientific colleague to them. Do not exaggerate the importance of your findings. Your study is not final or definitive; recognize that it is just one part of a broader picture. Ironically, the more important the research, the more related research will be undertaken, making that picture bigger (and, potentially, your part of it smaller).</p></li>
 </ul>
 <div id="references" class="section level3">
 <h3>References</h3>
@@ -371,13 +413,13 @@ ref_grid (MOats.lm, mult.name = &quot;nitro&quot;)</code></pre>
 <div id="summary" class="section level2">
 <h2>Summary of main points</h2>
 <ul>
-<li>EMMs are based on a <em>model</em>. A different model for the same data may lead to different EMMs.</li>
+<li>EMMs are derived from a <em>model</em>. A different model for the same data may lead to different EMMs.</li>
 <li>EMMs are based on a <em>reference grid</em> consisting of all combinations of factor levels, with each covariate set to its average (by default).</li>
 <li>For purposes of defining the reference grid, dimensions of a multivariate response are treated as levels of a factor.</li>
 <li>EMMs are then predictions on this reference grid, or marginal averages thereof (equally weighted by default).</li>
 <li>Reference grids may be modified using <code>at</code> or <code>cov.reduce</code>; the latter may be logical, a function, or a formula.</li>
 <li>Reference grids and <code>emmeans()</code> results may be plotted via <code>plot()</code> (for parallel confidence intervals) or <code>emmip()</code> (for an interaction-style plot).</li>
-<li>Avoid the terms “significant” and “nonsignificant”, and avoid using hard thresholds like <em>P</em> &lt; 0.05 as a means of defining scientific meaning or importance. The importance of a result is established by scientific context, not by some <em>P</em> value. Remember ATOM.</li>
+<li>Be cautious with the terms “significant” and “nonsignificant”, and avoid using hard thresholds like <em>P</em> &lt; 0.05 as a criterion for scientific meaning or importance. The importance of a result is established by scientific context, not by some <em>P</em> value. Remember ATOM.</li>
 </ul>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
@@ -388,7 +430,7 @@ ref_grid (MOats.lm, mult.name = &quot;nitro&quot;)</code></pre>
 <p>But here’s what you wouldn’t expect: the real impetus to develop the package came from doing some consulting work for the university administration. They wanted help in analyzing faculty salaries, especially with regard to gender and ethnicity differences. Accordingly, we fitted a pretty complicated regression model with effects for gender and ethnicity, as well as such things as college department, rank, tenure status, seniority, etc. It is a really messy model. I first came to the conclusion that to make sense of the model results in terms that the administration could understand, I could obtain predictions from that model and average them together in meaningful ways to summarize the primary factor effects. I figured out how to write R code to estimate those averages and test differences among them. Only after all that did I realize that really what I was computing was least-squares means (or EMMs); so the package was born.</p>
 <p>It grew from there, especially in terms of supporting more models, evolving from a spaghetti-code design to one incorporating essential building blocks with methods for different models. Meanwhile, I retired, so I had time on my hands to dink around with it (and to keep learning about new or unfamiliar models and data-analysis approaches).</p>
 <p>One aspect of the package that I am especially proud of is the ability to express results in accessible ways when there is a transformed response or link function (see the <a href="transformations.html">“transformations” vignette</a>). Again, this grew out of my needs for that administrative salary analysis. The model that fitted the best used a reciprocal transformation, but I wanted to express the predicted salaries in dollars. Moreover, I wanted to compare them using ratios. Those requirements led directly to the development of the <code>regrid()</code> function and the options to metamorphose any <code>emmGrid</code> object to the response or the log scale.</p>
-<p>The lesson is that it is possible that even university service duties can lead to technical developments in statistics. One never knows where new ideas and inspirations will arise. Speaking of this, I have learned and benefitted enormously from users’ questions about the package, and basically all recent improvements to <strong>emmeans</strong> are a direct result of those communications. So don’t be shy about asking questions or requesting features.</p>
+<p>The lesson is that it is possible that even university service duties can lead to technical developments in statistics. One never knows where new ideas and inspirations will arise. Speaking of this, I have learned and benefited enormously from users’ questions about the package, and basically all recent improvements to <strong>emmeans</strong> are a direct result of those communications. So don’t be shy about asking questions or requesting features.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="more" class="section level2">

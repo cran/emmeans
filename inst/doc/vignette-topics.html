@@ -11,7 +11,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4" />
+<meta name="author" content="emmeans package, Version 1.4.1" />
 
 
 <title>Index of vignette topics</title>
@@ -34,7 +34,7 @@
 
 
 <h1 class="title toc-ignore">Index of vignette topics</h1>
-<h4 class="author">emmeans package, Version 1.4</h4>
+<h4 class="author">emmeans package, Version 1.4.1</h4>
 
 
 
@@ -190,6 +190,7 @@
 <ul>
 <li><a href="xtending.html#ebreqs">Arguments and returned value</a></li>
 <li><a href="xtending.html#communic">Communicating with <code>recover_data()</code></a></li>
+<li><a href="xtending.html#dispatch">Dispatching</a></li>
 <li><a href="xtending.html#hooks">Hook functions</a></li>
 <li><a href="xtending.html#eblqs">for <code>lqs</code> objects</a></li>
 <li><a href="xtending.html#ebrsm">for <code>rsm</code> objects</a></li>
@@ -200,7 +201,6 @@
 <li><strong>emmeans</strong> package
 <ul>
 <li><a href="xtending.html#exporting">Exporting extensions to</a></li>
-<li><a href="xtending.html#exported">Exports useful to developers</a></li>
 </ul></li>
 <li><a href="basics.html#emmeans"><code>emmeans()</code></a>
 <ul>
@@ -214,7 +214,7 @@
 </ul></li>
 <li><a href="transformations.html#regrid">With transformations</a></li>
 </ul></li>
-<li><a href="confidence-intervals.html#emmobj"><code>emmGrid</code> objects</a>
+<li><a href="basics.html#emmobj"><code>emmGrid</code> objects</a>
 <ul>
 <li><a href="utilities.html#data">Accessing data</a></li>
 <li><a href="utilities.html#rbind">Combining and subsetting</a></li>
@@ -273,7 +273,11 @@
 <li><a href="interactions.html#oranges">in <em>interactions: oranges</em></a></li>
 </ul></li>
 <li><a href="sophisticated.html#ordinal">Ordinal model</a></li>
-<li><a href="basics.html#motivation"><code>pigs</code></a></li>
+<li><code>pigs</code>
+<ul>
+<li><a href="basics.html#motivation">in <em>basics: motivation</em></a></li>
+<li><a href="confidence-intervals.html#summary">in <em>confidence-intervals: summary</em></a></li>
+</ul></li>
 <li><a href="xtending.html#rlm"><code>rlm</code> objects</a></li>
 <li><a href="xtending.html#rlm">Robust regression</a></li>
 <li><a href="sophisticated.html#lmer">Split-plot experiment</a></li>
@@ -285,6 +289,11 @@
 </ul></li>
 <li><a href="utilities.html#relevel">Welch’s <em>t</em> comparisons</a></li>
 <li><a href="sophisticated.html#ordinal"><code>wine</code></a></li>
+</ul></li>
+<li>Extending <strong>emmeans</strong>
+<ul>
+<li><a href="xtending.html#exported">Exports useful to developers</a></li>
+<li><a href="xtending.html#dispatch">Restrictions</a></li>
 </ul></li>
 </ul>
 <p><a href="#topnav">Back to top</a></p>
@@ -531,7 +540,7 @@
 <li><a href="predictions.html#ref-grid">Reference grid</a></li>
 <li><a href="predictions.html#feedlot">Total SD</a></li>
 </ul></li>
-<li><a href="confidence-intervals.html#emmobj"><code>print.summary_emm()</code></a></li>
+<li><a href="basics.html#emmobj"><code>print.summary_emm()</code></a></li>
 <li><a href="comparisons.html#pwpp"><code>pwpp()</code></a></li>
 </ul>
 <p><a href="#topnav">Back to top</a></p>
@@ -553,6 +562,7 @@
 <ul>
 <li><a href="xtending.html#communic">Communicating with <code>emm_basis()</code></a></li>
 <li><a href="xtending.html#rdargs"><code>data</code> and <code>params</code> arguments</a></li>
+<li><a href="xtending.html#dispatch">Dispatching</a></li>
 <li><a href="xtending.html#rderrs">Error handling</a></li>
 <li><a href="xtending.html#rd.lqs">for <code>lqs</code> objects</a></li>
 <li><a href="xtending.html#rdrsm">for <code>rsm</code> objects</a></li>
@@ -615,7 +625,7 @@
 <li><a href="models.html#S"><code>stanreg</code> objects</a></li>
 <li><a href="interactions.html#factors">* gazing (star gazing)</a></li>
 <li><a href="utilities.html#startup">Startup options</a></li>
-<li><a href="confidence-intervals.html#emmobj"><code>str()</code></a></li>
+<li><a href="basics.html#emmobj"><code>str()</code></a></li>
 <li><a href="FAQs.html#model">Subsets of data</a></li>
 <li><a href="confidence-intervals.html#summary"><code>summary()</code></a>
 <ul>
@@ -634,7 +644,7 @@
 </ul></li>
 <li><a href="transformations.html#tranlink"><code>type = &quot;unlink&quot;</code></a></li>
 </ul></li>
-<li><a href="confidence-intervals.html#emmobj"><code>summary_emm</code> object</a>
+<li><a href="basics.html#emmobj"><code>summary_emm</code> object</a>
 <ul>
 <li><a href="utilities.html#data">As a data frame</a></li>
 </ul></li>
@@ -660,6 +670,7 @@
 <li>Transformations
 <ul>
 <li><a href="transformations.html#after">Adding after the fact</a></li>
+<li><a href="transformations.html#auto">Auto-detected</a></li>
 <li><a href="confidence-intervals.html#tran">Back-transforming</a></li>
 <li><a href="transformations.html#bias-adj">Bias adjustment</a></li>
 <li><a href="transformations.html#special">Custom</a></li>

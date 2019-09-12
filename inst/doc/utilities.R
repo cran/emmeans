@@ -64,7 +64,7 @@ str(pigs.emm.ss)
 ## ------------------------------------------------------------------------
 emmeans(pigs.emm.ss, pairwise ~ type)
 
-## ------------------------------------------------------------------------
+## ---- message = FALSE----------------------------------------------------
 warp <- transform(warpbreaks, treat = interaction(wool, tension))
 library(nlme)
 warp.gls <- gls(breaks ~ treat, weights = varIdent(form = ~ 1|treat), data = warp)

@@ -49,13 +49,8 @@ str.emmGrid <- function(object, ...) {
         if (is.null(x)) cat("(predicted by other variables)")
         else cat(paste(format(x, digits = 5, justify = "none"), collapse=", "))
     }
-    showtran = function(tran, label) { # internal convenience fcn
-        if (is.list(tran)) 
-            tran = ifelse(is.null(tran$name), "custom", tran$name)
-        if (!is.null(mul <- object@misc$tran.mult))
-            tran = paste0(mul, "*", tran)
-        cat(paste(label, dQuote(tran), "\n"))
-        
+    showtran = function(misc, label) { # internal convenience fcn
+        cat(paste(label, dQuote(.fmt.tran(misc)), "\n"))
     }
     levs = object@levels
     cat(paste("'", class(object)[1], "' object with variables:\n", sep=""))
@@ -87,9 +82,9 @@ str.emmGrid <- function(object, ...) {
         cat("\n")
     }
     if(!is.null(tran <- object@misc$tran)) {
-        showtran(tran, "Transformation:")
+        showtran(object@misc, "Transformation:")
         if (!is.null(tran2 <- object@misc$tran2))
-            showtran(tran2, "Additional response transformation:")
+            showtran(list(tran = tran2), "Additional response transformation:")
     }
 }
 
@@ -175,6 +170,10 @@ vcov.emmGrid = function(object, ...) {
 #' response transformation \samp{2*sqrt(y)} (or \samp{sqrt(y) + sqrt(y + 1)},
 #' for that matter), we should have \code{tran = "sqrt"} and \code{tran.mult =
 #' 2}. If absent, a multiple of 1 is assumed.}
+#' 
+#' \item{\code{tran.offset}}{Additive constant before a transformation is applied.
+#' For example, a response transformation of \code{log(y + pi)} has
+#' \code{tran.offset  = pi}. If no value is present, an offset of 0 is assumed.}
 #' 
 #' \item{\code{estName}}{(\code{character}) is the column label used for
 #' displaying predictions or EMMs.}
@@ -288,7 +287,7 @@ update.emmGrid = function(object, ..., silent = FALSE) {
     valid.misc = c("adjust","alpha","avgd.over","by.vars","delta","df",
                    "initMesg","estName","estType","famSize","infer","inv.lbl",
                    "level","methDesc","nesting","null","predict.type","pri.vars"
-                   ,"side","sigma","tran","tran.mult","tran2","type","is.new.rg")
+                   ,"side","sigma","tran","tran.mult","tran.offset","tran2","type","is.new.rg")
     valid.slots = slotNames(object)
     valid.choices = union(valid.misc, valid.slots)
     misc = object@misc
@@ -519,14 +518,6 @@ emm_defaults = list (
 #' contrasts will be conducted on the new scale -- which is
 #' the reason this function exists. 
 #' 
-#' In cases where the
-#' degrees of freedom depended on the linear function being estimated, the d.f.
-#' from the reference grid are saved, and a kind of \dQuote{containment} method
-#' is substituted in the returned object whereby the calculated d.f. for a new
-#' linear function will be the minimum d.f. among those having nonzero
-#' coefficients. This is kind of an \emph{ad hoc} method, and it can
-#' over-estimate the degrees of freedom in some cases.
-#'
 #' This function may also be used to convert a reference grid for a 
 #' frequentist model to one for a Bayesian model. To do so, specify a value
 #' for \code{N.sim} and a posterior sample is simulated using the function \code{sim}.
@@ -570,7 +561,20 @@ emm_defaults = list (
 #'   with respective arguments \code{N.sim}, \code{object@bhat}, and \code{object@V}.
 #'   The default is the multivariate normal distribution.
 #' @param ... Ignored.
-#'   
+#' 
+#' @section Degrees of freedom:  
+#' In cases where the
+#' degrees of freedom depended on the linear function being estimated (e.g.,
+#' Satterthwaite method), the d.f.
+#' from the reference grid are saved, and a kind of \dQuote{containment} method
+#' is substituted in the returned object, whereby the calculated d.f. for a new
+#' linear function will be the minimum d.f. among those having nonzero
+#' coefficients. This is kind of an \emph{ad hoc} method, and it can
+#' over-estimate the degrees of freedom in some cases. An annotation is
+#' displayed below any subsequent summary results statisng that the 
+#' degrees-of-freedom method is inherited from the previous method at
+#' the time of re-gridding.
+#'
 #' @note Another way to use \code{regrid} is to supply a \code{transform} 
 #'   argument to \code{\link{ref_grid}} (either directly of indirectly via
 #'   \code{\link{emmeans}}). This is often a simpler approach if the reference
@@ -641,6 +645,7 @@ regrid = function(object, transform = c("response", "mu", "unlink", "log", "none
     edf = df[estble]
     if (length(edf) == 0) edf = NA
     # note both NA/NA and Inf/Inf test is.na() = TRUE
+    prev.df.msg = attr(object@dffun, "mesg")
     if (any(is.na(edf/edf)) || (diff(range(edf)) < .01)) { # use common value
         object@dfargs = list(df = mean(edf, na.rm = TRUE))
         object@dffun = function(k, dfargs) dfargs$df
@@ -652,6 +657,11 @@ regrid = function(object, transform = c("response", "mu", "unlink", "log", "none
             ifelse(length(idx) == 0, NA, min(dfargs$df[idx], na.rm = TRUE))
         }
     }
+    if(!is.null(prev.df.msg)) 
+        attr(object@dffun, "mesg") = ifelse(
+            startsWith(prev.df.msg, "inherited"), prev.df.msg,
+                paste("inherited from", prev.df.msg, "when re-gridding"))
+
     
     if(transform %in% c("response", "mu", "unlink", "log") && !is.null(object@misc$tran)) {
         flink = link = attr(est, "link")
@@ -678,10 +688,10 @@ regrid = function(object, transform = c("response", "mu", "unlink", "log", "none
         }
         if((transform %in% c("mu", "unlink")) && !is.null(object@misc$tran2)) {
             object@misc$tran = object@misc$tran2
-            object@misc$tran2 = object@misc$tran.mult = object@misc$inv.lbl = NULL
+            object@misc$tran2 = object@misc$tran.mult = object@misc$tran.offset = object@misc$inv.lbl = NULL
         }
         else
-            object@misc$tran = object@misc$tran.mult = object@misc$inv.lbl = NULL
+            object@misc$tran = object@misc$tran.mult = object@misc$tran.offset = object@misc$inv.lbl = NULL
         sigma = object@misc$sigma = NULL
     }
     if (transform == "log") { # from prev block, we now have stuff on response scale

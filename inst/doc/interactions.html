@@ -11,7 +11,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4" />
+<meta name="author" content="emmeans package, Version 1.4.1" />
 
 
 <title>Interaction analysis in emmeans</title>
@@ -34,7 +34,7 @@
 
 
 <h1 class="title toc-ignore">Interaction analysis in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.4</h4>
+<h4 class="author">emmeans package, Version 1.4.1</h4>
 
 
 
@@ -136,7 +136,7 @@ anova(noise.lm)</code></pre>
 ## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre>
 <p>Not too surprisingly, the statistical comparisons are all different for standard filters, but with Octel filters, there isn’t much of a difference between small and medium size.</p>
 <!-- @index * gazing (star gazing)@star -->
-<p>For comparing the levels of other factors, similar judgments must be made. It may help to construct other interaction plots with the factors in different roles. In my opinion, almost all meaningful statistical analysis should be grounded in evaluating the practical impact of the estimated effects <em>first</em>, and seeing if the statistical evidence backs it up. Those who put all their attention on how many asterisks (I call these people “<code>*</code> gazers”) are ignoring the fact that these don’t measure the sizes of the effects on a practical scale.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> An effect can be practically negligible and still have a very small <em>P</em> value – or practically important but have a large <em>P</em> value – depending on sample size and error variance. Failure to describe what is actually going on in the data is a failure to do an adequate analysis. Use lots of plots, and <em>think</em> about the results. For more on this, see the discussion of <em>P</em> values in the <a href="#basics.html#pvalues">“basics” vignette</a>.</p>
+<p>For comparing the levels of other factors, similar judgments must be made. It may help to construct other interaction plots with the factors in different roles. In my opinion, almost all meaningful statistical analysis should be grounded in evaluating the practical impact of the estimated effects <em>first</em>, and seeing if the statistical evidence backs it up. Those who put all their attention on how many asterisks (I call these people “<code>*</code> gazers”) are ignoring the fact that these don’t measure the sizes of the effects on a practical scale.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> An effect can be practically negligible and still have a very small <em>P</em> value – or practically important but have a large <em>P</em> value – depending on sample size and error variance. Failure to describe what is actually going on in the data is a failure to do an adequate analysis. Use lots of plots, and <em>think</em> about the results. For more on this, see the discussion of <em>P</em> values in the <a href="basics.html#pvalues">“basics” vignette</a>.</p>
 <div id="simple" class="section level3">
 <h3>Simple contrasts</h3>
 <!-- @index Simple comparisons; `contrast()`!`simple`; `contrast()`!`combine` -->
@@ -152,22 +152,22 @@ anova(noise.lm)</code></pre>
 ##  L    Std   .    L - M         -86.67 3.12 24 -27.795 &lt;.0001 
 ##  R    Std   .    M - S          25.00 3.12 24   8.018 &lt;.0001 
 ##  R    Std   .    L - M         -55.00 3.12 24 -17.639 &lt;.0001 
-##  L    Octel .    M - S          -3.33 3.12 24  -1.069 0.9769 
+##  L    Octel .    M - S          -3.33 3.12 24  -1.069 0.9768 
 ##  L    Octel .    L - M         -56.67 3.12 24 -18.174 &lt;.0001 
 ##  R    Octel .    M - S           1.67 3.12 24   0.535 0.9999 
 ##  R    Octel .    L - M         -46.67 3.12 24 -14.967 &lt;.0001 
 ##  .    Std   S    R - L         -18.33 3.12 24  -5.880 0.0001 
-##  .    Std   M    R - L          -8.33 3.12 24  -2.673 0.1702 
+##  .    Std   M    R - L          -8.33 3.12 24  -2.673 0.1713 
 ##  .    Std   L    R - L          23.33 3.12 24   7.483 &lt;.0001 
-##  .    Octel S    R - L          -5.00 3.12 24  -1.604 0.7745 
+##  .    Octel S    R - L          -5.00 3.12 24  -1.604 0.7750 
 ##  .    Octel M    R - L           0.00 3.12 24   0.000 1.0000 
-##  .    Octel L    R - L          10.00 3.12 24   3.207 0.0562 
-##  L    .     S    Octel - Std   -10.00 3.12 24  -3.207 0.0559 
+##  .    Octel L    R - L          10.00 3.12 24   3.207 0.0564 
+##  L    .     S    Octel - Std   -10.00 3.12 24  -3.207 0.0560 
 ##  L    .     M    Octel - Std   -28.33 3.12 24  -9.087 &lt;.0001 
 ##  L    .     L    Octel - Std     1.67 3.12 24   0.535 0.9999 
-##  R    .     S    Octel - Std     3.33 3.12 24   1.069 0.9768 
+##  R    .     S    Octel - Std     3.33 3.12 24   1.069 0.9769 
 ##  R    .     M    Octel - Std   -20.00 3.12 24  -6.414 &lt;.0001 
-##  R    .     L    Octel - Std   -11.67 3.12 24  -3.742 0.0163 
+##  R    .     L    Octel - Std   -11.67 3.12 24  -3.742 0.0166 
 ## 
 ## P value adjustment: mvt method for 20 tests</code></pre>
 <p>The dots (<code>.</code>) in this result correspond to which simple effect is being displayed. If we re-run this same call with <code>combine = FALSE</code> or omitted, these twenty comparisons would be displayed in three broad sets of contrasts, each broken down further by combinations of <code>by</code> variables, each separately multiplicity-adjusted (a total of 16 different tables).</p>

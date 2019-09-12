@@ -53,12 +53,12 @@ emmeans(warp.glm, ~ tension | wool, type = "response")
 emmeans(warp.glm, ~ tension | wool, type = "unlink")
 
 ## ----eval = FALSE--------------------------------------------------------
-#  tran <- make.tran("genlog", 1/2)
+#  tran <- make.tran("asin.sqrt", 100)
 #  my.model <- with(tran,
-#      lmer(linkfun(yield) ~ treatment + (1|Block), data = mydata))
+#      lmer(linkfun(percent) ~ treatment + (1|Block), data = mydata))
 
 ## ----eval = FALSE--------------------------------------------------------
-#  mydata <- transform(mydata, logy.5 = log(yield + .5))
+#  mydata <- transform(mydata, logy.5 = log(yield + 0.5))
 #  my.model <- lmer(logy.5 ~ treatment + (1|Block), data = mydata)
 
 ## ----eval = FALSE--------------------------------------------------------

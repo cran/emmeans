@@ -11,7 +11,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4" />
+<meta name="author" content="emmeans package, Version 1.4.1" />
 
 
 <title>FAQs for emmeans</title>
@@ -34,7 +34,7 @@
 
 
 <h1 class="title toc-ignore">FAQs for emmeans</h1>
-<h4 class="author">emmeans package, Version 1.4</h4>
+<h4 class="author">emmeans package, Version 1.4.1</h4>
 
 
 
@@ -126,7 +126,7 @@
 <div id="NAs" class="section level2">
 <h2>All or some of the results are NA</h2>
 <!-- @index `NA`s in the output; `NonEst` values; Estimability issues -->
-<p>The <strong>emmeans</strong> package uses tookls in the <strong>estimability</strong> package to determine whether its results are uniquely estimable. For example, in a two-way model with interactions included, if there are no observations in a particular cell (factor combination), then we cannot estimate the mean of that cell.</p>
+<p>The <strong>emmeans</strong> package uses tools in the <strong>estimability</strong> package to determine whether its results are uniquely estimable. For example, in a two-way model with interactions included, if there are no observations in a particular cell (factor combination), then we cannot estimate the mean of that cell.</p>
 <p>When <em>some</em> of the EMMs are estimable and others are not, that is information about missing information in the data. If it’s possible to remove some terms from the model (particularly interactions), that may make more things estimable if you re-fit with those terms excluded; but don’t delete terms that are really needed for the model to fit well.</p>
 <p>When <em>all</em> of the estimates are non-estimable, it could be symptomatic of something else. Some possibilities include:</p>
 <ul>
@@ -151,9 +151,9 @@ emmeans(pg.lm, consec ~ percent)</code></pre>
 ## 
 ## $contrasts
 ##  contrast estimate     SE df t.ratio p.value
-##  12 - 9     0.1796 0.0561 23 3.202   0.0110 
-##  15 - 12    0.0378 0.0582 23 0.650   0.8614 
-##  18 - 15    0.0825 0.0691 23 1.194   0.5202 
+##  12 - 9     0.1796 0.0561 23 3.202   0.0108 
+##  15 - 12    0.0378 0.0582 23 0.650   0.8613 
+##  18 - 15    0.0825 0.0691 23 1.194   0.5200 
 ## 
 ## Results are averaged over the levels of: source 
 ## Results are given on the log (not the response) scale. 

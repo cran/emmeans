@@ -11,7 +11,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4" />
+<meta name="author" content="emmeans package, Version 1.4.1" />
 
 
 <title>Working with messy data</title>
@@ -34,7 +34,7 @@
 
 
 <h1 class="title toc-ignore">Working with messy data</h1>
-<h4 class="author">emmeans package, Version 1.4</h4>
+<h4 class="author">emmeans package, Version 1.4.1</h4>
 
 
 
@@ -62,12 +62,6 @@
 <p>As an illustration, consider the <code>nutrition</code> dataset provided with the package. These data are used as an example in Milliken and Johnson (1992), <em>Analysis of Messy Data</em>, and contain the results of an observational study on nutrition education. Low-income mothers are classified by race, age category, and whether or not they received food stamps (the <code>group</code> factor); and the response variable is a gain score (post minus pre scores) after completing a nutrition training program. First, let’s fit a model than includes all main effects and 2-way interactions, and obtain its “type II” ANOVA:</p>
 <pre class="r"><code>nutr.lm &lt;- lm(gain ~ (age + group + race)^2, data = nutrition) 
 car::Anova(nutr.lm)</code></pre>
-<pre><code>## Registered S3 methods overwritten by &#39;car&#39;:
-##   method                          from
-##   influence.merMod                lme4
-##   cooks.distance.influence.merMod lme4
-##   dfbeta.influence.merMod         lme4
-##   dfbetas.influence.merMod        lme4</code></pre>
 <pre><code>## Note: model has aliased coefficients
 ##       sums of squares computed by model comparison</code></pre>
 <pre class="ro"><code>## Anova Table (Type II tests)
@@ -131,8 +125,14 @@ car::Anova(nutr.lm)</code></pre>
 <h2>Mediating covariates</h2>
 <!-- @index Mediating covariates; Examples!`framing`; Covariates!Mediating -->
 <p>The <code>framing</code> data in the <strong>mediation</strong> package has the results of an experiment conducted by Brader et al. (2008) where subjects were given the opportunity to send a message to Congress regarding immigration. However, before being offered this, some subjects (<code>treat = 1</code>) were first shown a news story that portrays Latinos in a negative way. Besides the binary response (whether or not they elected to send a message), the experimenters also measured <code>emo</code>, the subjects’ emotional state after the treatment was applied. There are various demographic variables as well. Let’s a logistic regression model, after changing the labels for <code>educ</code> to shorter strings.</p>
-<pre class="r"><code>framing &lt;- mediation::framing 
-levels(framing$educ) &lt;- c(&quot;NA&quot;,&quot;Ref&quot;,&quot;&lt; HS&quot;, &quot;HS&quot;, &quot;&gt; HS&quot;,&quot;Coll +&quot;) 
+<pre class="r"><code>framing &lt;- mediation::framing </code></pre>
+<pre><code>## Registered S3 methods overwritten by &#39;lme4&#39;:
+##   method                          from
+##   cooks.distance.influence.merMod car 
+##   influence.merMod                car 
+##   dfbeta.influence.merMod         car 
+##   dfbetas.influence.merMod        car</code></pre>
+<pre class="r"><code>levels(framing$educ) &lt;- c(&quot;NA&quot;,&quot;Ref&quot;,&quot;&lt; HS&quot;, &quot;HS&quot;, &quot;&gt; HS&quot;,&quot;Coll +&quot;) 
 framing.glm &lt;- glm(cong_mesg ~ age + income + educ + emo + gender * factor(treat), 
     family = binomial, data = framing)</code></pre>
 <p>The conventional way to handle covariates like <code>emo</code> is to set them at their means and use those means for purposes of predictions and EMMs. These adjusted means are shown in the following plot.</p>
@@ -176,7 +176,7 @@ emmeans(emmeans(model, c(&quot;A&quot;, &quot;B&quot;), weights = &quot;prop&quo
 ## [1,] 1.258929 1.926554 2.546674 0.3809524 0.6865079
 ## [2,]       NA       NA       NA 1.6666667 1.2500000
 ## [3,] 2.932008 2.522821 3.142940 2.7951807 1.6103407</code></pre>
-<p>For <code>group * race</code> EMMs, the results for <code>&quot;prop&quot;</code> and <code>&quot;flat&quot;</code> are the same because only one factor (<code>age</code>) is averaged over.</p>
+<p>In the other hand, if we do <code>group * race</code> EMMs, only one factor (<code>age</code>) is averaged over; thus, the results for <code>&quot;prop&quot;</code> and <code>&quot;outer&quot;</code> weights will be identical in that case.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="nesting" class="section level2">

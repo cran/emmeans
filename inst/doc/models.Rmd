@@ -22,7 +22,7 @@ constructors.
 
 Additional models can be supported by writing appropriate `recover_data`
 and `emm_basis` methods. See the package documentation for 
-`extending-emmeans` and `vignette("extending")` for details.
+`extending-emmeans` and `vignette("xtending")` for details.
 
 [Index of all vignette topics](vignette-topics.html)
 
@@ -238,8 +238,8 @@ method: If `s^2` is the estimate of some variance, then its Satterthwaite d.f.
 is `2*s^4 / Var(s^2)`. In case our numerical methods for this fail, we also
 offer `mode = "boot-satterthwaite"` as a backup, by which quantities related to
 `Var(s^2)` are obtained by randomly perturbing the response values. Currently,
-only `"satterthwaite"` is unavailable for `lme` objects, and it is used
-if `"satterthwaite"` is requested.
+only `"boot-satterthwaite"` is available for `lme` objects, and it is used
+if `"satterthwaite"` is requested. 
 
 The alternative method is `"df.error"` (for `gls`) and
 `"containment"` (for `lme`). `df.error` is just the error degrees of freedom for
@@ -418,7 +418,7 @@ save it as a member of the model object (e.g., `object$data = quote(mydata)`),
 that removes the necessity of specifying it in each call.
 The special keyword `trait` is used in some models. 
 When the response is multivariate and numeric, `trait` is generated automatically
-as a factor in the refernce grid, and the arguments `mult.levels` can be used to
+as a factor in the reference grid, and the arguments `mult.levels` can be used to
 name its levels. In other models such as a multinomial model, use the
 `mode` argument to specify the type of model, and `trait = <factor name>` 
 to specify the name of the data column that contains the levels of the factor response.

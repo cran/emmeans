@@ -11,7 +11,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4" />
+<meta name="author" content="emmeans package, Version 1.4.1" />
 
 
 <title>Prediction in emmeans</title>
@@ -34,7 +34,7 @@
 
 
 <h1 class="title toc-ignore">Prediction in <strong>emmeans</strong></h1>
-<h4 class="author">emmeans package, Version 1.4</h4>
+<h4 class="author">emmeans package, Version 1.4.1</h4>
 
 
 
@@ -63,7 +63,7 @@
 <p>So it is essentially always important to think very specifically about whether we are using an appropriate value. You may check the value being assumed by looking at the <code>misc</code> slot in the reference grid:</p>
 <pre class="r"><code>rg &lt;- ref_grid(model)
 rg@misc$sigma</code></pre>
-<p>Finally, <code>sigma</code> may be a vector, as long as it is conformable with the estimates in the reference grid. This would be appropriate, for example, with a model fitted by <code>nlme::gls()</code> with some kind of inhomogeneous error structure. It may take some effort, as well as a clear understanding of the model and its structure, to obtain suitable SD estimates. It was sugegsted to me that the function <code>insight::get_variance()</code> may be helpful – especially when working with an unfamiliar model class. Personally, I prefer to make sure I understand the structure of the model object and/or its summary to ensure I am not going astray.</p>
+<p>Finally, <code>sigma</code> may be a vector, as long as it is conformable with the estimates in the reference grid. This would be appropriate, for example, with a model fitted by <code>nlme::gls()</code> with some kind of non-homogeneous error structure. It may take some effort, as well as a clear understanding of the model and its structure, to obtain suitable SD estimates. It was suggested to me that the function <code>insight::get_variance()</code> may be helpful – especially when working with an unfamiliar model class. Personally, I prefer to make sure I understand the structure of the model object and/or its summary to ensure I am not going astray.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="feedlot" class="section level2">
