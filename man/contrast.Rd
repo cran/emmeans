@@ -10,7 +10,7 @@
 contrast(object, ...)
 
 \method{contrast}{emmGrid}(object, method = "eff", interaction = FALSE,
-  by, offset = NULL, name = "contrast",
+  by, offset = NULL, scale = NULL, name = "contrast",
   options = get_emm_option("contrast"), type, adjust, simple,
   combine = FALSE, ratios = TRUE, ...)
 
@@ -24,13 +24,13 @@ contrast(object, ...)
 \item{...}{Additional arguments passed to other methods}
 
 \item{method}{Character value giving the root name of a contrast method (e.g.
-\code{"pairwise"} -- see \link{emmc-functions}). Alternatively, a named
-\code{list} of coefficients (for a contrast or linear function) that must
-each conform to the number of results in each \code{by} group. In a
-multi-factor situation, the factor levels are combined and treated like a
-single factor.}
+\code{"pairwise"} -- see \link{emmc-functions}). Alternatively, a function
+of the same form, or a named \code{list} of coefficients (for a contrast or
+linear function) that must each conform to the number of results in each
+\code{by} group. In a multi-factor situation, the factor levels are
+combined and treated like a single factor.}
 
-\item{interaction}{Character vector or logical value. If this is specified,
+\item{interaction}{Character vector, logical value, or list. If this is specified,
 \code{method} is ignored. See the \dQuote{Interaction contrasts} section
 below for details.}
 
@@ -39,9 +39,10 @@ contrasts or joint tests will be evaluated separately for each combination
 of these variables. If \code{object} was created with by groups, those are
 used unless overridden. Use \code{by = NULL} to use no by groups at all.}
 
-\item{offset}{Numeric vector of the same length as each \code{by} group.
-These values are added to their respective linear estimates. (It is ignored
-when \code{interaction} is specified.)}
+\item{offset, scale}{Numeric vectors of the same length as each \code{by} group.
+The \code{scale} values, if supplied, multiply their respective linear estimates, and
+any \code{offset} values are added. Scalar values are also allowed. 
+(These arguments are ignored when \code{interaction} is specified.)}
 
 \item{name}{Character name to use to override the default label for contrasts
 used in table headings or subsequent contrasts of the returned object.}
@@ -108,16 +109,21 @@ When \code{object} has a nesting structure (this can be seen via
 
 \section{Interaction contrasts}{
  When \code{interaction} is specified,
-  interaction contrasts are computed: Contrasts are generated for each factor
-  separately, one at a time; and these contrasts are applied to the object
-  (the first time around) or to the previous result (subsequently). (Any
-  factors specified in \code{by} are skipped.) The final result comprises
-  contrasts of contrasts, or, equivalently, products of contrasts for the
-  factors involved. Processing is done in the order of appearance in
-  \code{object@levels}. With \code{interaction = TRUE}, \code{method} (if
-  specified as character) is used for each contrast. If \code{interaction} is
-  a character vector, the elements specify the respective contrast method(s);
-  they are recycled as needed.
+  interaction contrasts are computed. Specifically contrasts are generated
+  for each factor separately, one at a time; and these contrasts are applied
+  to the object (the first time around) or to the previous result
+  (subsequently). (Any factors specified in \code{by} are skipped.) The final
+  result comprises contrasts of contrasts, or, equivalently, products of
+  contrasts for the factors involved. Any named elements of \code{interaction}
+  are assigned to contrast methods; others are assigned in order of
+  appearance in \code{object@levels}. The contrast factors in the resulting 
+  \code{emmGrid} object are ordered the same as in \code{interaction}.
+  
+  \code{interaction} may be a character vector or list of valid contrast
+  methods (as documented for the \code{method} argument). If the vector or
+  list is shorter than the number needed, it is recycled. Alternatively, if
+  the user specifies \code{contrast = TRUE}, the contrast specified in
+  \code{method} is used for all factors involved.
 }
 
 \section{Simple contrasts}{
@@ -163,7 +169,16 @@ contrast(warp.emm, simple = list("wool", "tension"))
 }
 
 # An interaction contrast for tension:wool
-tw.emm <- contrast(warp.emm, interaction = c("poly", "consec"), by = NULL)
+tw.emm <- contrast(warp.emm, interaction = c(tension = "poly", wool = "consec"), 
+                   by = NULL)
 tw.emm          # see the estimates
 coef(tw.emm)    # see the contrast coefficients
+
+# Use of scale and offset
+#   an unusual use of the famous stack-loss data...
+mod <- lm(Water.Temp ~ poly(stack.loss, degree = 2), data = stackloss)
+(emm <- emmeans(mod, "stack.loss", at = list(stack.loss = 10 * (1:4))))
+# Convert results from Celsius to Fahrenheit:
+confint(contrast(emm, "identity", scale = 9/5, offset = 32))
+
 }
