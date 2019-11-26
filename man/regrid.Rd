@@ -4,29 +4,32 @@
 \alias{regrid}
 \title{Reconstruct a reference grid with a new transformation or posterior sample}
 \usage{
-regrid(object, transform = c("response", "mu", "unlink", "log", "none",
-  "pass"), inv.log.lbl = "response", predict.type,
+regrid(object, transform = c("response", "mu", "unlink", "none", "pass",
+  links), inv.link.lbl = "response", predict.type,
   bias.adjust = get_emm_option("back.bias.adj"), sigma, N.sim,
   sim = mvtnorm::rmvnorm, ...)
 }
 \arguments{
 \item{object}{An object of class \code{emmGrid}}
 
-\item{transform}{Character or logical value. If \code{"response"} or
-\code{"mu"}, the inverse transformation is applied to the estimates in the
-grid (but if there is both a link function and a response transformation,
-\code{"mu"} back-transforms only the link part); if \code{"log"}, the
-results are formulated as if the response had been \code{log}-transformed;
-if \code{"none"}, predictions thereof are on the same scale as in 
-\code{object}, and any internal transformation information is preserved. 
-If \code{transform = "pass"}, the object is not re-gridded in any way (this
+\item{transform}{Character, list, or logical value. If \code{"response"},
+\code{"mu"}, or \code{TRUE}, the inverse transformation is applied to the
+estimates in the grid (but if there is both a link function and a response
+transformation, \code{"mu"} back-transforms only the link part); if
+\code{"none"} or \code{FALSE}, \code{object} is re-gridded so that its
+\code{bhat} slot contains \code{predict(object)} and its \code{linfct} slot
+is the identity. Any internal transformation information is preserved. If
+\code{transform = "pass"}, the object is not re-gridded in any way (this
 may be useful in conjunction with \code{N.sim}).
-For compatibility with past versions, \code{transform} may also be logical;
-\code{TRUE} is taken as \code{"response"}, and \code{FALSE} as 
-\code{"none"}.}
 
-\item{inv.log.lbl}{Character value. This applies only when \code{transform =
-"log"}, and is used to label the predictions if subsequently summarized
+If \code{transform} is a character value in \code{links} (which is the set
+of valid arguments for the \code{\link{make.link}} function, excepting
+\code{"identity"}), or if \code{transform} is a list of the same form as
+returned by \code{make.links} or \code{\link{make.tran}}, the results are
+formulated as if the response had been transformed with that link function.}
+
+\item{inv.link.lbl}{Character value. This applies only when \code{transform} 
+is in \code{links}, and is used to label the predictions if subsequently summarized
 with \code{type = "response"}.}
 
 \item{predict.type}{Character value. If provided, the returned object is
@@ -99,7 +102,7 @@ is substituted in the returned object, whereby the calculated d.f. for a new
 linear function will be the minimum d.f. among those having nonzero
 coefficients. This is kind of an \emph{ad hoc} method, and it can
 over-estimate the degrees of freedom in some cases. An annotation is
-displayed below any subsequent summary results statisng that the 
+displayed below any subsequent summary results stating that the 
 degrees-of-freedom method is inherited from the previous method at
 the time of re-gridding.
 }

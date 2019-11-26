@@ -1,5 +1,19 @@
 ## NEWS for the emmeans package
 
+emmeans 1.4.3
+-------------
+
+  * Added `"bcnPower"` option to `make.tran()` (per `car::bcnPower()`)
+  * Scoping correction for `emmtrends()` (#153)
+  * Allow passing `...` to hook functions (need exposed by #154)
+  * Addition to `regrid()` whereby we can fake any response transformation
+    -- not just `"log"` (again inspired by #154)
+  * Informative message when **pbkrtest** or **lmerTest** is not found
+    (affects `merMod` objects) (#157)
+  * Change in `pwpp()` to make extremely small P values more distinguishable
+  
+
+
 emmeans 1.4.2
 -------------
 

@@ -59,7 +59,7 @@ Cohen's *d*, which is defined as the observed difference, divided by the
 population SD; and obviously Cohen effect sizes are close cousins of pairwise
 differences. They are available via the `eff_size()` function, where the user
 must specify the `emmGrid` object with the means to be compared, the estimated
-population SD `sigma`, and its degrees of freedom `edf`. this is illustrated with the 
+population SD `sigma`, and its degrees of freedom `edf`. This is illustrated with the 
 current example:
 ```{r}
 eff_size(pigs.emm.s, sigma = sigma(pigs.lm), edf = 23)

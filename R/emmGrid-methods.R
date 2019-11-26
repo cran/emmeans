@@ -104,7 +104,7 @@ print.emmGrid = function(x,...)
 #' @param object An \code{emmGrid} object
 #' @param ... (required but not used)
 #' 
-#' @return The \code{vcov} method returns a ymmetric matrix of variances and
+#' @return The \code{vcov} method returns a symmetric matrix of variances and
 #'   covariances for \code{predict.emmGrid(object, type = "lp")}
 #'
 #' @method vcov emmGrid
@@ -529,20 +529,24 @@ emm_defaults = list (
 #' only change being the addition of the posterior sample.
 #' 
 #' @param object An object of class \code{emmGrid}
-#' @param transform Character or logical value. If \code{"response"} or
-#'   \code{"mu"}, the inverse transformation is applied to the estimates in the
-#'   grid (but if there is both a link function and a response transformation,
-#'   \code{"mu"} back-transforms only the link part); if \code{"log"}, the
-#'   results are formulated as if the response had been \code{log}-transformed;
-#'   if \code{"none"}, predictions thereof are on the same scale as in 
-#'   \code{object}, and any internal transformation information is preserved. 
-#'   If \code{transform = "pass"}, the object is not re-gridded in any way (this
+#' @param transform Character, list, or logical value. If \code{"response"},
+#'   \code{"mu"}, or \code{TRUE}, the inverse transformation is applied to the
+#'   estimates in the grid (but if there is both a link function and a response
+#'   transformation, \code{"mu"} back-transforms only the link part); if
+#'   \code{"none"} or \code{FALSE}, \code{object} is re-gridded so that its
+#'   \code{bhat} slot contains \code{predict(object)} and its \code{linfct} slot
+#'   is the identity. Any internal transformation information is preserved. If
+#'   \code{transform = "pass"}, the object is not re-gridded in any way (this
 #'   may be useful in conjunction with \code{N.sim}).
-#'   For compatibility with past versions, \code{transform} may also be logical;
-#'   \code{TRUE} is taken as \code{"response"}, and \code{FALSE} as 
-#'   \code{"none"}.
-#' @param inv.log.lbl Character value. This applies only when \code{transform =
-#'   "log"}, and is used to label the predictions if subsequently summarized
+#'   
+#'   If \code{transform} is a character value in \code{links} (which is the set
+#'   of valid arguments for the \code{\link{make.link}} function, excepting
+#'   \code{"identity"}), or if \code{transform} is a list of the same form as
+#'   returned by \code{make.links} or \code{\link{make.tran}}, the results are
+#'   formulated as if the response had been transformed with that link function.
+#'   
+#' @param inv.link.lbl Character value. This applies only when \code{transform} 
+#'   is in \code{links}, and is used to label the predictions if subsequently summarized
 #'   with \code{type = "response"}.
 #' @param predict.type Character value. If provided, the returned object is
 #'   updated with the given type to use by default by \code{summary.emmGrid}
@@ -574,7 +578,7 @@ emm_defaults = list (
 #' linear function will be the minimum d.f. among those having nonzero
 #' coefficients. This is kind of an \emph{ad hoc} method, and it can
 #' over-estimate the degrees of freedom in some cases. An annotation is
-#' displayed below any subsequent summary results statisng that the 
+#' displayed below any subsequent summary results stating that the 
 #' degrees-of-freedom method is inherited from the previous method at
 #' the time of re-gridding.
 #'
@@ -604,13 +608,18 @@ emm_defaults = list (
 #' set.seed(2.71828)
 #' rgb <- regrid(rg, N.sim = 200, transform = "pass")
 #' emmeans(rgb, "source", type = "response")  ## similar to emm1
-regrid = function(object, transform = c("response", "mu", "unlink", "log", "none", "pass"), 
-                  inv.log.lbl = "response", predict.type, 
+regrid = function(object, transform = c("response", "mu", "unlink", "none", "pass", links), 
+                  inv.link.lbl = "response", predict.type, 
                   bias.adjust = get_emm_option("back.bias.adj"), sigma, 
                   N.sim, sim = mvtnorm::rmvnorm, ...) 
 {
+    links = c("logit", "probit", "cauchit", "cloglog", "log", "sqrt", "1/mu^2", "inverse")
     if (is.logical(transform))   # for backward-compatibility
         transform = ifelse(transform, "response", "none")
+    else if (is.list(transform)) {
+        userlink = transform
+        transform = "user"
+    }
     else
         transform = match.arg(transform)
     
@@ -669,7 +678,7 @@ regrid = function(object, transform = c("response", "mu", "unlink", "log", "none
                 paste("inherited from", prev.df.msg, "when re-gridding"))
 
     
-    if(transform %in% c("response", "mu", "unlink", "log") && !is.null(object@misc$tran)) {
+    if(transform %in% c("response", "mu", "unlink", links, "user") && !is.null(object@misc$tran)) {
         flink = link = attr(est, "link")
         if (bias.adjust) {
             if(missing(sigma))
@@ -700,27 +709,33 @@ regrid = function(object, transform = c("response", "mu", "unlink", "log", "none
             object@misc$tran = object@misc$tran.mult = object@misc$tran.offset = object@misc$inv.lbl = NULL
         sigma = object@misc$sigma = NULL
     }
-    if (transform == "log") { # from prev block, we now have stuff on response scale
-        Vee = vcov(object)
-        incl = which(object@bhat > 0)
+    if (transform %in% c(links, "user")) { # fake a transformation
+        link = if (transform == "user") userlink
+               else                     make.link(transform)
+        bounds = range(link$linkinv(c(-1e6, -100, -1, 0, 1, 100, 1e6)))
         nas = which(is.na(object@bhat)) # already NA
-        negs = which(object@bhat <= 0)
+        incl = which((object@bhat > bounds[1]) & (object@bhat) < bounds[2])
+        negs = setdiff(seq_along(object@bhat), incl)
         if (length(negs) > 0) {
-            message("Non-positive response predictions are flagged as non-estimable")
+            message("Invalid response predictions are flagged as non-estimable")
             object@bhat[negs] = NA
             tmp = seq_along(object@bhat)
             object@nbasis = sapply(c(nas, negs), function(ii) 0 + (tmp == ii))
         }
-        D = .diag(1/object@bhat[incl])
-        object@V = D %*% tcrossprod(Vee[incl, incl, drop = FALSE], D)
-        object@bhat = log(object@bhat)
+        object@bhat = link$linkfun(object@bhat)
+        Vee = object@V
+        if(length(incl) > 0) {
+            D = .diag(1/link$mu.eta(object@bhat[incl]))
+            object@V = D %*% tcrossprod(Vee[incl, incl, drop = FALSE], D)
+        }
         if (!is.na(PB[1])) {
             PB[PB <= 0] = NA
-            PB = log(PB)
+            PB = link$linkfun(PB)
             PB[1] = ifelse(is.na(PB[1]), 0, PB[1]) # make sure 1st elt isn't NA
         }
-        object@misc$tran = "log"
-        object@misc$inv.lbl = inv.log.lbl
+        object@misc$tran = if (transform == "user") link   
+                           else                     transform
+        object@misc$inv.lbl = inv.link.lbl
     }
     
     if(!is.na(PB[1])) {
