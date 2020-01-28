@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4.3.1" />
+<meta name="author" content="emmeans package, Version 1.4.4" />
 
 
 <title>Models supported by emmeans</title>
@@ -34,14 +33,14 @@
 
 
 <h1 class="title toc-ignore">Models supported by emmeans</h1>
-<h4 class="author">emmeans package, Version 1.4.3.1</h4>
+<h4 class="author">emmeans package, Version 1.4.4</h4>
 
 
 
 <!-- @index Vignettes!Models -->
 <p>Here we document what model objects may be used with <strong>emmeans</strong>, and some special features of some of them that may be accessed by passing additional arguments through <code>ref_grid</code> or <code>emmeans()</code>.</p>
 <p>Certain objects are affected by optional arguments to functions that construct <code>emmGrid</code> objects, including <code>ref_grid()</code>, <code>emmeans()</code>, <code>emtrends()</code>, and <code>emmip()</code>. When “<em>arguments</em>” are mentioned in the subsequent quick reference and object-by-object documentation, we are talking about arguments in these constructors.</p>
-<p>Additional models can be supported by writing appropriate <code>recover_data</code> and <code>emm_basis</code> methods. See the package documentation for <code>extending-emmeans</code> and <code>vignette(&quot;xtending&quot;)</code> for details.</p>
+<p>If a model type is not included here, users may be able to obtain usable results via the <code>qdrg()</code> function; see its help page. Package developers may support their models by writing appropriate <code>recover_data</code> and <code>emm_basis</code> methods. See the package documentation for <code>extending-emmeans</code> and <code>vignette(&quot;xtending&quot;)</code> for details.</p>
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
 <div id="quickref" class="section level2">
 <h2>Quick reference for supported objects and options</h2>

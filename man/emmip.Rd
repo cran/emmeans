@@ -7,9 +7,10 @@
 \usage{
 emmip(object, formula, ...)
 
-\method{emmip}{default}(object, formula, type, CIs = FALSE,
-  PIs = FALSE, engine = get_emm_option("graphics.engine"), pch = c(1,
-  2, 6, 7, 9, 10, 15:20), lty = 1, col = NULL, plotit = TRUE, ...)
+\method{emmip}{default}(object, formula, type, CIs = FALSE, PIs = FALSE,
+  style, engine = get_emm_option("graphics.engine"), pch = c(1, 2, 6, 7, 9,
+  10, 15:20), lty = 1, col = NULL, plotit = TRUE, nesting.order = FALSE,
+  ...)
 }
 \arguments{
 \item{object}{An object of class \code{emmGrid}, or a fitted model of a class
@@ -45,6 +46,15 @@ parameters to \code{\link{predict.emmGrid}} (e.g., \code{sigma}) may be passed v
 \code{...}. For Bayesian models, PIs require \code{frequentist = TRUE} and 
 a value for \code{sigma}.}
 
+\item{style}{Optional character value. This has an effect only when the
+horizontal variable is a single numeric variable. If \code{style} is
+unspecified or \code{"numeric"}, the horizontal scale will be numeric and
+curves are plotted using lines (and no symbols). With \code{style =
+"factor"}, the horizontal variable is treated as the levels of a factor
+(equally spaced along the horizontal scale), and curves are plotted using
+lines and symbols. When the horizontal variable is character or factor, or
+a combination of more than one predictor, \code{"factor"} style is always used.}
+
 \item{engine}{Character value matching \code{"ggplot"} (default) or 
 \code{"lattice"}. The graphics engine to be used to produce the plot.
 These require, respectively, the \pkg{ggplot2} or \pkg{lattice} package to
@@ -61,6 +71,11 @@ specified, the default trellis colors are used.}
 \item{plotit}{Logical value. If \code{TRUE}, the plot is displayed.
 Otherwise, one may use the \code{"lattice"} attribute of the returned
 object and print it, perhaps after additional manipulation.}
+
+\item{nesting.order}{Logical value. If \code{TRUE}, factors that are nested
+are presented in order according to their nesting factors, even if those nesting
+factors are not present in \code{formula}. If \code{FALSE}, only the
+variables in \code{formula} are used to order the variables.}
 }
 \value{
 If \code{plotit = FALSE}, a \code{data.frame} (actually, a
@@ -113,7 +128,15 @@ emmip(noise.lm, type * side ~ size)
 # Individual traces in panels
 emmip(noise.lm, ~ size | type * side)
 
+# Example for the 'style' argument
+fib.lm = lm(strength ~ machine * sqrt(diameter), data = fiber)
+fib.rg = ref_grid(fib.lm, at = list(diameter = c(3.5, 4, 4.5, 5, 5.5, 6)^2))
+emmip(fib.rg, machine ~ diameter)   # curves (because diameter is numeric)
+emmip(fib.rg, machine ~ diameter, style = "factor")  # points and lines
+
+# For an example using extra ggplot2 code, see 'vignette("messy-data")',
+# in the section on nested models.
 }
 \seealso{
-\code{\link{emmeans}}, \code{\link{interaction.plot}}
+\code{\link{emmeans}}, \code{\link{interaction.plot}}.
 }

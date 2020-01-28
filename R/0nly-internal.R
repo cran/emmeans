@@ -52,7 +52,7 @@
 .parse.by.formula = function(form) {
     allv = .all.vars(form)
     ridx = ifelse(length(form) == 2, 2, 3)
-    allrhs = as.character(form)[ridx]
+    allrhs = as.vector(form, "character")[ridx]
     allrhs = gsub("\\|", "+ .by. +", allrhs) # '|' --> '.by.'
     allrhs = .all.vars(stats::reformulate(allrhs))
     bidx = grep(".by.", allrhs, fixed = TRUE)
@@ -133,6 +133,14 @@
     offset
 }
 
+# combine variables in several `terms` objects
+#' @export
+.combine.terms = function(...) {
+    trms = list(...)
+    vars = unlist(lapply(trms, .all.vars))
+    terms(.reformulate(vars, env = environment(trms[[1]])))
+}
+
 ######################################################################
 ### Contributed by Jonathon Love, https://github.com/jonathon-love ###
 ### and adapted by RVL to exclude terms like df$trt or df[["trt"]] ###
@@ -144,7 +152,7 @@
 #   For example I need reformulate() sometimes to strip off function calls
 #   and this .reformulate works quite differently.
 #
-.reformulate <- function (termlabels, response = NULL, intercept = TRUE)
+.reformulate <- function (termlabels, response = NULL, intercept = TRUE, env = parent.frame())
 {
     if (!is.character(termlabels) || !length(termlabels))
         stop("'termlabels' must be a character vector of length at least one")
@@ -162,7 +170,7 @@
         rval[[2L]] = if (is.character(response))
             as.symbol(response)
     else response
-    environment(rval) = parent.frame()
+    environment(rval) = env
     rval
 }
 

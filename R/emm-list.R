@@ -128,3 +128,38 @@ plot.emm_list = function(x, ..., which = 1) {
     plot.emmGrid(x[[which[1]]], ...)
 }
 
+#' @export
+#' @method rbind emm_list
+rbind.emm_list = function(...) {
+    do.call(rbind, ...)
+}
+
+#' @export
+#' @method as.data.frame emm_list
+as.data.frame.emm_list = function(x, ...) {
+    as.data.frame(rbind(x, ...))
+}
+
+#' @export
+#' @method as.list emm_list
+as.list.emm_list = function(x, ...) {
+    rtn = list()
+    for (nm in names(x))
+        rtn[[nm]] = as.list.emmGrid(x[[nm]])
+    attr(rtn, "emm_list") = TRUE
+    rtn
+}
+
+#' @export
+#' @return \code{as.emm_list} returns an object of class \code{emm_list}.
+#' 
+#' @rdname as.emmGrid
+#' @order 3
+as.emm_list = function(object, ...) {
+    if (is.null(attr(object, "emm_list")))
+        as.emmGrid(object, ...)
+    else
+        lapply(object, as.emmGrid, ...)
+}
+
+

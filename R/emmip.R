@@ -56,6 +56,14 @@ emmip = function(object, formula, ...) {
 #'   parameters to \code{\link{predict.emmGrid}} (e.g., \code{sigma}) may be passed via
 #'   \code{...}. For Bayesian models, PIs require \code{frequentist = TRUE} and 
 #'   a value for \code{sigma}.
+#' @param style Optional character value. This has an effect only when the
+#'   horizontal variable is a single numeric variable. If \code{style} is
+#'   unspecified or \code{"numeric"}, the horizontal scale will be numeric and
+#'   curves are plotted using lines (and no symbols). With \code{style =
+#'   "factor"}, the horizontal variable is treated as the levels of a factor
+#'   (equally spaced along the horizontal scale), and curves are plotted using
+#'   lines and symbols. When the horizontal variable is character or factor, or
+#'   a combination of more than one predictor, \code{"factor"} style is always used.
 #' @param engine Character value matching \code{"ggplot"} (default) or 
 #'   \code{"lattice"}. The graphics engine to be used to produce the plot.
 #'   These require, respectively, the \pkg{ggplot2} or \pkg{lattice} package to
@@ -68,6 +76,10 @@ emmip = function(object, formula, ...) {
 #' @param plotit Logical value. If \code{TRUE}, the plot is displayed.
 #'   Otherwise, one may use the \code{"lattice"} attribute of the returned
 #'   object and print it, perhaps after additional manipulation.
+#' @param nesting.order Logical value. If \code{TRUE}, factors that are nested
+#'   are presented in order according to their nesting factors, even if those nesting
+#'   factors are not present in \code{formula}. If \code{FALSE}, only the
+#'   variables in \code{formula} are used to order the variables.
 #' @param ... Additional arguments passed to \code{\link{emmeans}} (when
 #'   \code{object} is not already an \code{emmGrid} object),
 #'   \code{predict.emmGrid},
@@ -99,7 +111,7 @@ emmip = function(object, formula, ...) {
 #'   \code{\link{interaction.plot}} where the summarization function is thought 
 #'   to return the EMMs.
 #' 
-#' @seealso \code{\link{emmeans}}, \code{\link{interaction.plot}}
+#' @seealso \code{\link{emmeans}}, \code{\link{interaction.plot}}.
 #' @export
 #' @method emmip default
 #'
@@ -119,11 +131,21 @@ emmip = function(object, formula, ...) {
 #'
 #' # Individual traces in panels
 #' emmip(noise.lm, ~ size | type * side)
-#'
+#' 
+#' # Example for the 'style' argument
+#' fib.lm = lm(strength ~ machine * sqrt(diameter), data = fiber)
+#' fib.rg = ref_grid(fib.lm, at = list(diameter = c(3.5, 4, 4.5, 5, 5.5, 6)^2))
+#' emmip(fib.rg, machine ~ diameter)   # curves (because diameter is numeric)
+#' emmip(fib.rg, machine ~ diameter, style = "factor")  # points and lines
+#' 
+#' # For an example using extra ggplot2 code, see 'vignette("messy-data")',
+#' # in the section on nested models.
 emmip.default = function(object, formula, type, CIs = FALSE, PIs = FALSE,
+                         style,
                          engine = get_emm_option("graphics.engine"),
                          pch = c(1,2,6,7,9,10,15:20), 
-                         lty = 1, col = NULL, plotit = TRUE, ...) {
+                         lty = 1, col = NULL, plotit = TRUE, 
+                         nesting.order = FALSE, ...) {
     engine = match.arg(engine, c("ggplot", "lattice"))
     if (engine == "ggplot")
         .requireNS("ggplot2",
@@ -172,6 +194,11 @@ emmip.default = function(object, formula, type, CIs = FALSE, PIs = FALSE,
         names(emms)[nm == tgts[i]] = subs[i] 
     attr(emms, "estName") = "yvar"
     
+    if(!nesting.order) { # re-order by factor levels actually in plot
+        snm = intersect(nm, unlist(specs))
+        ord = do.call(order, emms[rev(snm)])
+        emms = emms[ord, ]
+    }
     
     # Set up trace vars and key
     tvars = specs$lhs
@@ -195,7 +222,25 @@ emmip.default = function(object, formula, type, CIs = FALSE, PIs = FALSE,
     
     xvars = specs$rhs
     xv = do.call(paste, unname(emms[xvars]))
-    emms$xvar = factor(xv, levels = unique(xv))
+    ltest = max(apply(table(xv,tv), 2, function(x) sum(x > 0))) # length of longest trace
+    if (!missing(style))
+        styl = match.arg(style, c("factor", "numeric"))
+    if (missing(style) || styl == "numeric")
+        styl = ifelse(length(xvars) == 1 && 
+                           is.numeric(emms[[xvars]]) &&
+                           ltest > 1,
+                   "numeric", "factor")
+    if (styl == "factor") {
+        emms$xvar = factor(xv, levels = unique(xv))
+        predicate = "Levels of "
+        if (ltest <= 1)
+            message("Suggestion: Add 'at = list(", xvars, " = ...)' ",
+                    "to call to see > 1 value per group.")
+    }
+    else {
+        emms$xvar = as.numeric(xv)
+        predicate = ""
+    }
     emms = emms[order(emms$xvar), ]
     plotform = yvar ~ xvar
     
@@ -204,7 +249,7 @@ emmip.default = function(object, formula, type, CIs = FALSE, PIs = FALSE,
          plotform = as.formula(paste("yvar ~ xvar |", paste(byvars, collapse="*")))
     }
     xlab = ifelse(is.null(xargs$xlab),
-                  paste("Levels of", paste(xvars, collapse=" * ")), xargs$xlab)
+                  paste0(predicate, paste(xvars, collapse=" * ")), xargs$xlab)
     rspLbl = paste("Predicted", 
                    ifelse(is.null(emmo@misc$inv.lbl), "response", emmo@misc$inv.lbl))
     ylab = ifelse(is.null(xargs$ylab),
@@ -230,17 +275,21 @@ emmip.default = function(object, formula, type, CIs = FALSE, PIs = FALSE,
         if (!is.null(col)) TP$superpose.symbol$col = TP$superpose.line$col = col
         lattice::trellis.par.set(TP)
         
+        plty = if(styl=="factor") c("p","l")   else "l"
         plotspecs = list(x = plotform, data = emms, groups = ~ tvar, 
                          xlab = xlab, ylab = ylab,
-                         strip = my.strip, auto.key = my.key(tvars), type=c("p","l"))
+                         strip = my.strip, auto.key = my.key(tvars), 
+                         type = plty)
         grobj = do.call(lattice::xyplot, c(plotspecs, xargs))
         lattice::trellis.par.set(TP.orig)
     }  # --- end lattice method
     else {  # engine = "ggplot"
         pos = ggplot2::position_dodge(width = ifelse(CIs|PIs, .1, 0)) # use dodging if CIs
         if (!one.trace) {
-            grobj = ggplot2::ggplot(emms, ggplot2::aes_(x = ~xvar, y = ~yvar, color = ~tvar)) +
-                ggplot2::geom_point(position = pos) +
+            grobj = ggplot2::ggplot(emms, ggplot2::aes_(x = ~xvar, y = ~yvar, color = ~tvar))
+            if (styl == "factor")
+                grobj = grobj + ggplot2::geom_point(position = pos)
+            grobj = grobj +
                 ggplot2::geom_line(ggplot2::aes_(group = ~tvar), position = pos) +
                 ggplot2::labs(x = xlab, y = ylab, color = tlab)
         }

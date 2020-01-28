@@ -24,7 +24,8 @@
 #' This documents the methods that \code{\link{ref_grid}} calls. A user
 #' or package developer may add \pkg{emmeans} support for a model
 #' class by writing \code{recover_data} and \code{emm_basis} methods
-#' for that class.
+#' for that class. (Users in need for a quick way to obtain results for a model
+#' that is not supported may be better served by the \code{\link{qdrg}} function.)
 #' 
 ## #' @rdname extending-emmeans
 #' @name extending-emmeans
@@ -164,7 +165,7 @@ recover_data.call = function(object, trms, na.action, data = NULL, params = "pi"
         }
         
         fcall$drop.unused.levels = TRUE
-        fcall[[1L]] = as.name("model.frame")
+        fcall[[1L]] = quote(stats::model.frame)
         fcall$xlev = NULL # we'll ignore xlev
         
         if(!is.numeric(na.action))   ### In case na.action is not a vector of indices
@@ -178,7 +179,7 @@ recover_data.call = function(object, trms, na.action, data = NULL, params = "pi"
         form = .reformulate(vars)
         fcall$formula = update(trms, form)
         env = environment(trms)
-        if (is.null(env)) 
+        if (is.null(env))
             env = parent.frame()
         tbl = try(eval(fcall, env, parent.frame()), silent = TRUE)
         if(inherits(tbl, "try-error"))
