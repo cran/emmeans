@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4.4" />
+<meta name="author" content="emmeans package, Version 1.4.5" />
 
 
 <title>Utilities and options for emmeans</title>
@@ -33,7 +33,7 @@
 
 
 <h1 class="title toc-ignore">Utilities and options for emmeans</h1>
-<h4 class="author">emmeans package, Version 1.4.4</h4>
+<h4 class="author">emmeans package, Version 1.4.5</h4>
 
 
 
@@ -116,27 +116,28 @@ pigs.emm.s</code></pre>
 <pre class="r"><code>pigs.anal.p &lt;- emmeans(pigs.lm, consec ~ percent)
 pigs.anal.p</code></pre>
 <pre class="ro"><code>## $emmeans
-##  percent emmean     SE df lower.CL upper.CL
-##        9   3.45 0.0409 23     3.36     3.53
-##       12   3.62 0.0384 23     3.55     3.70
-##       15   3.66 0.0437 23     3.57     3.75
-##       18   3.75 0.0530 23     3.64     3.85
+##  percent response   SE df lower.CL upper.CL
+##        9     31.4 1.28 23     28.8     34.1
+##       12     37.5 1.44 23     34.7     40.6
+##       15     39.0 1.70 23     35.6     42.7
+##       18     42.3 2.24 23     37.9     47.2
 ## 
 ## Results are averaged over the levels of: source 
-## Results are given on the log (not the response) scale. 
 ## Confidence level used: 0.95 
+## Intervals are back-transformed from the log scale 
 ## 
 ## $contrasts
-##  contrast estimate     SE df lower.CL upper.CL t.ratio p.value
-##  12 - 9     0.1796 0.0561 23   0.0375    0.322 3.202   0.0111 
-##  15 - 12    0.0378 0.0582 23  -0.1095    0.185 0.650   0.8613 
-##  18 - 15    0.0825 0.0691 23  -0.0925    0.257 1.194   0.5202 
+##  contrast ratio     SE df lower.CL upper.CL t.ratio p.value
+##  12 / 9    1.20 0.0671 23    1.038     1.38 3.202   0.0111 
+##  15 / 12   1.04 0.0604 23    0.896     1.20 0.650   0.8613 
+##  18 / 15   1.09 0.0750 23    0.912     1.29 1.194   0.5202 
 ## 
 ## Results are averaged over the levels of: source 
-## Results are given on the log (not the response) scale. 
 ## Confidence level used: 0.95 
 ## Conf-level adjustment: mvt method for 3 estimates 
-## P value adjustment: mvt method for 3 tests</code></pre>
+## Intervals are back-transformed from the log scale 
+## P value adjustment: mvt method for 3 tests 
+## Tests are performed on the log scale</code></pre>
 <p>Observe that the contrasts “inherited” the <code>type = &quot;response&quot;</code> default from the EMMs.</p>
 <p>NOTE: Setting the above options does <em>not</em> change how existing <code>emmGrid</code> objects are displayed; it only affects ones constructed in the future.</p>
 <p>There is one more option – <code>summary</code> – that overrides all other display defaults for both existing and future objects. For example, specifying <code>emm_options(summary = list(infer = c(TRUE, TRUE)))</code> will result in both intervals and tests being displayed, regardless of their internal defaults, unless <code>infer</code> is explicitly specified in a call to <code>summary()</code>.</p>
@@ -188,19 +189,20 @@ pigs.emm</code></pre>
 ## P value adjustment: bonferroni method for 6 tests</code></pre>
 <p>The default adjustment is <code>&quot;bonferroni&quot;</code>; we could have specified something different via the <code>adjust</code> argument. An equivalent way to combine <code>emmGrid</code>s is via the addition operator. Any options may be provided by <code>update()</code>. Below, we combine the same results into a family but ask for the “exact” multiplicity adjustment.</p>
 <pre class="r"><code>update(pigs.anal.p[[2]] + pairs(pigs.emm.s), adjust = &quot;mvt&quot;)</code></pre>
-<pre class="ro"><code>##  contrast    estimate     SE df lower.CL upper.CL t.ratio p.value
-##  12 - 9        0.1796 0.0561 23   0.0214   0.3377  3.202  0.0212 
-##  15 - 12       0.0378 0.0582 23  -0.1263   0.2020  0.650  0.9681 
-##  18 - 15       0.0825 0.0691 23  -0.1124   0.2773  1.194  0.7305 
-##  fish - soy   -0.2728 0.0529 23  -0.4221  -0.1234 -5.153  0.0002 
-##  fish - skim  -0.4023 0.0542 23  -0.5551  -0.2495 -7.428  &lt;.0001 
-##  soy - skim   -0.1295 0.0530 23  -0.2791   0.0201 -2.442  0.1109 
+<pre class="ro"><code>##  contrast    ratio     SE df lower.CL upper.CL t.ratio p.value
+##  12 / 9      1.197 0.0671 23    1.022    1.402  3.202  0.0212 
+##  15 / 12     1.039 0.0604 23    0.881    1.224  0.650  0.9681 
+##  18 / 15     1.086 0.0750 23    0.894    1.320  1.194  0.7305 
+##  fish / soy  0.761 0.0403 23    0.656    0.884 -5.153  0.0002 
+##  fish / skim 0.669 0.0362 23    0.574    0.779 -7.428  &lt;.0001 
+##  soy / skim  0.879 0.0466 23    0.756    1.020 -2.442  0.1109 
 ## 
 ## Results are averaged over some or all of the levels of: source, percent 
-## Results are given on the log (not the response) scale. 
 ## Confidence level used: 0.95 
 ## Conf-level adjustment: mvt method for 6 estimates 
-## P value adjustment: mvt method for 6 tests</code></pre>
+## Intervals are back-transformed from the log scale 
+## P value adjustment: mvt method for 6 tests 
+## Tests are performed on the log scale</code></pre>
 <p>Also evident in comparing these results is that settings are obtained from the first object combined. So in the second output, where they are combined in reverse order, we get both confidence intervals and tests, and transformation to the response scale.</p>
 <div id="brackets" class="section level6">
 <h6></h6>

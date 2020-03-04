@@ -98,8 +98,10 @@ is in effect), or for constructing prediction intervals. If not specified,
 \emph{Note:} \code{sigma} may be a vector, as long as it conforms to the number of rows
 of the reference grid.}
 
-\item{...}{(Not used by \code{summary.emmGrid}.) In
-\code{as.data.frame.emmGrid}, \code{confint.emmGrid}, \code{predict.emmGrid}, and 
+\item{...}{Optional arguments such as \code{scheffe.rank} 
+(see \dQuote{P-value adjustments}). 
+In \code{as.data.frame.emmGrid}, \code{confint.emmGrid}, 
+\code{predict.emmGrid}, and 
 \code{test.emmGrid}, these arguments are passed to
 \code{summary.emmGrid}.}
 
@@ -157,11 +159,15 @@ The \code{as.data.frame} method returns a plain data frame,
 }
 \description{
 These are the primary methods for obtaining numerical or tabular results 
-from an \code{emmGrid} object. Note that by default, summaries for Bayesian models are
+from an \code{emmGrid} object. 
+\code{summary.emmGrid} is the general function for summarizing \code{emmGrid} objects. 
+It also serves as the print method for these objects; so for convenience,
+\code{summary()} arguments may be included in calls to functions such as 
+\code{\link{emmeans}} and \code{\link{contrast}} that construct \code{emmGrid} 
+objects. Note that by default, summaries for Bayesian models are
 diverted to \code{\link{hpd.summary}}.
 }
 \details{
-\code{summary.emmGrid} is the general function for summarizing \code{emmGrid} objects. 
 \code{confint.emmGrid} is equivalent to \code{summary.emmGrid with 
 infer = c(TRUE, FALSE)}. When called with \code{joint = FALSE}, \code{test.emmGrid}
 is equivalent to \code{summary.emmGrid} with \code{infer = c(FALSE, TRUE)}. 
@@ -231,9 +237,15 @@ The default \code{show} method for \code{emmGrid} objects (with the
     of means in the family. (Available for two-sided cases only.)}
   \item{\code{"scheffe"}}{Computes \eqn{p} values from the \eqn{F}
     distribution, according to the Scheffe critical value of
-    \eqn{\sqrt{kF(k,d)}}{sqrt[k*F(k,d)]}, where \eqn{d} is the error degrees of
-    freedom and \eqn{k} is (family size minus 1) for contrasts, and (number of
-    estimates) otherwise. (Available for two-sided cases only.)}
+    \eqn{\sqrt{rF(\alpha; r, d)}}{sqrt[r*qf(alpha, r, d)]}, where \eqn{d} is
+    the error degrees of freedom and \eqn{r} is the rank of the set of linear
+    functions under consideration. By default, the value of \code{r} is
+    computed from \code{object@linfct} for each by group; however, if the
+    user specifies an argument matching \code{scheffe.rank}, its value will
+    be used instead. Ordinarily, if there are \eqn{k} means involved, then
+    \eqn{r = k - 1} for a full set of contrasts involving all \eqn{k} means, and
+    \eqn{r = k} for the means themselves. (The Scheffe adjustment is available
+    for two-sided cases only.)}
   \item{\code{"sidak"}}{Makes adjustments as if the estimates were independent
     (a conservative adjustment in many cases).}
   \item{\code{"bonferroni"}}{Multiplies \eqn{p} values, or divides significance
@@ -343,9 +355,16 @@ summary(pigs.emm)    # (inherits type = "response")
 # Note the test is done on the log scale even though we have type = "response"
 test(pigs.emm, null = log(35), delta = log(1.10), side = ">")
 
-test(contrast(pigs.emm, "consec"))
+con <- contrast(pigs.emm, "consec")
+test(con)
 
-test(contrast(pigs.emm, "consec"), joint = TRUE)
+test(con, joint = TRUE)
+
+# default Scheffe adjustment - rank = 3
+summary(con, infer = c(TRUE, TRUE), adjust = "scheffe")
+
+# Consider as some of many possible contrasts among the six cell means
+summary(con, infer = c(TRUE, TRUE), adjust = "scheffe", scheffe.rank = 5)
 
 }
 \seealso{

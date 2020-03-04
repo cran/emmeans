@@ -73,10 +73,25 @@ piglog.emm.s <- regrid(emmeans(pigroot.lm, "source"), transform = "log")
 confint(piglog.emm.s, type = "response")
 pairs(piglog.emm.s, type = "response")
 
+## -------------------------------------------------------------------------------------------------
+sigma(pigs.lm)
+
+## -------------------------------------------------------------------------------------------------
+summary(pigs.emm.s, type = "response", bias.adj = TRUE)
+
+## -------------------------------------------------------------------------------------------------
+ismod <- glm(count ~ spray, data = InsectSprays, family = poisson())
+emmeans(ismod, "spray", type = "response", bias.adj = FALSE)
+emmeans(ismod, "spray", type = "response", bias.adj = TRUE)
+
+## -------------------------------------------------------------------------------------------------
+with(InsectSprays, tapply(count, spray, mean))
+
 ## ---- message = FALSE-----------------------------------------------------------------------------
 require(lme4)
 cbpp <- transform(cbpp, unit = 1:nrow(cbpp))
-cbpp.glmer <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd) +  (1|unit),
+cbpp.glmer <- glmer(cbind(incidence, size - incidence) ~ period + 
+                          (1 | herd) +  (1 | unit),
                     family = binomial, data = cbpp)
 
 emm <- emmeans(cbpp.glmer, "period")

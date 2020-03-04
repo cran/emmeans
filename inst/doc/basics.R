@@ -138,5 +138,9 @@ pigs.emm.s
 str(pigs.emm.s)
 
 ## -----------------------------------------------------------------------------
+# equivalent to summary(emmeans(pigs.lm1, "percent"), level = 0.90, infer = TRUE))
+emmeans(pigs.lm1, "percent", level = 0.90, infer = TRUE)
+
+## -----------------------------------------------------------------------------
 class(summary(pigs.emm.s))
 

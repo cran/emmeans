@@ -27,10 +27,14 @@
 #' Summaries, predictions, intervals, and tests for \code{emmGrid} objects
 #' 
 #' These are the primary methods for obtaining numerical or tabular results 
-#' from an \code{emmGrid} object. Note that by default, summaries for Bayesian models are
+#' from an \code{emmGrid} object. 
+#' \code{summary.emmGrid} is the general function for summarizing \code{emmGrid} objects. 
+#' It also serves as the print method for these objects; so for convenience,
+#' \code{summary()} arguments may be included in calls to functions such as 
+#' \code{\link{emmeans}} and \code{\link{contrast}} that construct \code{emmGrid} 
+#' objects. Note that by default, summaries for Bayesian models are
 #' diverted to \code{\link{hpd.summary}}.
 #' 
-#' \code{summary.emmGrid} is the general function for summarizing \code{emmGrid} objects. 
 #' \code{confint.emmGrid} is equivalent to \code{summary.emmGrid with 
 #' infer = c(TRUE, FALSE)}. When called with \code{joint = FALSE}, \code{test.emmGrid}
 #' is equivalent to \code{summary.emmGrid} with \code{infer = c(FALSE, TRUE)}. 
@@ -99,8 +103,10 @@
 #'   \code{object@misc$sigma} is used, and an error is thrown if it is not found.
 #'   \emph{Note:} \code{sigma} may be a vector, as long as it conforms to the number of rows
 #'   of the reference grid.
-#' @param ... (Not used by \code{summary.emmGrid}.) In
-#'   \code{as.data.frame.emmGrid}, \code{confint.emmGrid}, \code{predict.emmGrid}, and 
+#' @param ... Optional arguments such as \code{scheffe.rank} 
+#'   (see \dQuote{P-value adjustments}). 
+#'   In \code{as.data.frame.emmGrid}, \code{confint.emmGrid}, 
+#'   \code{predict.emmGrid}, and 
 #'   \code{test.emmGrid}, these arguments are passed to
 #'   \code{summary.emmGrid}.
 #'
@@ -149,9 +155,15 @@
 #'     of means in the family. (Available for two-sided cases only.)}
 #'   \item{\code{"scheffe"}}{Computes \eqn{p} values from the \eqn{F}
 #'     distribution, according to the Scheffe critical value of
-#'     \eqn{\sqrt{kF(k,d)}}{sqrt[k*F(k,d)]}, where \eqn{d} is the error degrees of
-#'     freedom and \eqn{k} is (family size minus 1) for contrasts, and (number of
-#'     estimates) otherwise. (Available for two-sided cases only.)}
+#'     \eqn{\sqrt{rF(\alpha; r, d)}}{sqrt[r*qf(alpha, r, d)]}, where \eqn{d} is
+#'     the error degrees of freedom and \eqn{r} is the rank of the set of linear
+#'     functions under consideration. By default, the value of \code{r} is
+#'     computed from \code{object@linfct} for each by group; however, if the
+#'     user specifies an argument matching \code{scheffe.rank}, its value will
+#'     be used instead. Ordinarily, if there are \eqn{k} means involved, then
+#'     \eqn{r = k - 1} for a full set of contrasts involving all \eqn{k} means, and
+#'     \eqn{r = k} for the means themselves. (The Scheffe adjustment is available
+#'     for two-sided cases only.)}
 #'   \item{\code{"sidak"}}{Makes adjustments as if the estimates were independent
 #'     (a conservative adjustment in many cases).}
 #'   \item{\code{"bonferroni"}}{Multiplies \eqn{p} values, or divides significance
@@ -273,10 +285,17 @@
 #' # For which percents is EMM non-inferior to 35, based on a 10% threshold?
 #' # Note the test is done on the log scale even though we have type = "response"
 #' test(pigs.emm, null = log(35), delta = log(1.10), side = ">")
-#'
-#' test(contrast(pigs.emm, "consec"))
 #' 
-#' test(contrast(pigs.emm, "consec"), joint = TRUE)
+#' con <- contrast(pigs.emm, "consec")
+#' test(con)
+#' 
+#' test(con, joint = TRUE)
+#' 
+#' # default Scheffe adjustment - rank = 3
+#' summary(con, infer = c(TRUE, TRUE), adjust = "scheffe")
+#' 
+#' # Consider as some of many possible contrasts among the six cell means
+#' summary(con, infer = c(TRUE, TRUE), adjust = "scheffe", scheffe.rank = 5)
 #'
 summary.emmGrid <- function(object, infer, level, adjust, by, type, df, 
                         null, delta, side, frequentist, 
@@ -284,7 +303,15 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df,
                         sigma, ...) {
     if(missing(sigma))
         sigma = object@misc$sigma
-
+    if(missing(frequentist) && !is.null(object@misc$frequentist))
+        frequentist = object@misc$frequentist
+    if(missing(bias.adjust)) {
+        if (!is.null(object@misc$bias.adjust)) 
+            bias.adjust = object@misc$bias.adjust
+        else
+            bias.adjust = get_emm_option("back.bias.adj")
+    }
+    
     if(!is.na(object@post.beta[1]) && (missing(frequentist) || !frequentist))
         return (hpd.summary(object, prob = level, by = by, type = type, 
                             bias.adjust = bias.adjust, sigma = sigma, ...))
@@ -429,7 +456,8 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df,
         attr(corrmat, "by.rows") = by.rows
     }
     else if (!is.na(pmatch(adjust, "scheffe"))) {
-        sch.rank = sapply(by.rows, function(.) qr(object@linfct[., , drop = FALSE])$rank)
+        if(is.null(sch.rank <- .match.dots("scheffe.rank", ...)))
+            sch.rank = sapply(by.rows, function(.) qr(zapsmall(object@linfct[., , drop = FALSE]))$rank)
         if(length(unique(sch.rank)) > 1)
             fam.info[1] = "uneven"   # This forces ragged.by = TRUE in .adj functions
     }
@@ -807,7 +835,7 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
 #         else             paste(n.contr, "tests")
         xtra = switch(adjust, 
                       tukey = paste("for comparing a family of", fam.size, "estimates"),
-                      scheffe = paste("with dimensionality", scheffe.dim),
+                      scheffe = paste("with rank", scheffe.dim),
                       paste("for", n.contr, "tests")
                 )
         mesg = paste("P value adjustment:", adjust, "method", xtra)
@@ -871,7 +899,7 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
 #        else             paste(n.contr, "estimates")
         xtra = switch(adjust, 
                       tukey = paste("for comparing a family of", fam.size, "estimates"),
-                      scheffe = paste("with dimensionality", scheffe.dim),
+                      scheffe = paste("with rank", scheffe.dim),
                       paste("for", n.contr, "estimates")
         )
         mesg = paste("Conf-level adjustment:", adjust, "method", xtra)

@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4.4" />
+<meta name="author" content="emmeans package, Version 1.4.5" />
 
 
 <title>Transformations and link functions in emmeans</title>
@@ -33,7 +33,7 @@
 
 
 <h1 class="title toc-ignore">Transformations and link functions in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.4.4</h4>
+<h4 class="author">emmeans package, Version 1.4.5</h4>
 
 
 
@@ -56,7 +56,7 @@
 </div>
 <div id="overview" class="section level2">
 <h2>Overview</h2>
-<!-- @index Transformations!Overview -->
+<!-- @index Transformations!Overview; Examples!`pigs` -->
 <p>Consider the same example with the <code>pigs</code> dataset that is used in many of these vignettes:</p>
 <pre class="r"><code>pigs.lm &lt;- lm(log(conc) ~ source + factor(percent), data = pigs)</code></pre>
 <p>This model has two factors, <code>source</code> and <code>percent</code> (coerced to a factor), as predictors; and log-transformed <code>conc</code> as the response. Here we obtain the EMMs for <code>source</code>, examine its structure, and finally produce a summary, including a test against a null value of log(35):</p>
@@ -85,6 +85,7 @@ str(pigs.emm.s)</code></pre>
 ## Confidence level used: 0.95 
 ## Intervals are back-transformed from the log scale 
 ## Tests are performed on the log scale</code></pre>
+<p>Note: Looking ahead, this output is compared later in this vignette with a <a href="#pigs-biasadj">bias-adjusted version</a>.</p>
 <div id="timing" class="section level3">
 <h3>Timing is everything</h3>
 <!-- @index Transformations!Timing is everything -->
@@ -305,19 +306,73 @@ confint(piglog.emm.s, type = &quot;response&quot;)</code></pre>
     Means!Generalized; Geometric means; -->
 <p>So far, we have discussed ideas related to back-transforming results as a simple way of expressing results on the same scale as the response. In particular, means obtained in this way are known as <em>generalized means</em>; for example, a log transformation of the response is associated with geometric means. When the goal is simply to make inferences about which means are less than which other means, and a response transformation is used, it is often acceptable to present estimates and comparisons of these generalized means. However, sometimes it is important to report results that actually do reflect expected values of the untransformed response. An example is a financial study, where the response is in some monetary unit. It may be convenient to use a response transformation for modeling purposes, but ultimately we may want to make financial projections in those same units.</p>
 <p>In such settings, we need to make a bias adjustment when we back-transform, because any nonlinear transformation biases the expected values of statistical quantities. More specifically, suppose that we have a response <span class="math inline">\(Y\)</span> and the transformed response is <span class="math inline">\(U\)</span>. To back-transform, we use <span class="math inline">\(Y = h(U)\)</span>; and using a Taylor approximation, <span class="math inline">\(Y \approx h(\eta) + h&#39;(\eta)(U-\eta) + \frac12h&#39;&#39;(\eta)(U-\eta)^2\)</span>, so that <span class="math inline">\(E(Y) \approx h(\eta) + \frac12h&#39;&#39;(\eta)Var(U)\)</span>. This shows that the amount of needed bias adjustment is approximately <span class="math inline">\(\frac12h&#39;&#39;(\eta)\sigma^2\)</span> where <span class="math inline">\(\sigma\)</span> is the error SD in the model for <span class="math inline">\(U\)</span>. It depends on <span class="math inline">\(\sigma\)</span>, and the larger this is, the greater the bias adjustment is needed. This second-order bias adjustment is what is currently used in the <strong>emmeans</strong> package when bias-adjustment is requested. There are better or exact adjustments for certain cases, and future updates may incorporate some of those.</p>
+<div id="pigs-biasadj" class="section level3">
+<h3>Pigs example revisited</h3>
+<!-- @index Examples!`pigs` -->
+<p>Let us compare the estimates in <a href="#overview">the overview</a> after we apply a bias adjustment. First, note that an estimate of the residual SD is available via the <code>sigma()</code> function:</p>
+<pre class="r"><code>sigma(pigs.lm)</code></pre>
+<pre class="ro"><code>## [1] 0.115128</code></pre>
+<p>This estimate is used by default. The bias-adjusted EMMs for the sources are:</p>
+<pre class="r"><code>summary(pigs.emm.s, type = &quot;response&quot;, bias.adj = TRUE)</code></pre>
+<pre class="ro"><code>##  source response   SE df lower.CL upper.CL
+##  fish       30.0 1.10 23     27.8     32.4
+##  soy        39.4 1.48 23     36.5     42.6
+##  skim       44.9 1.77 23     41.3     48.7
+## 
+## Results are averaged over the levels of: percent 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the log scale 
+## Bias adjustment applied based on sigma = 0.11513</code></pre>
+<p>These estimates (and also their SEs) are slightly larger than we had without bias adjustment. They are estimates of the <em>aritmetic</em> mean responses, rather than the <em>geometric</em> means shown in the overview. Had the value of <code>sigma</code> been larger, the adjustment would have been greater. You can experiment with this by adding a <code>sigma =</code> argument to the above call.</p>
+</div>
 <div id="link-bias" class="section level3">
 <h3>Response transformations vs. link functions</h3>
 <!-- @index Transformations!Response versus link functions;
-    Bias adjustment!For link functions vs. response transformations; Bias adjustment!In GLMMs and GEE models; -->
-<p>At this point, it is important to point out that the above discussion focuses on response transformations, as opposed to link functions used in generalized linear models (GLMs). In an ordinary GLM, no bias adjustment is needed or appropriate because the link function is just used to define a nonlinear relationship between the actual response mean <span class="math inline">\(\eta\)</span> and the linear predictor. However, in a generalized linear <em>mixed</em> model, including generalized estimating equations and such, there are random components involved, and then bias adjustment becomes appropriate.</p>
+    Bias adjustment!For link functions vs. response transformations; -->
+<p>At this point, it is important to point out that the above discussion focuses on <em>response</em> transformations, as opposed to link functions used in generalized linear models (GLMs). In an ordinary GLM, no bias adjustment is needed, nor is it appropriate, because the link function is just used to define a nonlinear relationship between the actual response mean <span class="math inline">\(\eta\)</span> and the linear predictor. That is, the back-transformed parameter is already the mean.</p>
+<div id="insects" class="section level4">
+<h4>InsectSprays example</h4>
+<!-- @index Examples!`InsectSprays`;  Bias adjustment!When *not* to use; -->
+<p>To illustrate this, consider the <code>InsectSprays</code> data in the <strong>datasets</strong> package. The response variable is a count, and there is one treatment, the spray that is used. Let us model the count as a Poisson variable with (by defauylt) a square-root link; and obtain the EMMs, with and without a bias adjustment</p>
+<pre class="r"><code>ismod &lt;- glm(count ~ spray, data = InsectSprays, family = poisson())
+emmeans(ismod, &quot;spray&quot;, type = &quot;response&quot;, bias.adj = FALSE)</code></pre>
+<pre class="ro"><code>##  spray  rate    SE  df asymp.LCL asymp.UCL
+##  A     14.50 1.099 Inf     12.50     16.82
+##  B     15.33 1.130 Inf     13.27     17.72
+##  C      2.08 0.417 Inf      1.41      3.08
+##  D      4.92 0.640 Inf      3.81      6.35
+##  E      3.50 0.540 Inf      2.59      4.74
+##  F     16.67 1.179 Inf     14.51     19.14
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the log scale</code></pre>
+<pre class="r"><code>emmeans(ismod, &quot;spray&quot;, type = &quot;response&quot;, bias.adj = TRUE)</code></pre>
+<pre class="ro"><code>##  spray  rate    SE  df asymp.LCL asymp.UCL
+##  A     25.30 1.918 Inf     21.81     29.35
+##  B     26.76 1.972 Inf     23.16     30.91
+##  C      3.64 0.727 Inf      2.46      5.38
+##  D      8.58 1.117 Inf      6.65     11.07
+##  E      6.11 0.942 Inf      4.51      8.26
+##  F     29.08 2.056 Inf     25.32     33.41
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the log scale 
+## Bias adjustment applied based on sigma = 1.2206</code></pre>
+<p>These are substantially different! Which is right? Well, due to the simple structure of this dataset, the estimates should be well in line with the simple observed mean counts:</p>
+<pre class="r"><code>with(InsectSprays, tapply(count, spray, mean))</code></pre>
+<pre class="ro"><code>##         A         B         C         D         E         F 
+## 14.500000 15.333333  2.083333  4.916667  3.500000 16.666667</code></pre>
+<p>This illustrates that it is the <em>non</em>-bias-adjusted results that are appropriate. Again, the point here is that a GLM does not have an additive error term, that the model is already formulated in terms of the mean, not some generalized mean. Users must be very careful with this! There is no way to automatically do the right thing.</p>
+<p>Note that, in a generalized linear <em>mixed</em> model, including generalized estimating equations and such, there <em>are</em> additive random components involved, and then bias adjustment becomes appropriate.</p>
 </div>
-<div id="cbpp" class="section level3">
-<h3>CBPP example</h3>
-<!-- @index Examples!`cbpp` -->
+<div id="cbpp" class="section level4">
+<h4>CBPP example</h4>
+<!-- @index Examples!`cbpp`; Bias adjustment!In GLMMs and GEE models; -->
 <p>Consider an example adapted from the help page for <code>lme4::cbpp</code>. Contagious bovine pleuropneumonia (CBPP) is a disease in African cattle, and the dataset contains data on incidence of CBPP in several herds of cattle over four time periods. We will fit a mixed model that accounts for herd variations as well as overdispersion (variations larger than expected with a simple binomial model):</p>
 <pre class="r"><code>require(lme4)
 cbpp &lt;- transform(cbpp, unit = 1:nrow(cbpp))
-cbpp.glmer &lt;- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd) +  (1|unit),
+cbpp.glmer &lt;- glmer(cbind(incidence, size - incidence) ~ period + 
+                          (1 | herd) +  (1 | unit),
                     family = binomial, data = cbpp)
 
 emm &lt;- emmeans(cbpp.glmer, &quot;period&quot;)
@@ -354,8 +409,10 @@ trials &lt;- with(cbpp, tapply(size, period, sum))
 cases / trials</code></pre>
 <pre class="ro"><code>##          1          2          3          4 
 ## 0.21942446 0.08018868 0.07106599 0.04516129</code></pre>
+<p>Left as an exercise: Revisit the <code>InsectSprays</code> example, but (using similar methods to the above) create a <code>unit</code> variable and fit an over-dispersion model. Compare the results with and without bias adjustment, and evaluate these results against the earlier results. This is simpler than the CBPP example because there is only one random effect.</p>
 <p><a href="#contents">Back to Contents</a></p>
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
+</div>
 </div>
 </div>
 

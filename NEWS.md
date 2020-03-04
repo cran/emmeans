@@ -1,5 +1,25 @@
 ## NEWS for the emmeans package
 
+
+emmeans 1.4.5
+-------------
+
+  * Change to `.all.vars()` that addresses #170
+  * Addition of hidden argument `scheffe.rank` in `summary.emmGrid()`
+    to manually specify the desired dimensionality of a Scheffe 
+    adjustment (#171)
+  * Provided for `...` to be included in `options` in calls to
+    `emmeans()` and `contrast()`. This allows passing any `summary()`
+    argument more easily, e.g., 
+    `emmeans(..., type = "response", bias.adjust = TRUE, infer = c(TRUE, TRUE))`
+    (Before, we would have had to wrap this in `summary()`)
+  * Added a `plotit` argument to `plot.emmGrid()` that works similarly to
+    that in `emmip()`.
+  * Removed startup message for behavior change in 1.4.2; it's been long enough.
+  * Fixed bug with `character predictors in `at` (#175)
+  
+  
+
 emmeans 1.4.4
 ---------------
 

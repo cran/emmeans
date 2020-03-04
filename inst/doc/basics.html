@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4.4" />
+<meta name="author" content="emmeans package, Version 1.4.5" />
 
 
 <title>Basics of estimated marginal means</title>
@@ -33,7 +33,7 @@
 
 
 <h1 class="title toc-ignore">Basics of estimated marginal means</h1>
-<h4 class="author">emmeans package, Version 1.4.4</h4>
+<h4 class="author">emmeans package, Version 1.4.5</h4>
 
 
 
@@ -385,8 +385,20 @@ class(pigs.emm.s)</code></pre>
 <pre class="ro"><code>## &#39;emmGrid&#39; object with variables:
 ##     source = fish, soy, skim
 ## Transformation: &quot;log&quot;</code></pre>
-<!-- @index `str()`; `summary_emm` object; `print.summary_emm()` -->
-<p>The most important method for <code>emmGrid</code> objects is <code>summary()</code>. It is used as the default for displaying an <code>emmeans()</code> result like <code>pigs.emm.s</code>. This <code>summary()</code> method for <code>emmGrid</code> objects) actually produces a <code>data.frame</code>, but with extra bells and whistles:</p>
+<!-- @index `str()`; `summary()`; `summary_emm` object; `print.summary_emm()` -->
+<p>The most important method for <code>emmGrid</code> objects is <code>summary()</code>. It is used as the print method for displaying an <code>emmeans()</code> result. For this reason, arguments for <code>summary()</code> may also be specified within most functions that produce <code>these kinds of results.</code>emmGrid` objects. For example:</p>
+<pre class="r"><code># equivalent to summary(emmeans(pigs.lm1, &quot;percent&quot;), level = 0.90, infer = TRUE))
+emmeans(pigs.lm1, &quot;percent&quot;, level = 0.90, infer = TRUE)</code></pre>
+<pre class="ro"><code>##  percent emmean     SE df lower.CL upper.CL t.ratio p.value
+##        9   3.45 0.0409 23     3.38     3.52 84.262  &lt;.0001 
+##       12   3.62 0.0384 23     3.56     3.69 94.456  &lt;.0001 
+##       15   3.66 0.0437 23     3.59     3.74 83.757  &lt;.0001 
+##       18   3.75 0.0530 23     3.65     3.84 70.716  &lt;.0001 
+## 
+## Results are averaged over the levels of: source 
+## Results are given on the log (not the response) scale. 
+## Confidence level used: 0.9</code></pre>
+<p>This <code>summary()</code> method for <code>emmGrid</code> objects) actually produces a <code>data.frame</code>, but with extra bells and whistles:</p>
 <pre class="r"><code>class(summary(pigs.emm.s))</code></pre>
 <pre class="ro"><code>## [1] &quot;summary_emm&quot; &quot;data.frame&quot;</code></pre>
 <p>This can be useful to know because if you want to actually <em>use</em> <code>emmeans()</code> results in other computations, you should save its summary, and then you can access those results just like you would access data in a data frame. The <code>emmGrid</code> object itself is not so accessible. There is a <code>print.summary_emm()</code> function that is what actually produces the output you see above – a data frame with extra annotations.</p>
