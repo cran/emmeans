@@ -246,13 +246,14 @@ recover_data.lme = function(object, data, ...) {
 
 #' @export
 emm_basis.lme = function(object, trms, xlev, grid, 
-        mode = c("containment", "satterthwaite", "boot-satterthwaite", "auto"), 
+        mode = c("containment", "satterthwaite", "appx-satterthwaite", "auto", "boot-satterthwaite"), 
         sigmaAdjust = TRUE, options, ...) {
     mode = match.arg(mode)
+    if (mode == "boot-satterthwaite") mode = "appx-satterthwaite"  # backward compatibility
     if (!is.null(options$df)) # if we're gonna override the df anyway, keep it simple!
         mode = "fixed"
     if (mode == "auto")
-        mode = ifelse(is.null(object$apVar), "containment", "boot-satterthwaite")
+        mode = ifelse(is.null(object$apVar), "containment", "appx-satterthwaite")
     if (is.null(object$apVar))
         mode = "containment"
     contrasts = object$contrasts
@@ -272,7 +273,7 @@ emm_basis.lme = function(object, trms, xlev, grid,
         dfargs = list(df = options$df)
         dffun = function(k, dfargs) dfargs$df
     }
-    else if (mode %in% c("satterthwaite", "boot-satterthwaite")) {
+    else if (mode %in% c("satterthwaite", "appx-satterthwaite")) {
         G = try(gradV.kludge(object), silent = TRUE)
         ###! not yet, doesn't work G = try(lme_grad(object, object$call, object$data, V))
         if (inherits(G, "try-error"))
@@ -354,7 +355,7 @@ gradV.kludge = function(object, Vname = "varFix", call = object$call$fixed, data
 
 #--------------------------------------------------------------
 
-### new way to get gradients for gls models
+### new way to get jacobians for gls models
 gls_grad = function(object, call, data, V) {
     obj = object$modelStruct
     conLin = object
@@ -366,55 +367,67 @@ gls_grad = function(object, call, data, V) {
     func = function(x) {
         obj = nlme::`coef<-`(obj, value = x)
         tmp = nlme::glsEstimate(obj, conLin)
-        crossprod(tmp$sigma * tmp$varBeta)
+        .get.lt(crossprod(tmp$sigma * tmp$varBeta))  # lower triangular form
     }
     res = numDeriv::jacobian(func, coef(obj))
-    G = lapply(seq_len(ncol(res)), function(j) matrix(res[, j], ncol = ncol(V)))
+    G = lapply(seq_len(ncol(res)), function(j) .lt2mat(res[, j]))
     G[[1 + length(G)]] = 2 * V  # gradient wrt log sigma
     G
 }
 
 ### gls objects (nlme package)
-recover_data.gls = function(object, ...) {
+recover_data.gls = function(object, data, ...) {
     fcall = object$call
-    if (!is.null(fcall$weights))
-        fcall$weights = nlme::varWeights(object$modelStruct)
+    if (!is.null(wts <- fcall$weights)) {
+        wts = nlme::varWeights(object$modelStruct)
+        fcall$weights = NULL
+    }
     trms = delete.response(terms(nlme::getCovariateFormula(object)))
-    recover_data(fcall, trms, object$na.action, ...)
+    result = recover_data.call(fcall, trms, object$na.action, data = data, ...)
+    if (!is.null(wts))
+        result[["(weights)"]] = wts
+    if (!missing(data))
+        attr(result, "misc") = list(data = data)
+    result
 }
 
 emm_basis.gls = function(object, trms, xlev, grid, 
-                         mode = c("auto", "df.error", "satterthwaite", "boot-satterthwaite"), 
-                         options, ...) {
+                         mode = c("auto", "df.error", "satterthwaite", "appx-satterthwaite", "boot-satterthwaite"), 
+                         options, misc, ...) {
     contrasts = object$contrasts
     m = model.frame(trms, grid, na.action = na.pass, xlev = xlev)
     X = model.matrix(trms, m, contrasts.arg = contrasts)
     bhat = coef(object)
     V = .my.vcov(object, ...)
     nbasis = estimability::all.estble
-    misc = list()
     mode = match.arg(mode)
+    if (mode == "boot-satterthwaite") mode = "appx-satterthwaite"  # backward compatibility
     if (!is.null(options$df)) # if we're gonna override the df anyway, keep it simple!
         mode = "df.error"
     if (mode == "auto")
         mode = ifelse(is.null(object$apVar), "df.error", "satterthwaite")
     if (!is.matrix(object$apVar))
         mode = "df.error"
-    if (mode %in% c("satterthwaite", "boot-satterthwaite")) {
+    if (mode %in% c("satterthwaite", "appx-satterthwaite")) {
+        data = if(is.null(misc$data))
+            eval(object$call$data, parent.frame(2))
+        else
+            misc$data
+        misc = list()
         chk = attr(object$apVar, "Pars")
         if(max(abs(coef(object$modelStruct) - chk[-length(chk)])) > .001) {
-            message("Analytical Satterthwaite method not available; using boot-satterthwaite")
-            mode = "boot-satterthwaite"
+            message("Analytical Satterthwaite method not available; using appx-satterthwaite")
+            mode = "appx-satterthwaite"
         }
-        if (mode == "boot-satterthwaite") {
+        if (mode == "appx-satterthwaite") {
             G = try(gradV.kludge(object, "varBeta", call = object$call,
-                                 data = eval(object$call$data)),
+                                 data = data),
                     silent = TRUE)
         }
         else
-            G = try(gls_grad(object, object$call, eval(object$call$data), V))
+            G = try(gls_grad(object, object$call, data, V))
         if (inherits(G, "try-error")) {
-            sugg = ifelse(mode == "satterthwaite", "boot-satterthwaite", "df.error")
+            sugg = ifelse(mode == "satterthwaite", "appx-satterthwaite", "df.error")
             stop("Can't estimate Satterthwaite parameters.\n",
                  "  Try adding the argument 'mode = \"", sugg, "\"'", call. = FALSE)
         }
@@ -488,9 +501,9 @@ emm_basis.polr = function(object, trms, xlev, grid,
 recover_data.survreg = function(object, ...) {
     fcall = object$call
     trms = delete.response(terms(object))
-    # I'm gonna delete any terms involving strata(), cluster(), or frailty()
+    # I'm gonna delete any terms involving cluster(), or frailty() -- keep strata()
     mod.elts = dimnames(attr(trms, "factor"))[[2]]
-    tmp = grep("strata\\(|cluster\\(|frailty\\(", mod.elts)
+    tmp = grep("cluster\\(|frailty\\(", mod.elts)
     if (length(tmp))
         trms = trms[-tmp]
     recover_data(fcall, trms, object$na.action, ...)
@@ -502,9 +515,11 @@ recover_data.survreg = function(object, ...) {
 emm_basis.survreg = function(object, trms, xlev, grid, ...) {
     # Much of this code is adapted from predict.survreg
     bhat = object$coefficients
-    k = length(bhat)
+    k = length(bhat) - sum(is.na(bhat))
     V = .my.vcov(object, ...)[seq_len(k), seq_len(k), drop=FALSE]
     # ??? not used... is.fixeds = (k == ncol(object$var))
+    ### zap-out factors in xlev not needed by model.frame
+    xlev[setdiff(names(xlev), rownames(attr(trms, "factors")))] = NULL
     m = model.frame(trms, grid, na.action = na.pass, xlev = xlev)    
     # X = model.matrix(object, m) # This is what predict.survreg does
     # But I have manipulated trms, so need to make sure things are consistent
@@ -531,12 +546,14 @@ emm_basis.coxph = function (object, trms, xlev, grid, ...)
 {
     object$dist = "doesn't matter"
     result = emm_basis.survreg(object, trms, xlev, grid, ...)
-    result$dfargs$df = NA
-    result$X = result$X[, -1, drop = FALSE]
-    result$X = result$X - rep(object$means, each = nrow(result$X))
+    result$dfargs$df = Inf
+    nms = colnames(result$X)
+    # delete columns for intercept and main effects of strata
+    zaps = which(nms %in% setdiff(nms, names(result$bhat)))
+    result$X = result$X[, -zaps, drop = FALSE]
+    ### result$X = result$X - rep(object$means, each = nrow(result$X))
     result$misc$tran = "log"
     result$misc$inv.lbl = "hazard"
-    result$misc$postGridHook = .notran2   # removes "Surv()" as response transformation
     result
 }
 
