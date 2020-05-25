@@ -1,7 +1,7 @@
 ## ---- echo = FALSE, results = "hide", message = FALSE-------------------------
 require("emmeans")
 options(show.signif.stars = FALSE)
-knitr::opts_chunk$set(fig.width = 4.5, class.output = "ro")
+knitr::opts_chunk$set(fig.width = 4.5, class.output = "ro", class.message = "re")
 
 ## -----------------------------------------------------------------------------
 noise.lm <- lm(noise ~ size * type * side, data = auto.noise)

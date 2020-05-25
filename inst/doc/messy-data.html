@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4.6" />
+<meta name="author" content="emmeans package, Version 1.4.7" />
 
 
 <title>Working with messy data</title>
@@ -20,7 +20,7 @@
 
 
 
-<style type="text/css">body {font-size: 11pt; font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;margin: 30px 50px 30px 50px; }h1,h2,h3,h4,h5,h6 { font-family: Arial,Helvetica,Sans-serif; }a { text-decoration: none; }a:link { color:darkblue; } a:visited { color:darkblue; } a:hover { color:dodgerblue; }a:active { color:dodgerblue; } code {color: #602000;font-family: "Lucida Console", Monaco, monospace; font-size: 90%;}.r { color: darkred; }.ro { color: darkgreen; background-color: #eeeeee; }.r code, a code, .ro code { color: inherit; }.vigindex ul { list-style-type: none; }.vigindex ul li { list-style: none; }.vigindex a code { color: inherit; }.vigindex li code { color: inherit; }</style>
+<style type="text/css">body {font-size: 11pt; font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;margin: 30px 50px 30px 50px; }h1,h2,h3,h4,h5,h6 { font-family: Arial,Helvetica,Sans-serif; }a { text-decoration: none; }a:link { color:darkblue; } a:visited { color:darkblue; } a:hover { color:dodgerblue; }a:active { color:dodgerblue; } code {color: #602000;font-family: "Lucida Console", Monaco, monospace; font-size: 90%;}.r { color: darkred; }.ro { color: darkgreen; background-color: #eeeeee; }.re { color: red;}.r code, a code, .ro code, .re code { color: inherit; }.vigindex ul { list-style-type: none; }.vigindex ul li { list-style: none; }.vigindex a code { color: inherit; }.vigindex li code { color: inherit; }</style>
 
 
 
@@ -33,7 +33,7 @@
 
 
 <h1 class="title toc-ignore">Working with messy data</h1>
-<h4 class="author">emmeans package, Version 1.4.6</h4>
+<h4 class="author">emmeans package, Version 1.4.7</h4>
 
 
 
@@ -74,15 +74,15 @@ car::Anova(nutr.lm)</code></pre>
 ## age:race     87.30  3  1.0189    0.3880
 ## group:race  113.70  2  1.9906    0.1424
 ## Residuals  2627.47 92</code></pre>
-<p>There is definitely a <code>group</code> effect and a hint of and interaction with <code>race</code>. Here are the EMMs for those two factors:</p>
-<pre class="r"><code>emmeans(nutr.lm, ~ group * race)</code></pre>
-<pre class="ro"><code>##  group      race     emmean   SE df lower.CL upper.CL
-##  FoodStamps Black      4.71 2.37 92  0.00497     9.41
-##  NoAid      Black     -2.19 2.49 92 -7.13690     2.76
-##  FoodStamps Hispanic nonEst   NA NA       NA       NA
-##  NoAid      Hispanic nonEst   NA NA       NA       NA
-##  FoodStamps White      3.61 1.16 92  1.31252     5.90
-##  NoAid      White      2.26 2.39 92 -2.48897     7.00
+<p>There is definitely a <code>group</code> effect and a hint of and interaction with <code>race</code>. Here are the EMMs for those two factors, along with their counts:</p>
+<pre class="r"><code>emmeans(nutr.lm, ~ group * race, calc = c(n = &quot;.wgt.&quot;))</code></pre>
+<pre class="ro"><code>##  group      race     emmean   SE df  n lower.CL upper.CL
+##  FoodStamps Black      4.71 2.37 92  7  0.00497     9.41
+##  NoAid      Black     -2.19 2.49 92 14 -7.13690     2.76
+##  FoodStamps Hispanic nonEst   NA NA  1       NA       NA
+##  NoAid      Hispanic nonEst   NA NA  2       NA       NA
+##  FoodStamps White      3.61 1.16 92 52  1.31252     5.90
+##  NoAid      White      2.26 2.39 92 31 -2.48897     7.00
 ## 
 ## Results are averaged over the levels of: age 
 ## Confidence level used: 0.95</code></pre>

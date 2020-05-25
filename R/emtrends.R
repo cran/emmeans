@@ -197,7 +197,14 @@ emtrends = function(object, specs, var, delta.var=.001*rng,
     cl$options$delts = delts   # ref_grid hook -- expand grid by these increments
     bigRG = eval(cl)
     
-    var.subs = as.list(as.data.frame(matrix(seq_len(nrow(bigRG@grid)), ncol = length(delts))))
+    ### var.subs is list of indexes for each value of delts
+    gdim = nrow(bigRG@grid) / length(delts)
+    mdim = 1
+    for (v in bigRG@roles$multresp) 
+        mdim = mdim * length(bigRG@levels[[v]])
+    arr = array(seq_len(nrow(bigRG@grid)), c(gdim / mdim, length(delts), mdim))
+    var.subs = lapply(seq_along(delts), function(i) as.numeric(arr[,i,]))
+    
     RG = orig.rg = bigRG[var.subs[[idx.base]]]  # the subset that corresponds to reference values
     row.names(RG@grid) = seq_along(RG@grid[[1]])
 

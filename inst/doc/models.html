@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4.6" />
+<meta name="author" content="emmeans package, Version 1.4.7" />
 
 
 <title>Models supported by emmeans</title>
@@ -20,7 +20,7 @@
 
 
 
-<style type="text/css">body {font-size: 11pt; font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;margin: 30px 50px 30px 50px; }h1,h2,h3,h4,h5,h6 { font-family: Arial,Helvetica,Sans-serif; }a { text-decoration: none; }a:link { color:darkblue; } a:visited { color:darkblue; } a:hover { color:dodgerblue; }a:active { color:dodgerblue; } code {color: #602000;font-family: "Lucida Console", Monaco, monospace; font-size: 90%;}.r { color: darkred; }.ro { color: darkgreen; background-color: #eeeeee; }.r code, a code, .ro code { color: inherit; }.vigindex ul { list-style-type: none; }.vigindex ul li { list-style: none; }.vigindex a code { color: inherit; }.vigindex li code { color: inherit; }</style>
+<style type="text/css">body {font-size: 11pt; font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;margin: 30px 50px 30px 50px; }h1,h2,h3,h4,h5,h6 { font-family: Arial,Helvetica,Sans-serif; }a { text-decoration: none; }a:link { color:darkblue; } a:visited { color:darkblue; } a:hover { color:dodgerblue; }a:active { color:dodgerblue; } code {color: #602000;font-family: "Lucida Console", Monaco, monospace; font-size: 90%;}.r { color: darkred; }.ro { color: darkgreen; background-color: #eeeeee; }.re { color: red;}.r code, a code, .ro code, .re code { color: inherit; }.vigindex ul { list-style-type: none; }.vigindex ul li { list-style: none; }.vigindex a code { color: inherit; }.vigindex li code { color: inherit; }</style>
 
 
 
@@ -33,7 +33,7 @@
 
 
 <h1 class="title toc-ignore">Models supported by emmeans</h1>
-<h4 class="author">emmeans package, Version 1.4.6</h4>
+<h4 class="author">emmeans package, Version 1.4.7</h4>
 
 
 
@@ -89,8 +89,8 @@
 <tr class="even">
 <td align="left">brmsfit</td>
 <td align="left">brms</td>
-<td align="center"><a href="#S">S</a></td>
-<td align="left">Only simpler models</td>
+<td align="center"><a href="#P">P</a></td>
+<td align="left">Supported in <strong>brms</strong> package</td>
 </tr>
 <tr class="odd">
 <td align="left">carbayes</td>
@@ -509,7 +509,7 @@
 <p>Models fitted using MCMC methods contain a sample from the posterior distribution of fixed-effect coefficients. In some cases (e.g., results of <code>MCMCpack::MCMCregress()</code> and <code>MCMCpack::MCMCpoisson()</code>), the object may include a <code>&quot;call&quot;</code> attribute that <code>emmeans()</code> can use to reconstruct the data and obtain a basis for the EMMs. If not, a <code>formula</code> and <code>data</code> argument are provided that may help produce the right results. In addition, the <code>contrasts</code> specifications are not necessarily recoverable from the object, so the system default must match what was actually used in fitting the model.</p>
 <p>The <code>summary.emmGrid()</code> method provides credibility intervals (HPD intervals) of the results, and ignores the frequentist-oriented arguments (<code>infer</code>, <code>adjust</code>, etc.) An <code>as.mcmc()</code> method is provided that creates an <code>mcmc</code> object that can be summarized or plotted using the <strong>coda</strong> package (or others that support those objects). It provides a posterior sample of EMMs, or contrasts thereof, for the given reference grid, based on the posterior sample of the fixed effects from the model object.</p>
 <p>In <code>MCMCglmm</code> objects, the <code>data</code> argument is required; however, if you save it as a member of the model object (e.g., <code>object$data = quote(mydata)</code>), that removes the necessity of specifying it in each call. The special keyword <code>trait</code> is used in some models. When the response is multivariate and numeric, <code>trait</code> is generated automatically as a factor in the reference grid, and the arguments <code>mult.levels</code> can be used to name its levels. In other models such as a multinomial model, use the <code>mode</code> argument to specify the type of model, and <code>trait = &lt;factor name&gt;</code> to specify the name of the data column that contains the levels of the factor response.</p>
-<p>Support for the <strong>brms</strong> package is provided but it is quite rudimentary and usable only for the primary fixed effects and the simpler models.</p>
+<p>The <strong>brms</strong> package version 2.13 and later, has its own <code>emmeans</code> support. Refer to the documentation in that package.</p>
 <p><a href="#quickref">Back to quick reference</a></p>
 </div>
 <div id="V" class="section level2">

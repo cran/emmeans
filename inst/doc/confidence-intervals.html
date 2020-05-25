@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4.6" />
+<meta name="author" content="emmeans package, Version 1.4.7" />
 
 
 <title>Confidence intervals and tests in emmeans</title>
@@ -20,7 +20,7 @@
 
 
 
-<style type="text/css">body {font-size: 11pt; font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;margin: 30px 50px 30px 50px; }h1,h2,h3,h4,h5,h6 { font-family: Arial,Helvetica,Sans-serif; }a { text-decoration: none; }a:link { color:darkblue; } a:visited { color:darkblue; } a:hover { color:dodgerblue; }a:active { color:dodgerblue; } code {color: #602000;font-family: "Lucida Console", Monaco, monospace; font-size: 90%;}.r { color: darkred; }.ro { color: darkgreen; background-color: #eeeeee; }.r code, a code, .ro code { color: inherit; }.vigindex ul { list-style-type: none; }.vigindex ul li { list-style: none; }.vigindex a code { color: inherit; }.vigindex li code { color: inherit; }</style>
+<style type="text/css">body {font-size: 11pt; font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;margin: 30px 50px 30px 50px; }h1,h2,h3,h4,h5,h6 { font-family: Arial,Helvetica,Sans-serif; }a { text-decoration: none; }a:link { color:darkblue; } a:visited { color:darkblue; } a:hover { color:dodgerblue; }a:active { color:dodgerblue; } code {color: #602000;font-family: "Lucida Console", Monaco, monospace; font-size: 90%;}.r { color: darkred; }.ro { color: darkgreen; background-color: #eeeeee; }.re { color: red;}.r code, a code, .ro code, .re code { color: inherit; }.vigindex ul { list-style-type: none; }.vigindex ul li { list-style: none; }.vigindex a code { color: inherit; }.vigindex li code { color: inherit; }</style>
 
 
 
@@ -33,7 +33,7 @@
 
 
 <h1 class="title toc-ignore">Confidence intervals and tests in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.4.6</h4>
+<h4 class="author">emmeans package, Version 1.4.7</h4>
 
 
 
@@ -54,7 +54,9 @@
 </div>
 <div id="summary" class="section level2">
 <h2><code>summary()</code>, <code>confint()</code>, and <code>test()</code></h2>
-<!-- @index `summary()`; `summary()`!`infer`; `confint()`; `test()`; Confidence intervals;
+<!-- @index `summary()`; `summary()`!`infer`; `confint()`; `test()`; 
+    Confidence intervals; `summary()`!Calculated columns; 
+    `summary()`!Show sample size; Sample size, displaying;
             Tests!One- and two-sided; Tests!Nonzero null;
             `summary()`!Bayesian models; `summary()`!`hpd.summary()`;
             Examples!`pigs` -->
@@ -83,6 +85,16 @@ pigs.emm.s &lt;- emmeans(pigs.rg, &quot;source&quot;)</code></pre>
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
 ## P values are right-tailed</code></pre>
+<p>It is also possible to add calculated columns to the summary, via the <code>calc</code> argument. The calculations can include any columns up through <code>df</code> in the summary, as well as any variable in the object’s <code>grid</code> slot. Among the latter are usually weights in a column named <code>.wgt.</code>, and we can use that to include sample size in the summary:</p>
+<pre class="r"><code>confint(pigs.emm.s, calc = c(n = ~.wgt.))</code></pre>
+<pre class="ro"><code>##  source emmean     SE df  n lower.CL upper.CL
+##  fish     3.39 0.0367 23 10     3.32     3.47
+##  soy      3.67 0.0374 23 10     3.59     3.74
+##  skim     3.80 0.0394 23  9     3.72     3.88
+## 
+## Results are averaged over the levels of: percent 
+## Results are given on the log (not the response) scale. 
+## Confidence level used: 0.95</code></pre>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="tran" class="section level2">
@@ -189,20 +201,20 @@ pigsint.rg &lt;- ref_grid(pigsint.lm)
 contrast(pigsint.rg, &quot;consec&quot;, simple = &quot;percent&quot;)</code></pre>
 <pre class="ro"><code>## source = fish:
 ##  contrast estimate     SE df t.ratio p.value
-##  12 - 9     0.1849 0.1061 17  1.742  0.2353 
+##  12 - 9     0.1849 0.1061 17  1.742  0.2357 
 ##  15 - 12    0.0045 0.1061 17  0.042  0.9999 
 ##  18 - 15    0.0407 0.1061 17  0.383  0.9626 
 ## 
 ## source = soy:
 ##  contrast estimate     SE df t.ratio p.value
-##  12 - 9     0.1412 0.0949 17  1.487  0.3593 
+##  12 - 9     0.1412 0.0949 17  1.487  0.3592 
 ##  15 - 12   -0.0102 0.0949 17 -0.108  0.9992 
 ##  18 - 15    0.0895 0.1342 17  0.666  0.8571 
 ## 
 ## source = skim:
 ##  contrast estimate     SE df t.ratio p.value
 ##  12 - 9     0.2043 0.0949 17  2.152  0.1185 
-##  15 - 12    0.1398 0.1061 17  1.317  0.4519 
+##  15 - 12    0.1398 0.1061 17  1.317  0.4521 
 ##  18 - 15    0.1864 0.1424 17  1.309  0.4568 
 ## 
 ## Results are given on the log (not the response) scale. 

@@ -1,5 +1,25 @@
 ## NEWS for the emmeans package
 
+emmeans 1.4.69xxxxxxxx
+-------------
+
+  * Repairs to `pwpp()` so it plays nice with nonestimable cases
+  * Added `"xplanations"` vignette with additional documentation on
+    methods used. (comparison arrows, for starters)
+  * Touch-ups to `plot()`, especially regarding comparison arrows
+  * Bug fix for `stanreg` models (#196)
+  * Fixed error in `emmeans(obj, "1", by = "something")` (#197)
+  * `eff_size()` now supports `emm_list` objects with a `$contrasts`
+    component, using those contrasts. This helps those who
+    specify `pairwise ~ treatment`.
+  * Labels in `contrast()` for factor combinations with `by` groups 
+    were wacky (#199)
+  * `emtrends()` screwed up with multivariate models (#200).
+  * Added a new argument `calc` to `summary()`. For example,
+    `calc = c(n = ~.wgt.)` will add a column of sample sizes to
+    the summary.
+  
+
 emmeans 1.4.6
 -------------
 

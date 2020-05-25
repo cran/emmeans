@@ -9,7 +9,7 @@ nutr.lm <- lm(gain ~ (age + group + race)^2, data = nutrition)
 car::Anova(nutr.lm)
 
 ## -----------------------------------------------------------------------------
-emmeans(nutr.lm, ~ group * race)
+emmeans(nutr.lm, ~ group * race, calc = c(n = ".wgt."))
 
 ## -----------------------------------------------------------------------------
 with(nutrition, table(race, age))

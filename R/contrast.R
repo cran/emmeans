@@ -257,7 +257,7 @@ contrast.emmGrid = function(object, method = "eff", interaction = FALSE,
             args[[nm]] = NULL
             all.args[[nm]] = NULL
         }
-        all.levs = do.call("paste", unname(all.args))   # keep all levels in case we have permutations of them
+        all.levs = do.call("paste", c(unname(all.args), sep = ","))   # keep all levels in case we have permutations of them
     }
     args = unname(args)
     args$sep = ","
@@ -411,7 +411,7 @@ contrast.emmGrid = function(object, method = "eff", interaction = FALSE,
     }
     
     # ensure we don't inherit inappropriate settings
-    misc$null = misc$delta = misc$side = NULL
+    misc$null = misc$delta = misc$side = misc$calc = NULL
     
     object@roles$predictors = "contrast"
     levels = list()

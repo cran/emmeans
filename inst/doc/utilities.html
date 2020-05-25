@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="emmeans package, Version 1.4.6" />
+<meta name="author" content="emmeans package, Version 1.4.7" />
 
 
 <title>Utilities and options for emmeans</title>
@@ -20,7 +20,7 @@
 
 
 
-<style type="text/css">body {font-size: 11pt; font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;margin: 30px 50px 30px 50px; }h1,h2,h3,h4,h5,h6 { font-family: Arial,Helvetica,Sans-serif; }a { text-decoration: none; }a:link { color:darkblue; } a:visited { color:darkblue; } a:hover { color:dodgerblue; }a:active { color:dodgerblue; } code {color: #602000;font-family: "Lucida Console", Monaco, monospace; font-size: 90%;}.r { color: darkred; }.ro { color: darkgreen; background-color: #eeeeee; }.r code, a code, .ro code { color: inherit; }.vigindex ul { list-style-type: none; }.vigindex ul li { list-style: none; }.vigindex a code { color: inherit; }.vigindex li code { color: inherit; }</style>
+<style type="text/css">body {font-size: 11pt; font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;margin: 30px 50px 30px 50px; }h1,h2,h3,h4,h5,h6 { font-family: Arial,Helvetica,Sans-serif; }a { text-decoration: none; }a:link { color:darkblue; } a:visited { color:darkblue; } a:hover { color:dodgerblue; }a:active { color:dodgerblue; } code {color: #602000;font-family: "Lucida Console", Monaco, monospace; font-size: 90%;}.r { color: darkred; }.ro { color: darkgreen; background-color: #eeeeee; }.re { color: red;}.r code, a code, .ro code, .re code { color: inherit; }.vigindex ul { list-style-type: none; }.vigindex ul li { list-style: none; }.vigindex a code { color: inherit; }.vigindex li code { color: inherit; }</style>
 
 
 
@@ -33,7 +33,7 @@
 
 
 <h1 class="title toc-ignore">Utilities and options for emmeans</h1>
-<h4 class="author">emmeans package, Version 1.4.6</h4>
+<h4 class="author">emmeans package, Version 1.4.7</h4>
 
 
 
@@ -71,19 +71,21 @@ pigs.emm</code></pre>
 ## Results are given on the log (not the response) scale. 
 ## Confidence level used: 0.95</code></pre>
 <p>We see confidence intervals but not tests, by default. This happens as a result of internal settings in <code>pigs.emm.s</code> that are passed to <code>summary()</code> when the object is displayed. If we are going to work with this object a lot, we might want to change its internal settings rather than having to rely on explicitly calling <code>summary()</code> with several arguments. If so, just update the internal settings to what is desired; for example:</p>
-<pre class="r"><code>pigs.emm.s &lt;- update(pigs.emm, infer = c(TRUE, TRUE), null = log(35))
+<pre class="r"><code>pigs.emm.s &lt;- update(pigs.emm, infer = c(TRUE, TRUE), null = log(35),
+                     calc = c(n = &quot;.wgt.&quot;))
 pigs.emm.s</code></pre>
-<pre class="ro"><code>##  source emmean     SE df lower.CL upper.CL null t.ratio p.value
-##  fish     3.39 0.0367 23     3.32     3.47 3.56 -4.385  0.0002 
-##  soy      3.67 0.0374 23     3.59     3.74 3.56  2.988  0.0066 
-##  skim     3.80 0.0394 23     3.72     3.88 3.56  6.130  &lt;.0001 
+<pre class="ro"><code>##  source emmean     SE df  n lower.CL upper.CL null t.ratio p.value
+##  fish     3.39 0.0367 23 10     3.32     3.47 3.56 -4.385  0.0002 
+##  soy      3.67 0.0374 23 10     3.59     3.74 3.56  2.988  0.0066 
+##  skim     3.80 0.0394 23  9     3.72     3.88 3.56  6.130  &lt;.0001 
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
 ## Confidence level used: 0.95</code></pre>
-<p>See <code>help(&quot;update.emmGrid&quot;)</code> for details on the keywords that can be changed. Mostly, they are the same as the names of arguments in the functions that construct these objects.</p>
-<p>Of course, we can always get what we want via calls to <code>test()</code>, <code>confint()</code> or <code>summary()</code> with appropriate arguments. But the <code>update()</code> function is more useful in sophisticated manipulations of objects, or called implicitly via the <code>options</code> argument in <code>emmeans()</code> and other functions. Those options are passed to <code>update()</code> just before the object is returned. For example, we could have done the above update within the <code>emmeans()</code> call as follows:</p>
-<pre class="r"><code>emmeans(pigs.lm, &quot;source&quot;, options = list(infer = c(TRUE, TRUE), null = log(35)))</code></pre>
+<p>Note that by adding of <code>calc</code>, we have set a default to calculate and display the sample size when the object is summarized. See <code>help(&quot;update.emmGrid&quot;)</code> for details on the keywords that can be changed. Mostly, they are the same as the names of arguments in the functions that construct these objects.</p>
+<p>Of course, we can always get what we want via calls to <code>test()</code>, <code>confint()</code> or <code>summary()</code> with appropriate arguments. But the <code>update()</code> function is more useful in sophisticated manipulations of objects, or called implicitly via the <code>...</code> or <code>options</code> argument in <code>emmeans()</code> and other functions. Those options are passed to <code>update()</code> just before the object is returned. For example, we could have done the above update within the <code>emmeans()</code> call as follows (results are not shown because they are the same as before):</p>
+<pre class="r"><code>emmeans(pigs.lm, &quot;source&quot;, infer = c(TRUE, TRUE), null = log(35),
+        calc = c(n = &quot;.wgt.&quot;))</code></pre>
 <p><a href="#contents">Back to contents</a></p>
 </div>
 <div id="options" class="section level2">
@@ -247,9 +249,9 @@ str(pigs.emm.ss)</code></pre>
 <p>Note that the new object has a nesting structure (see more about this in the <a href="messy-data.html#nesting">“messy-data” vignette</a>), with the reference factor nested in the new grouping factor. Now we can obtain means and comparisons for each group</p>
 <pre class="r"><code>emmeans(pigs.emm.ss, pairwise ~ type)</code></pre>
 <pre class="ro"><code>## $emmeans
-##  type      emmean     SE df lower.CL upper.CL
-##  animal      3.60 0.0267 23     3.54     3.65
-##  vegetable   3.67 0.0374 23     3.59     3.74
+##  type      emmean     SE df  n lower.CL upper.CL
+##  animal      3.60 0.0267 23 19     3.54     3.65
+##  vegetable   3.67 0.0374 23 10     3.59     3.74
 ## 
 ## Results are averaged over the levels of: percent, source 
 ## Results are given on the log (not the response) scale. 

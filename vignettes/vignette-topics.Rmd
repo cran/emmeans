@@ -78,11 +78,14 @@ vignette: >
   * [`coef()`](comparisons.html#contrasts)
   * [Cohen's *d*](comparisons.html#pwpm)
   * [Compact letter displays](comparisons.html#CLD)
+  * Comparison arrows
+      * [Derivation](xplanations.html#arrows)
   * Comparisons
       * [Back-transforming](comparisons.html#logs)
       * [Displaying as groups](comparisons.html#CLD)
       * [Displaying *P* values](comparisons.html#pwpp)
       * [Graphical](comparisons.html#graphical)
+          * [How arrows are determined](xplanations.html#arrows)
       * [with logs](comparisons.html#logs)
       * [with overlapping CIs](FAQs.html#CIerror)
   * [Confidence intervals](confidence-intervals.html#summary)
@@ -490,6 +493,7 @@ vignette: >
 ### S {#s}
 
 
+  * [Sample size, displaying](confidence-intervals.html#summary)
   * Satterthwaite d.f.
       * [in *models: K*](models.html#K)
       * [in *models: L*](models.html#L)
@@ -517,12 +521,14 @@ vignette: >
       * Bayesian models
           * [in *confidence-intervals: summary*](confidence-intervals.html#summary)
           * [in *models: S*](models.html#S)
+      * [Calculated columns](confidence-intervals.html#summary)
       * [in *confidence-intervals: summary*](confidence-intervals.html#summary)
       * [HPD intervals](sophisticated.html#mcmc)
       * [`hpd.summary()`](confidence-intervals.html#summary)
       * `infer`
           * [in *comparisons: pairwise*](comparisons.html#pairwise)
           * [in *confidence-intervals: summary*](confidence-intervals.html#summary)
+      * [Show sample size](confidence-intervals.html#summary)
       * [`type = "unlink"`](transformations.html#tranlink)
   * [`summary_emm` object](basics.html#emmobj)
       * [As a data frame](utilities.html#data)
@@ -590,6 +596,7 @@ vignette: >
       * [Basics](basics.html)
       * [Comparisons](comparisons.html)
       * [Confidence intervals and tests](confidence-intervals.html)
+      * [Explanations supplement](xplanations.html)
       * [Extending **emmeans**](xtending.html)
       * [FAQS](FAQs.html)
       * [Interactions](interactions.html)
