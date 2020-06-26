@@ -286,8 +286,9 @@ emmeans = function(object, specs, by = NULL,
         options $tran = tran
     }
     
-    if((length(specs) == 1) && (specs == "1"))
-        specs = character(0)
+    # This was added in 1.47, but causes problems
+    # if((length(specs) == 1) && (specs == "1"))
+    #     specs = character(0)
     
     if(is.null(nesting <- object@model.info$nesting)) 
         {
@@ -309,11 +310,12 @@ emmeans = function(object, specs, by = NULL,
         if(any(ord != seq_along(ord)))
             RG = RG[ord]
         
-        if ((length(facs) == 1) && (facs == "1")) {  ### just want grand mean
+        # xxx if ((length(facs) == 1) && (facs == "1")) {  ### just want grand mean
+        if("1" %in% facs) {
             RG@levels[["1"]] = "overall"
             RG@grid[ ,"1"] = 1
         }
-        
+
         
         # Figure out the structure of the grid
         wgt = RG@grid[[".wgt."]]
@@ -543,7 +545,7 @@ emmeans = function(object, specs, by = NULL,
 #' ( dose.emm <- emmeans(expt.rg, "dose") )
 #' 
 #' rbind(pairs(trt.emm), pairs(dose.emm), adjust = "mvt")
-emmobj = function(bhat, V, levels, linfct, df = NA, dffun, dfargs = list(), 
+emmobj = function(bhat, V, levels, linfct = diag(length(bhat)), df = NA, dffun, dfargs = list(), 
                   post.beta = matrix(NA), ...) {
     if ((nrow(V) != ncol(V)) || (nrow(V) != ncol(linfct)) || (length(bhat) != ncol(linfct)))
         stop("bhat, V, and linfct are incompatible")

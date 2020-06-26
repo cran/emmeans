@@ -1,6 +1,30 @@
 ## NEWS for the emmeans package
 
-emmeans 1.4.69xxxxxxxx
+emmeans 1.4.8
+-------------
+
+  * Bug fix and smoother support for `stanreg` objects (#202)
+  * Fix to `emmip()` to be consistent between one curve and several, 
+    in whether points are displayed (`style` option)
+  * Added `"scale"` option to `make.tran()`
+  * Auto-detection of standardized response transformation
+  * Fix to a scoping issue in `emtrends()` (#201)
+  * Bug fix for #197 created a new issue #206. Both now fixed.
+  * Non-existent reference levels in `trt.vs.ctrl.emmc()` now 
+    throws an error (#208)
+  * Added a default for `linfct` (the identity) to `emmobj` 
+  * Provisions for more flexible and consistent labeling/naming of results.
+    This includes added `emm_options` `"sep"` and `"parens"`,
+    and a `parens` argument in `contrast()`. 
+    `sep` controls how factor levels are combined when ploted or contrasted,
+    and `parens` sets whether, what, and how labels are parenthesized
+    in `contrast()`. In constructing contrasts of contrasts, for example,
+    labels like `A - B - C - D` are now `(A - B) - (C - D)`, by default. 
+    To reproduce old labeling, do `emm_options(sep = ",", parens = "a^")
+  
+
+
+emmeans 1.4.7
 -------------
 
   * Repairs to `pwpp()` so it plays nice with nonestimable cases

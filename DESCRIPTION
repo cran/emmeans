@@ -1,8 +1,8 @@
 Package: emmeans
 Type: Package
 Title: Estimated Marginal Means, aka Least-Squares Means
-Version: 1.4.7
-Date: 2020-05-25
+Version: 1.4.8
+Date: 2020-06-26
 Authors@R: c(person("Russell", "Lenth", role = c("aut", "cre", "cph"), 
     email = "russell-lenth@uiowa.edu"),
     person("Henrik", "Singmann", role = "ctb"),
@@ -32,10 +32,10 @@ Description: Obtain estimated marginal means (EMMs) for many linear, generalized
   Statistician 34(4), 216-221 <doi:10.1080/00031305.1980.10483031>.
 License: GPL-2 | GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.0.1
+RoxygenNote: 7.1.0
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2020-05-25 17:01:07 UTC; rlenth
+Packaged: 2020-06-26 16:21:46 UTC; rlenth
 Author: Russell Lenth [aut, cre, cph],
   Henrik Singmann [ctb],
   Jonathon Love [ctb],
@@ -43,4 +43,4 @@ Author: Russell Lenth [aut, cre, cph],
   Maxime Herve [ctb]
 Maintainer: Russell Lenth <russell-lenth@uiowa.edu>
 Repository: CRAN
-Date/Publication: 2020-05-25 17:40:06 UTC
+Date/Publication: 2020-06-26 18:20:08 UTC

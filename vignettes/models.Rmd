@@ -430,7 +430,9 @@ name its levels. In other models such as a multinomial model, use the
 `mode` argument to specify the type of model, and `trait = <factor name>` 
 to specify the name of the data column that contains the levels of the factor response.
 
-The **brms** package version 2.13 and later, has its own `emmeans` support. Refer to the documentation in that package.
+The **brms** package version 2.13 and later, has its own `emmeans` support. 
+Refer to the documentation in that package.
+
 
 [Back to quick reference](#quickref)
 

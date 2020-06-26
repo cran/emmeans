@@ -76,6 +76,44 @@ pairs(piglog.emm.s, type = "response")
 ## ---- eval = FALSE--------------------------------------------------------------------------------
 #  regrid(emm, transform = "probit")
 
+## ---- message = FALSE-----------------------------------------------------------------------------
+fiber.lm <- lm(scale(strength) ~ machine * scale(diameter), data = fiber)
+emmeans(fiber.lm, "machine")   # on the standardized scale
+emmeans(fiber.lm, "machine", type = "response")   # strength scale
+
+## -------------------------------------------------------------------------------------------------
+emtrends(fiber.lm, "machine", var = "diameter")
+
+## -------------------------------------------------------------------------------------------------
+emtrends(fiber.lm, "machine", var = "diameter", transform = "response")
+
+## -------------------------------------------------------------------------------------------------
+with(fiber, c(mean = mean(diameter), sd = sd(diameter)))
+emtrends(fiber.lm, "machine", var = "scale(diameter, 24.133, 4.324)")
+
+## -------------------------------------------------------------------------------------------------
+coef(fiber.lm)[4:6]
+
+## ---- eval = FALSE--------------------------------------------------------------------------------
+#  mod <- some.fcn(scale(RT) ~ group + (1|subject), data = mydata)
+#  emmeans(mod, "group", type = "response",
+#          tran = make.tran("scale", y = mydata$RT))
+
+## ---- eval = FALSE--------------------------------------------------------------------------------
+#  mod <- with(make.tran("scale", y = mydata$RT),
+#              some.fcn(linkfun(RT) ~ group + (1|subject), data = mydata))
+#  emmeans(mod, "group", type = "response")
+
+## ---- message = FALSE-----------------------------------------------------------------------------
+fib.lm <- lm(strength ~ machine * diameter, data = fiber)
+
+# On raw scale:
+emmeans(fib.lm, "machine")
+
+# On standardized scale:
+tran <- make.tran("scale", y = fiber$strength)
+emmeans(fib.lm, "machine", transform = tran)
+
 ## -------------------------------------------------------------------------------------------------
 sigma(pigs.lm)
 

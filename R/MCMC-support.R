@@ -529,14 +529,6 @@ recover_data.stanreg = function(object, ...) {
 
 # note: mode and rescale are ignored for some models
 emm_basis.stanreg = function(object, trms, xlev, grid, mode, rescale, ...) {
-    m = model.frame(trms, grid, na.action = na.pass, xlev = xlev)
-    if(is.null(contr <- object$contrasts))
-        contr = attr(model.matrix(object), "contrasts")
-    X = model.matrix(trms, m, contrasts.arg = contr)
-    bhat = rstanarm::fixef(object)
-    nms = intersect(colnames(X), names(bhat))
-    bhat = bhat[nms]
-    V = vcov(object)[nms, nms]
     misc = list()
     if (!is.null(object$family)) {
         if (is.character(object$family)) # work around bug for stan_polr
@@ -544,6 +536,23 @@ emm_basis.stanreg = function(object, trms, xlev, grid, mode, rescale, ...) {
         else
             misc = .std.link.labels(object$family, misc)
     }
+    # Previous code...
+    ### m = model.frame(trms, grid, na.action = na.pass, xlev = xlev)
+    ### if(is.null(contr <- object$contrasts))
+    ###     contr = attr(model.matrix(object), "contrasts")
+    ### X = model.matrix(trms, m, contrasts.arg = contr)
+    ### bhat = rstanarm::fixef(object)
+    ### nms = intersect(colnames(X), names(bhat))
+    ### bhat = bhat[nms]
+    ### V = vcov(object)[nms, nms, drop = FALSE]
+
+    # Instead, use internal routine in rstanarm to get the model matrix
+    # Later, we'll get bhat and V from the posterior sample because
+    # the vcov(object) doesn't always jibe with fixef(object)
+    pp_data = get("pp_data", envir = getNamespace("rstanarm"))
+    X = pp_data(object, newdata = grid, re.form = ~0, ...)[[1]]
+    nms = colnames(X)
+    
     if(!is.null(object$zeta)) {   # Polytomous regression model
         if (missing(mode))
             mode = "latent"
@@ -581,16 +590,24 @@ emm_basis.stanreg = function(object, trms, xlev, grid, mode, rescale, ...) {
     }
     samp = as.matrix(object$stanfit)[, nms, drop = FALSE]
     attr(samp, "n.chains") = object$stanfit@sim$chains
+
+    bhat = apply(samp, 2, mean)
+    V = cov(samp)
+    
     # estimability...
     nbasis = estimability::all.estble
     all.nms = colnames(X)
     if (length(nms) < length(all.nms)) {
+        if(is.null(contr <- object$contrasts))
+            contr = attr(model.matrix(object), "contrasts")
         coef = NA * X[1, ]
         coef[names(bhat)] = bhat
         bhat = coef
         mmat = model.matrix(trms, object$data, contrasts.arg = contr)
         nbasis = estimability::nonest.basis(mmat)
     }
+    
+    
     list(X = X, bhat = bhat, nbasis = nbasis, V = V, 
          dffun = function(k, dfargs) Inf, dfargs = list(), 
          misc = misc, post.beta = samp)
