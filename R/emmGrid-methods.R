@@ -269,6 +269,35 @@ vcov.emmGrid = function(object, ...) {
 #' \emph{Note:} All six letters of \code{levels} is needed in order to distinguish
 #' it from \code{level}.}
 #' 
+#' \item{\code{submodel}}{\code{formula} or \code{character} value specifying a 
+#' submodel (requires this feature being supported by underlying methods 
+#' for the model class). When specified, the \code{linfct} slot is replaced by 
+#' its aliases for the specified sub-model. Any factors in the sub-model that 
+#' do not appear in the model matrix are ignored, as are any interactions that 
+#' are not in the main model, and any factors associate with multivariate responses. 
+#' The estimates displayed are then computed as if 
+#' the sub-model had been fitted. (However, the standard errors will be based on the
+#' error variance(s) of the full model.) 
+#' \emph{Note:} The formula should refer only to predictor names, \emph{excluding} any
+#' function calls (such as \code{factor} or \code{poly}) that appear in the 
+#' original model formula. See the example.
+#' 
+#' The character values allowed should partially 
+#' match \code{"minimal"} or \code{"type2"}. With \code{"minimal"}, the sub-model
+#' is taken to be the one only involving the surviving factors in \code{object}
+#' (the ones averaged over being omitted). Specifying \code{"type2"} is the same as
+#' \code{"minimal"} except only the highest-order term in the submodel is retained,
+#' and all effects not containing it are orthogonalized-out. Thus, in a purely linear
+#' situation such as an \code{lm} model, the joint test
+#' of the modified object is in essence a type-2 test as in \code{car::Anova}.
+#' 
+#' For some objects such as generalized linear models, specifying \code{submodel}
+#' will typically not produce the same estimates or type-2 tests as would be
+#' obtained by actually fitting a separate model with those specifications.
+#' The reason is that those models are fitted by iterative-reweighting methods,
+#' whereas the \code{submodel} calculations preserve the final weights used in
+#' fitting the full model.}
+#' 
 #' \item{(any other slot name)}{If the name matches an element of
 #' \code{slotNames(object)} other than \code{levels}, that slot is replaced by 
 #' the supplied value, if it is of the required class (otherwise an error occurs). 
@@ -286,19 +315,26 @@ vcov.emmGrid = function(object, ...) {
 #' is called, because it probably will not make sense to do the same 
 #' calculations on the contrast results, and in fact the variable(s) needed
 #' may not even still exist.
+#' \code{factor(percent)}.
 #'
 #' @seealso \code{\link{emm_options}}
 #' @examples
 #' # Using an already-transformed response:
-#' mypigs <- transform(pigs, logconc = log(pigs$conc))
-#' mypigs.lm <- lm(logconc ~ source + factor(percent), data = mypigs)
+#' pigs.lm <- lm(log(conc) ~ source * factor(percent), data = pigs)
 #' 
 #' # Reference grid that knows about the transformation
 #' # and asks to include the sample size in any summaries:
-#' mypigs.rg <- update(ref_grid(mypigs.lm), tran = "log", 
+#' pigs.rg <- update(ref_grid(pigs.lm), tran = "log", 
 #'                     predict.type = "response",
 #'                     calc = c(n = ~.wgt.))
-#' emmeans(mypigs.rg, "source")
+#' emmeans(pigs.rg, "source")
+#' 
+#' # Obtain estimates for the additive model
+#' # [Note that the submodel refers to 'percent', note 'factor(percent)']
+#' emmeans(pigs.rg, "source", submodel = ~ source + percent)
+#' 
+#' # Type II ANOVA
+#' joint_tests(pigs.rg, submodel = "type2")
 update.emmGrid = function(object, ..., silent = FALSE) {
     args = list(...)
     # see .valid.misc below this function for list of legal options
@@ -354,6 +390,24 @@ update.emmGrid = function(object, ..., silent = FALSE) {
                         object@misc$display = .find.nonempty.nests(object, nms)
                     }
                 }
+                if (fullname == "submodel") {
+                    if(!is.null(A <- .alias.matrix(object, args[[nm]]))) {
+                        rcols = attr(A, "rcols")
+                        L = object@linfct
+                        k = ncol(L) / ncol(A)
+                        if(abs(k - (k<-as.integer(k))) > .01)
+                            stop("Incompatible columns in alias setup")
+                        ixmat = matrix(seq_along(L[1,]), ncol = k)
+                        for (j in seq_len(k)) {
+                            rc = ixmat[rcols, j]
+                            fc =ixmat[, j]
+                            object@linfct[, fc] = L[, rc, drop = FALSE] %*% A
+                        }
+                        object@model.info$model.matrix = "" # silent message
+                        misc$initMesg = c(misc$initMesg, paste("submodel: ~", attr(A, "submodstr")))
+                    }
+                }
+                    
                 else
                     misc[[fullname]] = args[[nm]]
             }
@@ -366,8 +420,9 @@ update.emmGrid = function(object, ..., silent = FALSE) {
 ### List of valid strings to match in update() ###
 .valid.misc = c("adjust","alpha","avgd.over","bias.adjust","by.vars","calc","delta","df",
                "initMesg","estName","estType","famSize","frequentist","infer","inv.lbl",
-               "level","methDesc","nesting","null","predict.type","pri.vars"
-               ,"side","sigma","tran","tran.mult","tran.offset","tran2","type","is.new.rg")
+               "level","methDesc","nesting","null","predict.type","pri.vars",
+               "side","sigma","tran","tran.mult","tran.offset","tran2","type","is.new.rg",
+               "submodel")
 
 
 #' Set or change emmeans options
@@ -375,6 +430,12 @@ update.emmGrid = function(object, ..., silent = FALSE) {
 #' Use \code{emm_options} to set or change various options that are used in
 #' the \pkg{emmeans} package. These options are set separately for different contexts in
 #' which \code{emmGrid} objects are created, in a named list of option lists.
+#' 
+#' \pkg{emmeans}'s options are stored as a list in the system option \code{"emmeans"}. 
+#' Thus, \code{emm_options(foo = bar)} is the same as 
+#' \code{options(emmeans = list(..., foo = bar))} where \code{...} represents any
+#' previously existing options. The list \code{emm_defaults} contains the default
+#' values in case the corresponding element of system option \code{emmeans} is \code{NULL}.
 #' 
 #' Currently, the following main list entries are supported:
 #' \describe{
@@ -449,9 +510,32 @@ update.emmGrid = function(object, ..., silent = FALSE) {
 #' } %%%%%% end \describe
 #'
 #' @param ... Option names and values (see Details)
+#' @param disable If non-missing, this will reset all options to their defaults 
+#'   if \code{disable} tests \code{TRUE} (but first save them for possible later 
+#'   restoration). Otherwise, all previously saved options
+#'   are restored. This is important for bug reporting; please see the section below
+#'   on reproducible bugs. When \code{disable} is specified, the other arguments are ignored.
 #' 
 #' @return \code{emm_options} returns the current options (same as the result 
 #'   of \samp{getOption("emmeans")}) -- invisibly, unless called with no arguments.
+#' 
+#' @section Reproducible bugs:
+#' Most options set display attributes and such that are not likely to be associated
+#' with bugs in the code. However, some other options (e.g., \code{cov.keep})
+#' are essentially configuration settings that may affect how/whether the code
+#' runs, and the settings for these options may cause subtle effects that may be
+#' hard to reproduce. Therefore, when sending a bug report, please create a reproducible
+#' example and make sure the bug occurs with all options set at their defaults.
+#' This is done by preceding it with  \code{emm_options(disable = TRUE)}. 
+#' 
+#' By the way, \code{disable} works like a stack (LIFO buffer), in that \code{disable = TRUE}
+#' is equivalent to \code{emm_options(saved.opts = emm_options())} and 
+#' \code{emm_options(disable = FALSE)} is equivalent to 
+#' \code{options(emmeans = get_emm_option("saved.opts"))}. To completely erase
+#' all options, use \code{options(emmeans = NULL)}
+#' 
+#' 
+#' 
 #' @seealso \code{\link{update.emmGrid}}
 #' @export
 #' @examples
@@ -473,17 +557,35 @@ update.emmGrid = function(object, ..., silent = FALSE) {
 #' 
 #' # See tolerance being used for determining estimability
 #' get_emm_option("estble.tol")
+#' 
+#' \dontrun{
+#' # Set all options to their defaults
+#' emm_options(disable = TRUE)
+#' # ... and perhaps follow with code for a minimal reproducible bug,
+#' #     which may include emm_options() clls if they are pertinent ...
+#' 
+#' # restore options that had existed previously
+#' emm_options(disable = FALSE)
+#' }
 #'
-emm_options = function(...) {
+emm_options = function(..., disable) {
     opts = getOption("emmeans", list())
-    #    if (is.null(opts)) opts = list()
     newopts = list(...)
+    display = TRUE  # flag to display all options if ... is empty
+    if (!missing(disable)) {
+        if (disable)
+            opts = list(saved.opts = opts)
+        else if (!is.null(saved <- opts$saved.opts))
+            opts = saved
+        newopts = list()
+        display = FALSE
+    }
     for (nm in names(newopts))
         opts[[nm]] = newopts[[nm]]
     options(emmeans = opts)
     if (length(newopts) > 0)
         invisible(opts)
-    else {
+    else if (display) {
         opts = c(opts, emm_defaults)
         opts[sort(names(opts))]
     }
@@ -781,6 +883,7 @@ regrid = function(object, transform = c("response", "mu", "unlink", "none", "pas
     # Nix out things that are no longer needed or valid
     object@grid$.offset. = object@misc$offset.mult =
         object@misc$estHook = object@misc$vcovHook = NULL
+    object@model.info$model.matrix = "Submodels are not available with regridded objects"
     if(!missing(predict.type))
         object = update(object, predict.type = predict.type)
     object

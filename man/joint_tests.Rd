@@ -4,11 +4,12 @@
 \alias{joint_tests}
 \title{Compute joint tests of the terms in a model}
 \usage{
-joint_tests(object, by = NULL, show0df = FALSE, ...)
+joint_tests(object, by = NULL, show0df = FALSE, cov.reduce = range, ...)
 }
 \arguments{
-\item{object}{a fitted model or an \code{emmGrid}. If a fitted model, it is
-replaced by \code{ref_grid(object, cov.reduce = range, ...)}}
+\item{object, cov.reduce}{\code{object} is a fitted model or an \code{emmGrid}. 
+If a fitted model, it is
+replaced by \code{ref_grid(object, cov.reduce = cov.reduce, ...)}}
 
 \item{by}{character names of \code{by} variables. Separate sets of tests are
 run for each combination of these.}
@@ -63,10 +64,11 @@ toy.cov = lm(resp ~ treat * female, data = toy)
 # (These two models have identical fitted values and residuals)
 
 joint_tests(toy.fac)
+joint_tests(toy.cov)   # female is regarded as a 2-level factor by default
 
-joint_tests(toy.cov)                      # ref grid uses mean(female) = 0.4
-joint_tests(toy.cov, cov.reduce = FALSE)  # ref grid uses female = c(0, 1) 
-joint_tests(toy.cov, at = list(female = c(-1, 1)))  # center on intercept
+joint_tests(toy.cov, at = list(female = 0.5))
+joint_tests(toy.cov, cov.keep = 0)   # i.e., female = mean(toy$female)
+joint_tests(toy.cov, at = list(female = 0))
 
 # -- Compare with SAS output -- female as factor --
 ## Source          DF    Type III SS    Mean Square   F Value   Pr > F

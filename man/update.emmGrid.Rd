@@ -32,6 +32,7 @@ For example, a \code{calc} option will be nulled-out if \code{contrast}
 is called, because it probably will not make sense to do the same 
 calculations on the contrast results, and in fact the variable(s) needed
 may not even still exist.
+\code{factor(percent)}.
 }
 \section{Details}{
 
@@ -156,6 +157,35 @@ and resets \code{pri.vars}, \code{by.vars}, \code{adjust}, \code{famSize},
 \emph{Note:} All six letters of \code{levels} is needed in order to distinguish
 it from \code{level}.}
 
+\item{\code{submodel}}{\code{formula} or \code{character} value specifying a 
+submodel (requires this feature being supported by underlying methods 
+for the model class). When specified, the \code{linfct} slot is replaced by 
+its aliases for the specified sub-model. Any factors in the sub-model that 
+do not appear in the model matrix are ignored, as are any interactions that 
+are not in the main model, and any factors associate with multivariate responses. 
+The estimates displayed are then computed as if 
+the sub-model had been fitted. (However, the standard errors will be based on the
+error variance(s) of the full model.) 
+\emph{Note:} The formula should refer only to predictor names, \emph{excluding} any
+function calls (such as \code{factor} or \code{poly}) that appear in the 
+original model formula. See the example.
+
+The character values allowed should partially 
+match \code{"minimal"} or \code{"type2"}. With \code{"minimal"}, the sub-model
+is taken to be the one only involving the surviving factors in \code{object}
+(the ones averaged over being omitted). Specifying \code{"type2"} is the same as
+\code{"minimal"} except only the highest-order term in the submodel is retained,
+and all effects not containing it are orthogonalized-out. Thus, in a purely linear
+situation such as an \code{lm} model, the joint test
+of the modified object is in essence a type-2 test as in \code{car::Anova}.
+
+For some objects such as generalized linear models, specifying \code{submodel}
+will typically not produce the same estimates or type-2 tests as would be
+obtained by actually fitting a separate model with those specifications.
+The reason is that those models are fitted by iterative-reweighting methods,
+whereas the \code{submodel} calculations preserve the final weights used in
+fitting the full model.}
+
 \item{(any other slot name)}{If the name matches an element of
 \code{slotNames(object)} other than \code{levels}, that slot is replaced by 
 the supplied value, if it is of the required class (otherwise an error occurs). 
@@ -169,15 +199,21 @@ conform.}
 
 \examples{
 # Using an already-transformed response:
-mypigs <- transform(pigs, logconc = log(pigs$conc))
-mypigs.lm <- lm(logconc ~ source + factor(percent), data = mypigs)
+pigs.lm <- lm(log(conc) ~ source * factor(percent), data = pigs)
 
 # Reference grid that knows about the transformation
 # and asks to include the sample size in any summaries:
-mypigs.rg <- update(ref_grid(mypigs.lm), tran = "log", 
+pigs.rg <- update(ref_grid(pigs.lm), tran = "log", 
                     predict.type = "response",
                     calc = c(n = ~.wgt.))
-emmeans(mypigs.rg, "source")
+emmeans(pigs.rg, "source")
+
+# Obtain estimates for the additive model
+# [Note that the submodel refers to 'percent', note 'factor(percent)']
+emmeans(pigs.rg, "source", submodel = ~ source + percent)
+
+# Type II ANOVA
+joint_tests(pigs.rg, submodel = "type2")
 }
 \seealso{
 \code{\link{emm_options}}

@@ -239,8 +239,8 @@
 #' emmip(nutr.emm, race ~ group)
 #' 
 #' # Hispanics seem exceptional; but this doesn't test out due to very sparse data
-#' CLD(nutr.emm, by = "group")
-#' CLD(nutr.emm, by = "race")
+#' pairs(nutr.emm, by = "group")
+#' pairs(nutr.emm, by = "race")
 "nutrition"
 
 
@@ -263,7 +263,7 @@
 #'   \item{\code{sales1}}{a numeric vector. Sales (per customer) of variety 1.}
 #'   \item{\code{sales2}}{a numeric vector. Sales (per customer) of variety 2.}
 #' }
-#' @source SAS sample dataset. Download from \url{http://ftp.sas.com/samples/A56655}.
+#' @source This is (or once was) available as a SAS sample dataset. 
 #' @references
 #' Littell, R., Stroup W., Freund, R. (2002) \emph{SAS For Linear Models} (4th
 #' edition). SAS Institute. ISBN 1-59047-023-0.
@@ -305,3 +305,35 @@
 #'   pigs.lm <- lm(log(conc) ~ source + factor(percent), data = pigs)
 #'   emmeans(pigs.lm, "source")
 "pigs"
+
+### ubds ###
+#' Unbalanced dataset
+#' 
+#' This is a simulated unbalanced dataset with three factors
+#' and two numeric variables. There are true relationships among these variables.
+#' This dataset can be useful in testing or illustrating messy-data situations.
+#' There are no missing data, and there is at least one observation for every 
+#' factor combination; however, the \code{"cells"} attribute makes it simple
+#' to construct subsets that have empty cells.
+#' 
+#' @format A data frame with 100 observations, 5 variables,
+#'   and a special \code{"cells"} attribute:
+#' \describe{
+#'   \item{A}{Factor with levels 1, 2, and 3}
+#'   \item{B}{Factor with levels 1, 2, and 3}
+#'   \item{C}{Factor with levels 1, 2, and 3}
+#'   \item{x}{A numeric variable}
+#'   \item{y}{A numeric variable}
+#' }
+#' In addition, \code{attr(ubds, "cells")} consists of a named list of length 27 with the row numbers for
+#' each combination of \code{A, B, C}. For example, 
+#' \code{attr(ubds, "cells")[["213"]]} has the row numbers corresponding
+#' to levels \code{A == 2, B == 1, C == 3}. The entries are ordered by
+#' length, so the first entry is the cell with the lowest frequency.
+#' @examples
+#'  # Omit the three lowest-frequency cells
+#'  low3 <- unlist(attr(ubds, "cells")[1:3]) 
+#'  messy.lm <- lm(y ~ (x + A + B + C)^3, data = ubds, subset = -low3)
+#'   
+
+"ubds"

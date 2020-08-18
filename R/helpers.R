@@ -38,7 +38,9 @@ emm_basis.lm = function(object, trms, xlev, grid, ...) {
     bhat = object$coefficients
     nm = if(is.null(names(bhat))) row.names(bhat) else names(bhat)
     m = suppressWarnings(model.frame(trms, grid, na.action = na.pass, xlev = xlev))
-    X = model.matrix(trms, m, contrasts.arg = object$contrasts)[, nm, drop = FALSE]
+    X = model.matrix(trms, m, contrasts.arg = object$contrasts)
+    assign = attr(X, "assign")
+    X = X[, nm, drop = FALSE]
     bhat = as.numeric(bhat) 
     # stretches it out if multivariate - see mlm method
     V = .my.vcov(object, ...)
@@ -57,7 +59,8 @@ emm_basis.lm = function(object, trms, xlev, grid, ...) {
         dfargs = list(df = object$df.residual)
         dffun = function(k, dfargs) dfargs$df
     }
-    list(X=X, bhat=bhat, nbasis=nbasis, V=V, dffun=dffun, dfargs=dfargs, misc=misc)
+    list(X=X, bhat=bhat, nbasis=nbasis, V=V, dffun=dffun, dfargs=dfargs, misc=misc,
+         model.matrix = .cmpMM(object$qr, assign = assign))
 }
 
 
@@ -220,7 +223,11 @@ emm_basis.merMod = function(object, trms, xlev, grid, vcov.,
     else
         nbasis=estimability::all.estble
     
-    list(X=X, bhat=bhat, nbasis=nbasis, V=V, dffun=dffun, dfargs=dfargs, misc=misc)
+    mm = .cmpMM(object@pp$X, object@pp$Xwts^2,
+                attr(object@pp$X, "assign"))
+    
+    list(X=X, bhat=bhat, nbasis=nbasis, V=V, dffun=dffun, dfargs=dfargs, misc=misc,
+         model.matrix = mm)
 }
 
 
@@ -241,7 +248,9 @@ recover_data.lme = function(object, data, ...) {
         else
             fcall$weights = nlme::varWeights(object$modelStruct)
     }
-    recover_data(fcall, delete.response(object$terms), object$na.action, data = data, ...)
+    dat = recover_data(fcall, delete.response(object$terms), object$na.action, data = data, ...)
+    attr(dat, "pass.it.on") = TRUE
+    dat
 }
 
 #' @export
@@ -298,8 +307,15 @@ emm_basis.lme = function(object, trms, xlev, grid,
         dfargs = list(dfx = dfx)
     }
     attr(dffun, "mesg") = mode
+    
+    # submodel support (not great -- omits any weights)
+    m = model.frame(trms, attr(object, "data"), na.action = na.pass, xlev = xlev)
+    mm = model.matrix(trms, m, contrasts.arg = contrasts)
+    mm = .cmpMM(mm, assign = attr(mm, "assign"))
+    
     list(X = X, bhat = bhat, nbasis = nbasis, V = V, 
-         dffun = dffun, dfargs = dfargs, misc = misc)
+         dffun = dffun, dfargs = dfargs, misc = misc,
+         model.matrix = mm)
 }
 
 # Here is a total hack, but it works pretty well
@@ -308,6 +324,14 @@ emm_basis.lme = function(object, trms, xlev, grid,
 # regressing the changes in V against the changes in the 
 # covariance parameters
 gradV.kludge = function(object, Vname = "varFix", call = object$call$fixed, data = object$data) {
+    # check consistency of contrasts
+    cnm = names(object$contrasts)
+    cdiff = sapply(cnm, function(.) max(abs(contrasts(data[[.]]) - object$contrasts[[.]])))
+    if (max(cdiff) > 1e-6) {
+        message("Contrasts don't match those used when the model was fitted. Fix this and re-run")
+        stop()
+    }
+    
     A = object$apVar
     theta = attr(A, "Pars")
     V = object[[Vname]]
@@ -388,6 +412,7 @@ recover_data.gls = function(object, data, ...) {
         result[["(weights)"]] = wts
     if (!missing(data))
         attr(result, "misc") = list(data = data)
+    attr(result, "pass.it.on") = TRUE
     result
 }
 
@@ -444,7 +469,14 @@ emm_basis.gls = function(object, trms, xlev, grid,
         dffun = function(k, dfargs) dfargs$df
     }
     attr(dffun, "mesg") = mode
-    list(X=X, bhat=bhat, nbasis=nbasis, V=V, dffun=dffun, dfargs=dfargs, misc=misc)
+    
+    # submodel support (not great because I don't know how to retrieve the weights)
+    m = model.frame(trms, attr(object, "data"), na.action = na.pass, xlev = xlev)
+    mm = model.matrix(trms, m, contrasts.arg = contrasts)
+    mm = .cmpMM(mm, assign = attr(mm, "assign"))
+    
+    list(X=X, bhat=bhat, nbasis=nbasis, V=V, dffun=dffun, dfargs=dfargs, misc=misc,
+         model.matrix = mm)
 }
 
 

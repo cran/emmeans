@@ -2,17 +2,24 @@
 % Please edit documentation in R/summary.R, R/test.R
 \name{summary.emmGrid}
 \alias{summary.emmGrid}
-\alias{predict.emmGrid}
-\alias{as.data.frame.emmGrid}
-\alias{[.summary_emm}
 \alias{confint.emmGrid}
 \alias{test}
 \alias{test.emmGrid}
+\alias{predict.emmGrid}
+\alias{as.data.frame.emmGrid}
+\alias{[.summary_emm}
 \title{Summaries, predictions, intervals, and tests for \code{emmGrid} objects}
 \usage{
 \method{summary}{emmGrid}(object, infer, level, adjust, by, type, df, calc,
   null, delta, side, frequentist,
   bias.adjust = get_emm_option("back.bias.adj"), sigma, ...)
+
+\method{confint}{emmGrid}(object, parm, level = 0.95, ...)
+
+test(object, null, ...)
+
+\method{test}{emmGrid}(object, null = 0, joint = FALSE, verbose = FALSE,
+  rows, by, status = FALSE, ...)
 
 \method{predict}{emmGrid}(object, type, interval = c("none", "confidence",
   "prediction"), level = 0.95,
@@ -21,13 +28,6 @@
 \method{as.data.frame}{emmGrid}(x, row.names = NULL, optional = FALSE, ...)
 
 \method{[}{summary_emm}(x, ..., as.df = TRUE)
-
-\method{confint}{emmGrid}(object, parm, level = 0.95, ...)
-
-test(object, null, ...)
-
-\method{test}{emmGrid}(object, null = 0, joint = FALSE, verbose = FALSE,
-  rows, by, status = FALSE, ...)
 }
 \arguments{
 \item{object}{An object of class \code{"emmGrid"} (see \link{emmGrid-class})}
@@ -112,21 +112,6 @@ In \code{as.data.frame.emmGrid}, \code{confint.emmGrid},
 \code{test.emmGrid}, these arguments are passed to
 \code{summary.emmGrid}.}
 
-\item{interval}{Type of interval desired (partial matching is allowed): 
-\code{"none"} for no intervals,
-  otherwise confidence or prediction intervals with given arguments, 
-  via \code{\link{confint.emmGrid}}.}
-
-\item{x}{object of the given class}
-
-\item{row.names}{passed to \code{\link{as.data.frame}}}
-
-\item{optional}{passed to \code{\link{as.data.frame}}}
-
-\item{as.df}{Logical value. With \code{x[..., as.df = TRUE]}, the result is
-object is coerced to an ordinary \code{\link{data.frame}}; otherwise, it is left as a 
-\code{summary_emm} object.}
-
 \item{parm}{(Required argument for \code{confint} methods, but not used)}
 
 \item{joint}{Logical value. If \code{FALSE}, the arguments are passed to 
@@ -148,6 +133,21 @@ ignored.}
 flags (for rank deficiencies and estimability issues) is displayed even 
 when empty. If \code{FALSE}, the column is included only if there are 
 such issues.}
+
+\item{interval}{Type of interval desired (partial matching is allowed): 
+\code{"none"} for no intervals,
+  otherwise confidence or prediction intervals with given arguments, 
+  via \code{\link{confint.emmGrid}}.}
+
+\item{x}{object of the given class}
+
+\item{row.names}{passed to \code{\link{as.data.frame}}}
+
+\item{optional}{passed to \code{\link{as.data.frame}}}
+
+\item{as.df}{Logical value. With \code{x[..., as.df = TRUE]}, the result is
+object is coerced to an ordinary \code{\link{data.frame}}; otherwise, it is left as a 
+\code{summary_emm} object.}
 }
 \value{
 \code{summary.emmGrid}, \code{confint.emmGrid}, and

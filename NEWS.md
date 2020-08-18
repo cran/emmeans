@@ -1,5 +1,27 @@
 ## NEWS for the emmeans package
 
+emmeans 1.5.0
+-------------
+
+  * Changed help page for `joint_tests()` to reflect `cov.keep` (ver. 1.4.2)
+  * `emm_options()` gains a `disable` argument to use for setting aside
+    any existing options. Useful for reproducible bug reporting.
+  * In `emmeans()` with a `contr` argument or two-sided formula, we now suppress
+    several particular `...` arguments from being passed on to `contrast()`
+    when they should apply only to the construction of the EMMs (#214)
+  * More control of what `...` arguments are passed to methods
+  * `CLD()` was deprecated in version 1.3.4. THIS IS THE LAST VERSION where it
+    will continue to be available. Users should use `multcomp::cld()` instead,
+    for which an `emmGrid`  method will continue to exist.
+  * Experimental `submodel` option
+      * Bug fix therein (#217)
+  * Enhancements to `mgcv::gam` support (#216)
+  * New `ubds` dataset for testing with messy situations
+  * Added minimal support for `lqm` and `lqmm` models (#213)
+  * Interim support for user-supplied contrasts for `stanreg` models (#212)
+  
+
+
 emmeans 1.4.8
 -------------
 

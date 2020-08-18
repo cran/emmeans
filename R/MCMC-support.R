@@ -99,20 +99,20 @@
 #' @method as.mcmc emmGrid
 #' @export as.mcmc.emmGrid
 #' @examples
-#' require("coda")
-#'
-#' ### A saved reference grid for a mixed logistic model (see lme4::cbpp)
-#' cbpp.rg <- do.call(emmobj, 
+#' if(requireNamespace("coda")) {
+#'   ### A saved reference grid for a mixed logistic model (see lme4::cbpp)
+#'   cbpp.rg <- do.call(emmobj, 
 #'     readRDS(system.file("extdata", "cbpplist", package = "emmeans")))
-#' # Predictive distribution for herds of size 20
-#' # (perhaps a bias adjustment should be applied; see "sophisticated" vignette)
-#' pred.incidence <- as.mcmc(regrid(cbpp.rg), likelihood = "binomial", trials = 20)
+#'   # Predictive distribution for herds of size 20
+#'   # (perhaps a bias adjustment should be applied; see "sophisticated" vignette)
+#'   pred.incidence <- coda::as.mcmc(regrid(cbpp.rg), likelihood = "binomial", trials = 20)
+#' }
 as.mcmc.emmGrid = function(x, names = TRUE, sep.chains = TRUE, 
                            likelihood, NE.include = FALSE, ...) {
     if (is.na(x@post.beta[1])) {
         stop("No posterior sample -- can't make an 'mcmc' object")
     }
-# notes on estimabilityn issues:
+# notes on estimability issues:
 # 1. Use @bhat to determine which coefs to use
 # 2. @nabasis as in freq models
 # 3. @post.beta we will EXCLUDE cols corresp to NAs in @bhat
@@ -549,6 +549,8 @@ emm_basis.stanreg = function(object, trms, xlev, grid, mode, rescale, ...) {
     # Instead, use internal routine in rstanarm to get the model matrix
     # Later, we'll get bhat and V from the posterior sample because
     # the vcov(object) doesn't always jibe with fixef(object)
+    if(is.null(object$contrasts)) # old version of rstanarm where contrasts may get lost.
+        object$contrasts = attr(model.matrix(object), "contrasts")
     pp_data = get("pp_data", envir = getNamespace("rstanarm"))
     X = pp_data(object, newdata = grid, re.form = ~0, ...)[[1]]
     nms = colnames(X)

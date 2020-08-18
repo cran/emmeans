@@ -520,7 +520,7 @@ ref_grid <- function(object, at, cov.reduce = mean, cov.keep = get_emm_option("c
     if (!is.null(delts)) # add increments if any
         grid[[var]] = grid[[var]] + rep(delts, each = n.orig)
     
-    if (!is.null(attr(data, "pass.it.on")))   # a hook needed by emm_basis.gamlss
+    if (!is.null(attr(data, "pass.it.on")))   # a hook needed by emm_basis.gamlss et al.
         attr(object, "data") = data
     
     # we've added args `misc` and `options` so emm_basis methods can access and use these if they want
@@ -690,6 +690,10 @@ ref_grid <- function(object, at, cov.reduce = mean, cov.keep = get_emm_option("c
     grid[[".wgt."]] = wgt
     
     model.info = list(call = attr(data,"call"), terms = trms, xlev = xlev)
+    if (!is.null(mm <- basis$model.matrix)) { # submodel support
+        attr(mm, "factors") = .smpFT(trms)
+        model.info$model.matrix = mm  
+    }
     # Detect any nesting structures
     nst = .find_nests(grid, trms, coerced$orig, ref.levels)
     if (length(nst) > 0)

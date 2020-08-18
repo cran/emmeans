@@ -73,29 +73,63 @@ emm_basis.Gam = function(object, trms, xlev, grid, nboot = 800, ...) {
 
 ### emm_basis method for mgcv::gam objects
 ### extra arg `unconditional` and `freq` as in `vcov.gam`
-emm_basis.gam = function(object, trms, xlev, grid, 
-                         freq = FALSE, unconditional = FALSE, ...) {
-    # coef() works right for lm but coef.aov tosses out NAs
+emm_basis.gam = function(object, trms, xlev, grid,
+                         freq = FALSE, unconditional = FALSE,
+                         what = c("location", "scale", "shape", "rate", "prob.gt.0"), 
+                         ...) {
     bhat = object$coefficients
-#    m = suppressWarnings(model.frame(trms, grid, na.action = na.pass, xlev = xlev))
-#    X = model.matrix(trms, m, contrasts.arg = object$contrasts)
     X = predict(object, newdata = grid, type = "lpmatrix", 
                 newdata.guaranteed = TRUE)
     bhat = as.numeric(bhat) 
-    # stretches it out if multivariate - see mlm method
     V = .my.vcov(object, freq = freq, unconditional = unconditional, ...)
+
+    fam_name = object$family$family
+    what_num = what
     
-    # if (sum(is.na(bhat)) > 0)
-    #     nbasis = estimability::nonest.basis(object$qr)
-    # else
-        nbasis = estimability::all.estble
-        misc = .std.link.labels(object$family, list())
-        # dffun = function(k, dfargs) Inf
-        # dfargs = list()
-#    else {
-        dfargs = list(df = object$df.residual)
-        dffun = function(k, dfargs) dfargs$df
-#    }
+    if (fam_name == "multinom" || fam_name == "mvn") {
+        if (!is.numeric(what)) {
+            stop("Family '", fam_name, "' requires a numeric argument 'what'")
+        }
+    } 
+    else if (is.character(what)) {
+        what = match.arg(what)
+        if (fam_name == "ziplss") {
+            what_num = switch(what, location = 1, rate = 1, prob.gt.0 = 2)
+        } 
+        else {
+            what_num = switch(what, location = 1, scale = 2, shape = 3)
+        }
+    }
+    
+    select = attr(X, "lpi")
+    if (is.null(select)) select = list(seq_along(bhat))
+    select = try(select[[what_num]], silent = TRUE)
+    
+    if (inherits(select, "try-error")) {
+        stop("Model does not have a linear predictor 'what = ", what, "'")
+    }
+    
+    bhat = bhat[select]
+    X = X[, select, drop = FALSE]
+    V = V[select, select, drop = FALSE]
+    
+    nbasis = estimability::all.estble
+    link = object$family$link[what_num]
+    if(link == "identity") # they may be lying
+        link = switch(fam_name,
+                      ocat = "logit",
+                      ziP = "log",
+                      cox.ph = "log", ## ???
+                      ziplss = c("log", "cloglog")[what_num],
+                      gevlss = c("identity", "log", "logit")[what_num],
+                      "identity")
+    misc = .std.link.labels(list(link = link, family = fam_name), list())
+    
+    if (!is.null(misc$tran) && misc$tran == "logb")  # the way this is documented is truly bizarre but I think this is right
+        misc$tran = make.tran("genlog", - environment(object$family$linfo[[what_num]]$linkfun)$b)
+
+    dfargs = list(df = object$df.residual)
+    dffun = function(k, dfargs) dfargs$df
     list(X=X, bhat=bhat, nbasis=nbasis, V=V, dffun=dffun, dfargs=dfargs, misc=misc)
 }
 
