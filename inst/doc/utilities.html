@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.5.0" />
+<meta name="author" content="emmeans package, Version 1.5.1" />
 
 
 <title>Utilities and options for emmeans</title>
@@ -33,7 +33,7 @@
 
 
 <h1 class="title toc-ignore">Utilities and options for emmeans</h1>
-<h4 class="author">emmeans package, Version 1.5.0</h4>
+<h4 class="author">emmeans package, Version 1.5.1</h4>
 
 
 
@@ -275,6 +275,7 @@ str(pigs.emm.ss)</code></pre>
 library(nlme)
 warp.gls &lt;- gls(breaks ~ treat, weights = varIdent(form = ~ 1|treat), data = warp)
 ( warp.emm &lt;- emmeans(warp.gls, &quot;treat&quot;) )</code></pre>
+<pre><code>## Warning in sweep(X, 1, sqrt(weights), &quot;*&quot;): STATS is longer than the extent of &#39;dim(x)[MARGIN]&#39;</code></pre>
 <pre class="ro"><code>##  treat emmean   SE   df lower.CL upper.CL
 ##  A.L     44.6 6.03 8.01     30.6     58.5
 ##  B.L     28.2 3.29 8.00     20.6     35.8

@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.5.0" />
+<meta name="author" content="emmeans package, Version 1.5.1" />
 
 
 <title>Working with messy data</title>
@@ -33,7 +33,7 @@
 
 
 <h1 class="title toc-ignore">Working with messy data</h1>
-<h4 class="author">emmeans package, Version 1.5.0</h4>
+<h4 class="author">emmeans package, Version 1.5.1</h4>
 
 
 
@@ -44,6 +44,7 @@
 <li><a href="#issues">Issues with observational data</a></li>
 <li><a href="#mediators">Mediating covariates</a></li>
 <li><a href="#weights">Mediating factors and weights</a></li>
+<li><a href="#submodels">Sub-models</a></li>
 <li><a href="#nesting">Nested fixed effects</a>
 <ol style="list-style-type: lower-alpha">
 <li><a href="#nest-trap">Avoiding mis-identified nesting</a></li>
@@ -161,7 +162,8 @@ framing.glm &lt;- glm(cong_mesg ~ age + income + educ + emo + gender * factor(tr
 </div>
 <div id="weights" class="section level2">
 <h2>Mediating factors and weights</h2>
-<!-- @index Factors!Mediating; `weights`; `emmeans()`!`weights` -->
+<!-- @index Factors!Mediating; `weights`; `emmeans()`!`weights`
+            Examples!`nutrition`!`weights` -->
 <p>A mediating covariate is one that is in the causal path; likewise, it is possible to have a mediating <em>factor</em>. For mediating factors, the moral equivalent of the <code>cov.reduce</code> technique described above is to use <em>weighted</em> averages in lieu of equally-weighted ones in computing EMMs. The weights used in these averages should depend on the frequencies of mediating factor(s). Usually, the <code>&quot;cells&quot;</code> weighting scheme described later in this section is the right approach. In complex situations, it may be necessary to compute EMMs in stages.</p>
 <p>As described in <a href="basics.html#emmeans">the “basics” vignette</a>, EMMs are usually defined as <em>equally-weighted</em> means of reference-grid predictions. However, there are several built-in alternative weighting schemes that are available by specifying a character value for <code>weights</code> in a call to <code>emmeans()</code> or related function. The options are <code>&quot;equal&quot;</code> (the default), <code>&quot;proportional&quot;</code>, <code>&quot;outer&quot;</code>, <code>&quot;cells&quot;</code>, and <code>&quot;flat&quot;</code>.</p>
 <p>The <code>&quot;proportional&quot;</code> (or <code>&quot;prop&quot;</code> for short) method weights proportionally to the frequencies (or model weights) of each factor combination that is averaged over. The <code>&quot;outer&quot;</code> method uses the outer product of the marginal frequencies of each factor that is being averaged over. To explain the distinction, suppose the EMMs for <code>A</code> involve averaging over two factors <code>B</code> and <code>C</code>. With <code>&quot;prop&quot;</code>, we use the frequencies for each combination of <code>B</code> and <code>C</code>; whereas for <code>&quot;outer&quot;</code>, first obtain the marginal frequencies for <code>B</code> and for <code>C</code> and weight proportionally to the product of these for each combination of <code>B</code> and <code>C</code>. The latter weights are like the “expected” counts used in a chi-square test for independence. Put another way, outer weighting is the same as proportional weighting applied one factor at a time; the following two would yield the same results:</p>
@@ -177,6 +179,82 @@ emmeans(emmeans(model, c(&quot;A&quot;, &quot;B&quot;), weights = &quot;prop&quo
 ## [3,] 2.932008 2.522821 3.142940 2.7951807 1.6103407</code></pre>
 <p>In the other hand, if we do <code>group * race</code> EMMs, only one factor (<code>age</code>) is averaged over; thus, the results for <code>&quot;prop&quot;</code> and <code>&quot;outer&quot;</code> weights will be identical in that case.</p>
 <p><a href="#contents">Back to Contents</a></p>
+</div>
+<div id="submodels" class="section level2">
+<h2>Sub-models</h2>
+<!-- @index `submodel`; Models!Constrained 
+             Examples!`nutrition`!`submodel` -->
+<p>We have just seen that we can assign different weights to the levels of containing factors. Another option is to constrain the effects of those containing factors to zero. In essence, that means fitting a different model without those containing effects; however, for certain models (not all), an <code>emmGrid</code> may be updated with a <code>submodel</code> specification so as to impose such a constraint. For illustration, return again to the nutrition example, and consider the analysis of <code>group</code> and <code>race</code> as before, after removing interactions involving <code>age</code>:</p>
+<pre class="r"><code>summary(emmeans(nutr.lm, pairwise ~ group | race, submodel = ~ age + group*race), 
+        by = NULL)</code></pre>
+<pre class="ro"><code>## $emmeans
+##  group      race     emmean    SE df lower.CL upper.CL
+##  FoodStamps Black      4.91 2.061 92    0.817    9.003
+##  NoAid      Black     -3.01 1.581 92   -6.148    0.133
+##  FoodStamps Hispanic  -1.18 5.413 92  -11.935    9.567
+##  NoAid      Hispanic   1.32 3.876 92   -6.382    9.014
+##  FoodStamps White      4.10 0.901 92    2.308    5.886
+##  NoAid      White     -1.44 1.114 92   -3.654    0.771
+## 
+## Results are averaged over the levels of: age 
+## submodel: ~ age + group + race + group:race 
+## Confidence level used: 0.95 
+## 
+## $contrasts
+##  contrast           race     estimate   SE df t.ratio p.value
+##  FoodStamps - NoAid Black        7.92 2.62 92  3.021  0.0033 
+##  FoodStamps - NoAid Hispanic    -2.50 6.55 92 -0.382  0.7034 
+##  FoodStamps - NoAid White        5.54 1.27 92  4.364  &lt;.0001 
+## 
+## Results are averaged over the levels of: age</code></pre>
+<p>If you like, you may confirm that we would obtain exactly the same estimates if we had fitted that sub-model to the data, except we continue to use the residual variance from the full model in tests and confidence intervals. Without the interactions with <code>age</code>, all of the marginal means become estimable. The results are somewhat different from those obtained earlier where we narrowed the scope to just age 3. These new estimates include all ages, averaging over them equally, but with constraints that the interaction effects involving <code>age</code> are all zero.</p>
+<div id="type2submodel" class="section level6">
+<h6></h6>
+<!-- @index `submodel`!`"minimal"` and `"type2"`; Type II analysis
+     `joint_tests()`!with `submodel = "type2"`  -->
+<p>There are two special character values that may be used with <code>submodel</code>. Specifying <code>&quot;minimal&quot;</code> creates a submodel with only the active factors:</p>
+<pre class="r"><code>emmeans(nutr.lm, ~ group * race, submodel = &quot;minimal&quot;)</code></pre>
+<pre class="ro"><code>##  group      race     emmean    SE df lower.CL upper.CL
+##  FoodStamps Black     5.000 2.020 92    0.988    9.012
+##  NoAid      Black    -1.929 1.428 92   -4.765    0.908
+##  FoodStamps Hispanic  0.000 5.344 92  -10.614   10.614
+##  NoAid      Hispanic  2.500 3.779 92   -5.005   10.005
+##  FoodStamps White     4.769 0.741 92    3.297    6.241
+##  NoAid      White    -0.516 0.960 92   -2.422    1.390
+## 
+## Results are averaged over the levels of: age 
+## submodel: ~ group + race + group:race 
+## Confidence level used: 0.95</code></pre>
+<p>This submodel constrains all effects involving <code>age</code> to be zero. Another interesting option is <code>&quot;type2&quot;</code>, whereby we in essence analyze the residuals of the model with all contained or overlapping effects, then constrain the containing effects to be zero. So what is left if only the interaction effects of the factors involved. This is most useful with <code>joint_tests()</code>:</p>
+<pre class="r"><code>joint_tests(nutr.lm, submodel = &quot;type2&quot;)</code></pre>
+<pre class="ro"><code>##  model term df1 df2 F.ratio p.value note
+##  age          3  92   0.961 0.4145      
+##  group        1  92  23.044 &lt;.0001      
+##  race         2  92   0.196 0.8227      
+##  age:group    3  92   1.069 0.3663      
+##  age:race     3  92   1.019 0.3880   d e
+##  group:race   2  92   1.991 0.1424      
+## 
+## d: df1 reduced due to linear dependence 
+## e: df1 reduced due to non-estimability</code></pre>
+<p>These results are identical to the type II anova obtained <a href="#nutrex">at the beginning of this example</a></p>
+<pre class="r"><code>car::Anova(nutr.lm)</code></pre>
+<pre><code>## Note: model has aliased coefficients
+##       sums of squares computed by model comparison</code></pre>
+<pre class="ro"><code>## Anova Table (Type II tests)
+## 
+## Response: gain
+##             Sum Sq Df F value    Pr(&gt;F)
+## age          82.37  3  0.9614    0.4145
+## group       658.13  1 23.0441 6.105e-06
+## race         11.17  2  0.1956    0.8227
+## age:group    91.58  3  1.0688    0.3663
+## age:race     87.30  3  1.0189    0.3880
+## group:race  113.70  2  1.9906    0.1424
+## Residuals  2627.47 92</code></pre>
+<p>More details on how <code>submodel</code> works may be found in <a href="xplanations.html#submodels"><code>vignette(&quot;xplanations&quot;)</code></a></p>
+<p><a href="#contents">Back to Contents</a></p>
+</div>
 </div>
 <div id="nesting" class="section level2">
 <h2>Nested fixed effects</h2>

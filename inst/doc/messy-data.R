@@ -46,6 +46,19 @@ sapply(c("equal", "prop", "outer", "cells", "flat"), function(w)
     predict(emmeans(nutr.lm, ~ race, weights = w)))
 
 ## -----------------------------------------------------------------------------
+summary(emmeans(nutr.lm, pairwise ~ group | race, submodel = ~ age + group*race), 
+        by = NULL)
+
+## -----------------------------------------------------------------------------
+emmeans(nutr.lm, ~ group * race, submodel = "minimal")
+
+## -----------------------------------------------------------------------------
+joint_tests(nutr.lm, submodel = "type2")
+
+## -----------------------------------------------------------------------------
+car::Anova(nutr.lm)
+
+## -----------------------------------------------------------------------------
 cows <- data.frame (
     route = factor(rep(c("injection", "oral"), c(5, 9))),
     drug = factor(rep(c("Bovineumab", "Charloisazepam", 
