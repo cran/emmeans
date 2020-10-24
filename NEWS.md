@@ -1,22 +1,40 @@
 ## NEWS for the emmeans package
 
-emmeans 1.5.0-xxxx
+emmeans 1.5.2
 -------------
- * Additional checking for potential errors (e.g. memory overload) connected
-   with `submodel` support. Also, much more memory-efficient code therein 
-   (#218, #219)
- * A new option `enable.submodel` so user
-   can switch off `submodel` support when unwanted or to save memory.
- * `multinom` support for `N.sim` option 
- * Modification to internal dispatching of `recover_data` and `emm_basis`
-   so that an external package's methods are always found and given priority
-   whether or not they are registered (#220)
- * Patches to `gamlss` support. Smoothers are not supported but other aspects
+
+  * Change to `plot.emmGrid(... comparisons = TRUE)` where we determine arrow 
+    bounds and unnecessary-arrow deletions *separately* in each `by` group. 
+    See also [Stack Overflow posting](https://stackoverflow.com/questions/63713439/interpreting-results-from-emmeans-comparison/63734042#63734042)
+  * `emmeans()` with contrasts specified ignores `adjust` and passes to 
+    `contrast()` instead. Associated documentation improved (I hope)
+  * Bug-fix for missing cases in `plot(..., comparisons = TRUE)` (#228)
+  * Robustified `plot.emmGrid()` so that comparison arrows work correctly
+    with back-transformations. (Previously we used `regrid()` in that case,
+    causing different CIs and PIs depending on `comparisons`) (#230)
+  * Bug fixes in support for `stan_polr` models.
+  * Bug fix for incorrect (and relatively harmless) warning in several models (#234)
+  * Lower object size via removing unnecessary environment deps (#232)
+  * Repairs to `as.list()` and `as.emmGrid()` to fully support nesting and submodels.
+  
+
+emmeans 1.5.1
+-------------
+  * Additional checking for potential errors (e.g. memory overload) connected
+    with `submodel` support. Also, much more memory-efficient code therein 
+    (#218, #219)
+  * A new option `enable.submodel` so user
+    can switch off `submodel` support when unwanted or to save memory.
+  * `multinom` support for `N.sim` option 
+  * Modification to internal dispatching of `recover_data` and `emm_basis`
+    so that an external package's methods are always found and given priority
+    whether or not they are registered (#220)
+  * Patches to `gamlss` support. Smoothers are not supported but other aspects
    are more reliable. See [CV posting](https://stats.stackexchange.com/questions/484886/post-hoc-analysis-for-gamlss-model-in-r)
- * Improvement to auto-detection of transformations (#223)
- * Added `aes` argument in `pwpp()` for more control over rendering (#178)
- * Fix to a situation in `plot.emmGrid()` where ordering of factor levels
-   could change depending on `CIs` and `PIs` (#225)
+  * Improvement to auto-detection of transformations (#223)
+  * Added `aes` argument in `pwpp()` for more control over rendering (#178)
+  * Fix to a situation in `plot.emmGrid()` where ordering of factor levels
+    could change depending on `CIs` and `PIs` (#225)
 
 
 emmeans 1.5.0
