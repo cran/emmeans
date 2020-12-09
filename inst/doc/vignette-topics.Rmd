@@ -47,10 +47,12 @@ vignette: >
 
 
   * [Back story of **emmeans**](basics.html#backstory)
+  * [Bayes factor](sophisticated.html#bayesxtra)
   * Bayesian models
       * [in *models: S*](models.html#S)
       * [in *sophisticated: mcmc*](sophisticated.html#mcmc)
   * [**bayesplot** package](sophisticated.html#bayesxtra)
+  * [**bayestestR** package](sophisticated.html#bayesxtra)
   * [Beta regression](models.html#B)
   * [`betareg` models](models.html#B)
   * Bias adjustment
@@ -478,6 +480,8 @@ vignette: >
       * [Error handling](xtending.html#rderrs)
       * [for `lqs` objects](xtending.html#rd.lqs)
       * [for `rsm` objects](xtending.html#rdrsm)
+  * `recover_data.call()`
+      * [`frame` argument](xtending.html#rdargs)
   * [`ref_grid()`](basics.html#ref_grid)
       * [`at`](basics.html#altering)
       * [`cov.keep`](basics.html#altering)
@@ -488,12 +492,14 @@ vignette: >
   * [Reference grids](basics.html#ref_grid)
       * [Altering](basics.html#altering)
       * [Prediction on](predictions.html#ref-grid)
+  * [Region of practical equivalence](sophisticated.html#bayesxtra)
   * [Registering `recover_data` and `emm_basis` methods](xtending.html#exporting)
   * [`regrid()`](transformations.html#regrid)
       * [`transform = "log"`](transformations.html#logs)
       * [`transform` vs. `type`](transformations.html#regrid)
   * [Response scale](confidence-intervals.html#tran)
   * [`revpairwise` contrasts](comparisons.html#contrasts)
+  * [ROPE](sophisticated.html#bayesxtra)
   * [**rsm** package](xtending.html#rsm)
   * [`rstanarm`](sophisticated.html#mcmc)
 

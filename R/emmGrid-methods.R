@@ -126,6 +126,8 @@ vcov.emmGrid = function(object, ...) {
 }
 
 
+
+
 # Method to alter contents of misc slot
 
 #' Update an \code{emmGrid} object
@@ -258,14 +260,15 @@ vcov.emmGrid = function(object, ...) {
 #' structure. See \dQuote{Recovering or overriding model information} in the
 #' documentation for \code{\link{ref_grid}}. The current nesting structure is
 #' displayed by \code{\link{str.emmGrid}}.}
-#' 
+#'
 #' \item{\code{levels}}{named \code{list} of new levels for the elements of the
 #' current \code{emmGrid}. The list name(s) are used as new variable names, and
 #' if needed, the list is expanded using \code{expand.grid}. These results replace
-#' current variable names and levels. This specification changes the \code{levels}, 
+#' current variable names and levels. This specification changes the \code{levels},
 #' \code{grid}, \code{roles}, and \code{misc} slots in the updated \code{emmGrid},
 #' and resets \code{pri.vars}, \code{by.vars}, \code{adjust}, \code{famSize},
-#' \code{avgd.over}, and \code{nesting}. 
+#' and \code{avgd.over}. In addition, if there is nesting of factors, that may be 
+#' altered; a warning is issued if it involves something other than mere name changes.
 #' \emph{Note:} All six letters of \code{levels} is needed in order to distinguish
 #' it from \code{level}.}
 #' 
@@ -360,12 +363,20 @@ update.emmGrid = function(object, ..., silent = FALSE) {
                 grd = do.call(expand.grid, lvls)
                 if (nrow(object@grid) != nrow(grd))
                     stop("Length of replacement levels does not match the number of rows in the grid")
+                oldlvls = object@levels
+                if(!is.null(object@model.info$nesting) &&
+                   ((length(oldlvls) != length(lvls)) ||
+                    any(sapply(oldlvls, length) != sapply(lvls, length))))
+                    warning("Changes to levels may have altered nesting structure.\n",
+                            "You likely need to also run 'update(..., nesting = ...)'")
                 object@levels = lvls
                 for (nm in c(".wgt.", ".offset"))
                         grd[[nm]] = object@grid[[nm]]
                 object@grid = grd
                 object@roles$predictors = misc$pri.vars = names(lvls)
-                misc$by.vars = misc$avgd.over = object@model.info$nesting = NULL
+                misc$by.vars = misc$avgd.over = NULL
+                if (!is.null(object@model.info$nesting))
+                    object@model.info$nesting = .find_nests(grd, NULL, FALSE, lvls)
                 misc$adjust = "none"
                 misc$famSize = nrow(grd)
             }
@@ -638,6 +649,157 @@ emm_defaults = list (
 )
 
 
+# override levels<- method
+#' @rdname update.emmGrid
+#' @export
+#' @param x an \code{emmGrid} object
+#' @param value \code{list} or replacement levels. See the documentation for
+#' \code{\link{update.emmGrid}} with the \code{levels} argument, 
+#' as well as the section below on \dQuote{Replaciong levels}
+#'   
+#' @return \code{levels<-} replaces the levels of the object in-place.
+#'   See the section on  for details.
+#' @section Replacing levels:
+#' The \code{levels<-} method uses \code{\link{update.emmGrid}} to replace the
+#' levels of one or more factors. This method allows selectively replacing
+#' the levels of just one factor (via subsetting operators), whereas 
+#' \code{update(x, levels = list(...))} requires a list of \emph{all} factors
+#' and their levels. If any factors are to be renamed, we must replace all
+#' levels and include the new names in the replacements. See the examples.
+#' 
+#' @examples
+#' 
+#' ## Changing levels of one factor
+#' newrg <- pigs.rg
+#' levels(newrg)$source <- 1:3
+#' newrg
+#' 
+#' ## Unraveling a previously standardized covariate
+#' zd = scale(fiber$diameter)
+#' fibz.lm <- lm(strength ~ machine * zd, data = fiber)
+#' (fibz.rg <- ref_grid(fibz.lm, at = list(zd = -2:2)))   ### 2*SD range
+#' lev <- levels(fibz.rg)
+#' levels(fibz.rg) <- list (
+#'     machine = lev$machine,
+#'     diameter = with(attributes(zd), 
+#'                     `scaled:center` + `scaled:scale` * lev$zd) )
+#' fibz.rg
+#' 
+"levels<-.emmGrid" = function(x, value) {
+    update.emmGrid(x, levels = value)
+}
+
+# ### transform method (I decided to ditch this completely in favor of levels<-)
+# #' Modify variable names and/or levels in a reference grid
+# #'
+# #' @param `_data` An object of class \code{emmGrid}
+# #' @param ... Specifications for changes to be made. See Specifications section
+# #' @param `_par` named \code{list} containing any additional parameters needed
+# #' in evaluating expressions
+# #' 
+# #' @section Specifications:
+# #' Each specification can be of one of the following forms:
+# #' \itemize{
+# #'   \item{\code{name = <replacement levels>  } (replace levels only)}
+# #'   \item{\code{name = newname ~ <replacement levels>  } (replace levels and rename)}
+# #'   \item{\code{name = ~ <expression>  } (calculate new levels)}
+# #'   \item{\code{name = newname ~ <expression>  } (calculate new levels and rename)}
+# #'   \item{\code{newame ~ name  } (rename with levels unchanged)}
+# #'   \item{\code{newname ~ <expression>  } (calculate new levels for variable 
+# #'          in expression, and rename)}
+# #' }
+# #' Here, \code{name} must be the name of an existing predictor in the grid,
+# #' and \code{<replacement levels>} is a character of numeric vector of length
+# #' exactly equal to the number of levels of \code{name}. The type of the replacement levels
+# #' does not need to match the type of the existing levels; however, any factor in the grid
+# #' remains a factor, with its levels changed.
+# #' 
+# #' Expressions must be supplied via a formula, and must be evaluable in the context 
+# #' of \code{envir} and the existing levels of \code{name}.
+# #' If a formula has a left-hand side, it is used as
+# #' a replacement name for that variable.
+# #'
+# #' @return a modified \code{emmGrid} object
+# #' @export
+# #' 
+# #' @note
+# #' An alternative way to use this is to supply a list of arguments as the \code{morph}
+# #' option in \code{\link{update.emmGrid}}.
+# #'
+# #' @examples
+# #' warp.lm <- lm(breaks ~ wool * tension, data = warpbreaks)
+# #' (warp.rg <- ref_grid(warp.lm))
+# #' transform(warp.rg, tension = 1:3,  wool = texture ~ c("soft", "coarse"))
+# #' 
+# #' # Standardized predictor
+# #' z <- scale(fiber$diameter)
+# #' fiber.lm <- lm(strength ~ z + machine, data = fiber)
+# #' 
+# #' ### Mean predictions at 1-SD intervals:
+# #' (fiber.emm <- emmeans(fiber.lm, "z", at = list(z = -1:1)))
+# #' 
+# #' ### Same predictions labeled with actual diameter values:
+# #' transform(fiber.emm, diameter ~ `scaled:center` + `scaled:scale` * z,
+# #'     `_par` = attributes(z))
+# #' 
+# #' 
+# 
+# transform.emmGrid <- function(`_data`, ..., `_par` = list()) {
+#     specs = list(...)
+#     nms = names(c(`_dummy_` = 0, specs))[-1]  # keeps this from being NULL
+#     for (i in which(nms == "")) { # get name from formula rhs
+#         if (!inherits(spc <- specs[[i]], "formula") 
+#             || (inherits(spc, "formula") && (length(spc) < 3)))
+#             stop("Unnamed specifications must be two-sided formulas")
+#         nms[i] = names(specs)[i] = c(intersect(all.vars(spc[-2]),
+#                         names(`_data`@levels)), "(absent)")[1]
+#     }
+#     for (var in nms) {
+#         oldlev = `_data`@levels[[var]]
+#         if (is.null(oldlev))
+#             stop("No variable named '", var, "' in this object.")
+#         newlev = specs[[var]]
+#         if(inherits(newlev, "formula") && length(newlev) > 2) {
+#             newname = as.character(newlev)[2]
+#             newlev = newlev[-2]
+#         }
+#         else
+#             newname = ""
+#         if ((is.numeric(newlev) || is.character(newlev)) 
+#             && length(newlev) != length(oldlev))
+#             stop("Must provide exactly ", length(oldlev), " levels for '", var, "'")
+#         else if (inherits(newlev, "formula"))
+#             newlev = eval(str2expression(as.character(newlev)[2]), 
+#                           envir = c(`_data`@levels[var], `_par`))
+#         # so at this point we have conforming numbers of levels.
+#         `_data`@levels[[var]] = newlev
+#         v = newv = `_data`@grid[[var]]
+#         if (inherits(v, "factor"))
+#             levels(newv) = newlev
+#         else for (i in seq_along(oldlev)) 
+#             newv[v == oldlev[[i]]] = newlev[[i]]
+#         `_data`@grid[[var]] = newv
+#         if (newname != "") {
+#             i = which(names(`_data`@levels) == var)
+#             names(`_data`@levels)[i] = newname
+#             i = which(names(`_data`@grid) == var)
+#             names(`_data`@grid)[i] = newname
+#             i = which(`_data`@roles$predictors == var)
+#             if (length(i) > 0) 
+#                 `_data`@roles$predictors[i] = newname
+#             nst = `_data`@model.info$nesting
+#             if (!is.null(nst)) {
+#                 names(nst)[names(nst) == var] = newname
+#                 nst = lapply(nst, function(x) { x[x == var] = newname; x })
+#                 `_data`@model.info$nesting = nst
+#             }
+#         }
+#     }
+#     `_data`
+# }
+
+
+
 ### Utility to change the internal structure of an emmGrid object
 ### Returned emmGrid object has linfct = I and bhat = estimates
 ### Primary reason to do this is with transform = TRUE, then can 
@@ -753,7 +915,7 @@ regrid = function(object, transform = c("response", "mu", "unlink", "none", "pas
                   bias.adjust = get_emm_option("back.bias.adj"), sigma, 
                   N.sim, sim = mvtnorm::rmvnorm, ...) 
 {
-    links = c("logit", "probit", "cauchit", "cloglog", "log", "sqrt", "1/mu^2", "inverse")
+    links = c("logit", "probit", "cauchit", "cloglog", "log", "log10", "log2", "sqrt", "1/mu^2", "inverse")
     if (is.logical(transform))   # for backward-compatibility
         transform = ifelse(transform, "response", "none")
     else if (is.list(transform)) {
@@ -851,7 +1013,7 @@ regrid = function(object, transform = c("response", "mu", "unlink", "none", "pas
     }
     if (transform %in% c(links, "user")) { # fake a transformation
         link = if (transform == "user") userlink
-               else                     make.link(transform)
+               else                     .make.link(transform)
         bounds = range(link$linkinv(c(-1e6, -100, -1, 0, 1, 100, 1e6)))
         nas = which(is.na(object@bhat)) # already NA
         incl = vincl = which((object@bhat > bounds[1]) & (object@bhat < bounds[2]))

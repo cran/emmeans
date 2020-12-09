@@ -36,10 +36,17 @@ emmeans.list = function(object, specs, ...) {
         }
         desc
     }
+    name.arg = match.call()$name
     
     for (i in seq_len(length(specs))) {
-        res = emmeans(object=object, specs = specs[[i]], ...)
         nm = nms[i]
+        # We'll rename the contrasts if spec is named
+        if (is.null(name.arg)) {
+            contr.name = ifelse(nm == "", "contrast", paste0(nm, ".contrast"))
+            res = emmeans(object=object, specs = specs[[i]], name = contr.name, ...)
+        }
+        else
+            res = emmeans(object=object, specs = specs[[i]], ...)
         if (is.data.frame(res)) { # happens e.g. when cld is used
             if (is.null(nm))
                 nm = .make.desc("summary", attr(res, "pri.vars"), attr(res, "by.vars"))
@@ -579,14 +586,14 @@ emmobj = function(bhat, V, levels, linfct = diag(length(bhat)), df = NA, dffun, 
         stop("linfct should have ", nrow(grid), "rows")
     pri.vars = names(grid)
     dotargs = list(...)
-    for (nm in names(dotargs$extras))
-        grid[[nm]] = dotargs$extras[[nm]]
     model.info = dotargs$model.info
     if(is.null(model.info))
         model.info = list(call = str2lang("emmobj"), xlev = levels, 
                           nesting = .parse_nest(nesting))
     roles = list(predictors= names(grid), responses=character(0), 
                  multresp=character(0))
+    for (nm in names(dotargs$extras))
+        grid[[nm]] = dotargs$extras[[nm]]
     if (!missing(dffun))
         df = dffun
     if (is.function(df)) {

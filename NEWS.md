@@ -1,5 +1,38 @@
 ## NEWS for the emmeans package
 
+emmeans 1.5.3
+-------------
+
+  * Per long-time threats, we really are removing `CLD()` once and for all.
+    We tried in version 1.5.0, but forced to cave due to downstream problems.
+  * Addition of `levels<-` method that maps to `update(... levels =)` (#237)
+  * Fix `cld()` so it works with nested cases (#239)
+  * Enable `coef()` method to work with contrasts of nested models.
+    This makes it possible for `pwpp()` to work (#239)
+  * Fixed a coding error in `plot()` that occurs if we use `type = "response"
+    but there is in fact no transformation 
+    ([reported on StackOverflow](https://stackoverflow.com/questions/64962094/in-r-plot-emmeans-of-glmmtmb-linear-model-error-in-linkinvsummthe-emmean/64995896#64995896))
+  * Added `"log10"` and `"log2"` as legal transformations in `regrid()`
+  * Revised vignette example for MCMC models, added example with **bayestestR**
+  * Expanded support for ordinal models to all link functions available in
+    **ordinal** (errors-out if **ordinal** not installed and link not 
+    available in `stats::make.link()`)
+  * Cleaned-up `emmip()` to route plot output to rendering functions 
+    `emmip_ggplot()` and `emmip_lattice()`. These functions allow more customization
+    to the plot and can also be called independently.
+    (To do later, maybe next update: the same for `plot.emmGrid()`. 
+    What to name rendering functions?? -- suggestions?)
+  * Cleaned up code for `.emmc` functions so that parenthesization of levels
+    does not get in the way of `ref`, `exclude`, or `include` arguments (#246)
+  * Fix to bug in `emtrends()` when `data` is specified (#247)
+  * Tries harder to recover original data when available in the object (#247).
+    In particular, sometimes this is available, e.g., in `$model` slot in
+    a `lm` object, *as long as there are no predictor transformations*. This
+    provides a little bit more safety in cases the data have been removed 
+    or altered.
+  * Tweaks to `rbind.emm_list()` to allow subsetting. (Also documentation & example)
+
+
 emmeans 1.5.2
 -------------
 
