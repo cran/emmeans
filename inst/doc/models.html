@@ -10,17 +10,18 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.5.3" />
+<meta name="author" content="emmeans package, Version 1.5.4" />
 
 
 <title>Models supported by emmeans</title>
 
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
 
 
 
 
 
-<style type="text/css">body {font-size: 11pt; font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;margin: 30px 50px 30px 50px; }h1,h2,h3,h4,h5,h6 { font-family: Arial,Helvetica,Sans-serif; }a { text-decoration: none; }a:link { color:darkblue; } a:visited { color:darkblue; } a:hover { color:dodgerblue; }a:active { color:dodgerblue; } code {color: #602000;font-family: "Lucida Console", Monaco, monospace; font-size: 90%;}.r { color: darkred; }.ro { color: darkgreen; background-color: #eeeeee; }.re { color: red;}.r code, a code, .ro code, .re code { color: inherit; }.vigindex ul { list-style-type: none; }.vigindex ul li { list-style: none; }.vigindex a code { color: inherit; }.vigindex li code { color: inherit; }</style>
+<link rel="stylesheet" href="data:text/css,body%20%7Bfont%2Dsize%3A%2011pt%3B%20font%2Dfamily%3A%20%22Palatino%20Linotype%22%2C%20%22Book%20Antiqua%22%2C%20Palatino%2C%20serif%3Bmargin%3A%2030px%2050px%2030px%2050px%3B%20%7Dh1%2Ch2%2Ch3%2Ch4%2Ch5%2Ch6%20%7B%20font%2Dfamily%3A%20Arial%2CHelvetica%2CSans%2Dserif%3B%20%7Da%20%7B%20text%2Ddecoration%3A%20none%3B%20%7Da%3Alink%20%7B%20color%3Adarkblue%3B%20%7D%20a%3Avisited%20%7B%20color%3Adarkblue%3B%20%7D%20a%3Ahover%20%7B%20color%3Adodgerblue%3B%20%7Da%3Aactive%20%7B%20color%3Adodgerblue%3B%20%7D%20code%20%7Bcolor%3A%20%23602000%3Bfont%2Dfamily%3A%20%22Lucida%20Console%22%2C%20Monaco%2C%20monospace%3B%20font%2Dsize%3A%2090%25%3B%7D%2Er%20%7B%20color%3A%20darkred%3B%20%7D%2Ero%20%7B%20color%3A%20darkgreen%3B%20background%2Dcolor%3A%20%23eeeeee%3B%20%7D%2Ere%20%7B%20color%3A%20red%3B%7D%2Er%20code%2C%20a%20code%2C%20%2Ero%20code%2C%20%2Ere%20code%20%7B%20color%3A%20inherit%3B%20%7D%2Evigindex%20ul%20%7B%20list%2Dstyle%2Dtype%3A%20none%3B%20%7D%2Evigindex%20ul%20li%20%7B%20list%2Dstyle%3A%20none%3B%20%7D%2Evigindex%20a%20code%20%7B%20color%3A%20inherit%3B%20%7D%2Evigindex%20li%20code%20%7B%20color%3A%20inherit%3B%20%7D" type="text/css" />
 
 
 
@@ -33,7 +34,7 @@
 
 
 <h1 class="title toc-ignore">Models supported by emmeans</h1>
-<h4 class="author">emmeans package, Version 1.5.3</h4>
+<h4 class="author">emmeans package, Version 1.5.4</h4>
 
 
 
@@ -275,20 +276,32 @@
 <tr class="odd">
 <td align="left">lqm,lqmm</td>
 <td align="left">lqmm</td>
-<td align="center"><a href="#A">A</a></td>
+<td align="center"><a href="#Q">Q</a></td>
 <td align="left"><code>tau = &quot;0.5&quot;</code> (must match an entry in <code>object$tau</code>)</td>
 </tr>
 <tr class="even">
+<td align="left"></td>
+<td align="left"></td>
+<td align="center"></td>
+<td align="left">Optional: <code>method</code>, <code>R</code>, <code>seed</code>, <code>startQR</code> (must be fully spelled-out)</td>
+</tr>
+<tr class="odd">
 <td align="left">manova</td>
 <td align="left">stats</td>
 <td align="center"><a href="#M">M</a></td>
 <td align="left"><code>mult.name</code>, <code>mult.levs</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">maov</td>
 <td align="left">stats</td>
 <td align="center"><a href="#M">M</a></td>
 <td align="left"><code>mult.name</code>, <code>mult.levs</code></td>
+</tr>
+<tr class="odd">
+<td align="left">mblogit</td>
+<td align="left">mclogit</td>
+<td align="center"><a href="#N">N</a></td>
+<td align="left"><code>mode = c(&quot;prob&quot;, &quot;latent&quot;)</code></td>
 </tr>
 <tr class="even">
 <td align="left">mcmc</td>
@@ -387,20 +400,44 @@
 <td align="left"><code>&quot;cum.prob&quot;, &quot;exc.prob&quot;, &quot;prob&quot;, &quot;mean.class&quot;)</code></td>
 </tr>
 <tr class="even">
+<td align="left">rq,rqs</td>
+<td align="left">quantreg</td>
+<td align="center"><a href="#Q">Q</a></td>
+<td align="left"><code>tau = &quot;0.5&quot;</code> (must match an entry in <code>object$tau</code>)</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left"></td>
+<td align="center"></td>
+<td align="left">Optional: <code>se</code>, <code>R</code>, <code>bsmethod</code>, etc.</td>
+</tr>
+<tr class="even">
+<td align="left">rlmerMod</td>
+<td align="left">robustlmm</td>
+<td align="center"><a href="#P">P</a></td>
+<td align="left">Supported in <strong>robustlmm</strong> package</td>
+</tr>
+<tr class="odd">
 <td align="left">rsm</td>
 <td align="left">rsm</td>
 <td align="center"><a href="#P">P</a></td>
 <td align="left">Supported in <strong>rsm</strong> package</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">stanreg</td>
 <td align="left">rstanarm</td>
 <td align="center"><a href="#S">S</a></td>
 <td align="left">Args for <code>stanreg_</code><em>xxx</em> similar to those for <em>xxx</em></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">survreg</td>
 <td align="left">survival</td>
+<td align="center"><a href="#A">A</a></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">svyglm</td>
+<td align="left">survey</td>
 <td align="center"><a href="#A">A</a></td>
 <td align="left"></td>
 </tr>
@@ -496,6 +533,7 @@
 <p>The reference grid includes a pseudo-factor with the same name and levels as the multinomial response. There is an optional <code>mode</code> argument which should match <code>&quot;prob&quot;</code> or <code>&quot;latent&quot;</code>. With <code>mode = &quot;prob&quot;</code>, the reference-grid predictions consist of the estimated multinomial probabilities. The <code>&quot;latent&quot;</code> mode returns the linear predictor, recentered so that it averages to zero over the levels of the response variable (similar to sum-to-zero contrasts). Thus each latent variable can be regarded as the log probability at that level minus the average log probability over all levels.</p>
 <p>There are two optional arguments: <code>mode</code> and <code>rescale</code> (which defaults to <code>c(0, 1)</code>).</p>
 <p>Please note that, because the probabilities sum to 1 (and the latent values sum to 0) over the multivariate-response levels, all sensible results from <code>emmeans()</code> must involve that response as one of the factors. For example, if <code>resp</code> is a response with <em>k</em> levels, <code>emmeans(model, ~ resp | trt)</code> will yield the estimated multinomial distribution for each <code>trt</code>; but <code>emmeans(model, ~ trt)</code> will just yield the average probability of 1/<em>k</em> for each <code>trt</code>.</p>
+<p><em>NOTE:</em> Due to a coding error, the SEs for these models are incorrect when obtained with <strong>emmeans</strong> versions 1.5.3 and earlier (the estimates themselves are correct). Re-run the analysis to obtain the correct results.</p>
 <p><a href="#quickref">Back to quick reference</a></p>
 </div>
 <div id="O" class="section level2">
@@ -513,6 +551,10 @@
 <div id="P" class="section level2">
 <h2>P – Other packages</h2>
 <p>Models in this group have their <strong>emmeans</strong> support provided by the package that implements the model-fitting procedure. Users should refer to the package documentation for details on <strong>emmeans</strong> support.</p>
+</div>
+<div id="Q" class="section level2">
+<h2>Q – Quantile regression</h2>
+<p>The argument <code>tau</code> should match (within a very small margin) one of the quantiles actually specified in fitting the model; otherwise an error results. In these models, the covariance matrix is obtained via the model’s <code>summary()</code> method with <code>covariance = TRUE</code>. The user may specify one or more of the other arguments for <code>summary</code> or to be passed to, say, a bootstrap routine. If so, those optional arguments must be spelled-out completely (e.g., <code>start</code> will <em>not</em> be matched to <code>startQR</code>).</p>
 </div>
 <div id="S" class="section level2">
 <h2>S – Sampling (MCMC) methods</h2>

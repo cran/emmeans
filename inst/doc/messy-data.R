@@ -56,9 +56,6 @@ emmeans(nutr.lm, ~ group * race, submodel = "minimal")
 joint_tests(nutr.lm, submodel = "type2")
 
 ## -----------------------------------------------------------------------------
-car::Anova(nutr.lm)
-
-## -----------------------------------------------------------------------------
 cows <- data.frame (
     route = factor(rep(c("injection", "oral"), c(5, 9))),
     drug = factor(rep(c("Bovineumab", "Charloisazepam", 

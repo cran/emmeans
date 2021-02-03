@@ -27,12 +27,20 @@ recover_data.lqmm = function(object, data = object$mfArgs$data, ...) {
     recover_data(fcall, trms, object$mfArgs$na.action, data = data, ...)
 }
 
-emm_basis.lqmm = function(object, trms, xlev, grid, tau = "0.5", ...) {
-    tau = as.character(tau)
-    bhat = coef(object)[, tau]
-    nm = names(bhat)
-    vcv = summary(object, covariance = TRUE)$Cov
-    V = vcv[nm, nm, tau]
+emm_basis.lqmm = function(object, trms, xlev, grid, tau = 0.5, ...) {
+    taudiff = abs(object$tau - tau)
+    col = which(taudiff < 0.0001)
+    if (length(col) == 0)
+        stop("No coefficients available for tau = ", tau)
+    bhat = coef(object)
+    # Very touchy here because their boot() function doesn't take dots...
+    nm = intersect(names(list(...)), c("method", "R", "seed", "startQR"))
+    vargs = c(list(object = object, covariance = TRUE), list(...)[nm])
+    V = do.call("summary", vargs)$Cov
+    if (length(taudiff) > 1) {
+        bhat = bhat[, col[1]]
+        V = V[, , col]
+    }
     m = model.frame(trms, grid, na.action = na.pass, xlev = xlev)
     X = model.matrix(trms, m, contrasts.arg = object$contrasts)
     nbasis = estimability::all.estble
@@ -45,8 +53,51 @@ emm_basis.lqmm = function(object, trms, xlev, grid, tau = "0.5", ...) {
 
 # Use same functions for lqm objects
 recover_data.lqm = function(object, ...) {
-    recover_data.lm(object, ...)
+    recover_data.lm(object, frame = NULL, ...)
 }
 
 emm_basis.lqm = function(object, ...)
     emm_basis.lqmm(object, ...)
+
+
+
+#### rq objects (quantreg)
+
+recover_data.rq = function(object, ...) {
+    recover_data.lm(object, frame = object$model, ...)
+}
+    
+emm_basis.rq = function(object, trms, xlev, grid, tau = 0.5, ...) {
+    taudiff = abs(object$tau - tau)
+    col = which(taudiff < 0.0001)
+    if (length(col) == 0)
+        stop("No coefficients available for tau = ", tau)
+    bhat = object$coefficients
+    summ = summary(object, covariance = TRUE, ...)
+    if (length(taudiff) == 1) {
+        V = summ$cov
+        df = summ$rdf
+    }
+    else {
+        bhat = bhat[, col[1]]
+        V = summ[[col]] $ cov
+        df = summ[[col]] $ rdf
+    }
+    nm = if(is.null(names(bhat))) row.names(bhat) else names(bhat)
+    m = suppressWarnings(model.frame(trms, grid, na.action = na.pass, xlev = xlev))
+    X = model.matrix(trms, m, contrasts.arg = object$contrasts)
+    assign = attr(X, "assign")
+    X = X[, nm, drop = FALSE]
+    bhat = as.numeric(bhat) 
+    nbasis = estimability::all.estble
+    misc = list()
+    dfargs = list(df = df)
+    dffun = function(k, dfargs) dfargs$df
+    list(X = X, bhat = bhat, nbasis = nbasis, V = V, 
+         dffun = dffun, dfargs = dfargs, misc = misc)
+}
+
+# we just reroute rqs objects to emm_basis.rq, as pretty similar
+recover_data.rqs = recover_data.rq
+emm_basis.rqs = function(object, ...)
+    emm_basis.rq(object, ...)
