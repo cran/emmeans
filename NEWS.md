@@ -1,6 +1,31 @@
 ## NEWS for the emmeans package
 
+emmeans 1.5.5
+-------------
+
+  * The `multinom` "correction" in version 1.5.4 was actually an
+    "incorrection." It was right before, and I made it wrong!
+    **If analyzing `multinom` models, use a version *other* than 1.5.4**
+  * Repairs to support for `mblogit` models
+  * Bug fix for `survreg` support (#258) -- `survreg()` doesn't handle missing 
+    factor levels the same way as `lm()`. This also affects results from
+    `coxph()`, `AER::tobit()`, ...
+  * Addition of a note in help `auto.noise` dataset, and changing that
+    example and vignette example to have `noise/10` as the response variable.
+    (Thanks to speech and hearing professor Stuart Rosen for pointing
+    out this issue in an e-mail comment.)
+  * Bug fix for `appx-satterthwaite` mode in `gls`/`lme` models (#263)
+  * Added `mode = "asymptotic"` for `gls`/`lme` models.
+  * Added `facetlab` argument to `emmip_ggplot()` so user can control how
+    facets are labeled (#261)
+  * Efficiency improvements in `joint_tests()` (#265)
+  * Bug fixes in `joint_tests()` and interaction contrasts for nested models (#266)
+  * Improvement to `multinom` support suggested by this [SO question](https://stackoverflow.com/questions/66675697/wrapping-nnetmultinom-ggeffectsggemmeans-in-a-custom-function-fails-th/66681184#66681184)
+  
+    
+
 emmeans 1.5.4
+-------------
 
   * Fix to bug in `rbind.emm_list()` to default for `which`
   * Fix for a glitch in recovering data for `gee` models (#249)
@@ -10,8 +35,10 @@ emmeans 1.5.4
     `boot` arguments such as `method`, `se`, `R`, ... (#250)
   * Correction to `multinom` objects (SEs were previously incorrect)
     and addition of support for related `mclogit::mblogit` objects.
-    **If at all possible, users should re-run any pre-1.5.4 analyses of
-    multinomial models**
+    If at all possible, users should re-run any pre-1.5.4 analyses of
+    multinomial models<br>
+    **Note: This correction was wrong!** If using multinomial models,
+    you should use some version *other than* 1.5.4!
   * Change to less misleading messages and documentation related to the
     `N.sim` argument of `regrid()`. We are no longer calling this a posterior 
     sample because this is not really a Bayesian method, it is just a simulated

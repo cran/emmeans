@@ -1,8 +1,8 @@
 Package: emmeans
 Type: Package
 Title: Estimated Marginal Means, aka Least-Squares Means
-Version: 1.5.4
-Date: 2021-02-03
+Version: 1.5.5-1
+Date: 2021-03-21
 Authors@R: c(person("Russell V.", "Lenth", role = c("aut", "cre", "cph"), 
     email = "russell-lenth@uiowa.edu"),
     person("Paul", "Buerkner", role = "ctb"),
@@ -36,7 +36,7 @@ Encoding: UTF-8
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2021-02-03 20:32:41 UTC; rlenth
+Packaged: 2021-03-21 01:59:00 UTC; rlenth
 Author: Russell V. Lenth [aut, cre, cph],
   Paul Buerkner [ctb],
   Maxime Herve [ctb],
@@ -45,4 +45,4 @@ Author: Russell V. Lenth [aut, cre, cph],
   Henrik Singmann [ctb]
 Maintainer: Russell V. Lenth <russell-lenth@uiowa.edu>
 Repository: CRAN
-Date/Publication: 2021-02-03 21:40:03 UTC
+Date/Publication: 2021-03-21 08:00:02 UTC

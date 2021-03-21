@@ -4,7 +4,7 @@ options(show.signif.stars = FALSE)
 knitr::opts_chunk$set(fig.width = 4.5, class.output = "ro", class.message = "re")
 
 ## -----------------------------------------------------------------------------
-noise.lm <- lm(noise ~ size * type * side, data = auto.noise)
+noise.lm <- lm(noise/10 ~ size * type * side, data = auto.noise)
 anova(noise.lm)
 
 ## -----------------------------------------------------------------------------

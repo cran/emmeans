@@ -10,12 +10,22 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.5.4" />
+<meta name="author" content="emmeans package, Version 1.5.5.1" />
 
 
 <title>Confidence intervals and tests in emmeans</title>
 
 <script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
 
 
 
@@ -34,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Confidence intervals and tests in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.5.4</h4>
+<h4 class="author">emmeans package, Version 1.5.5.1</h4>
 
 
 
@@ -204,13 +214,13 @@ pigsint.rg &lt;- ref_grid(pigsint.lm)
 contrast(pigsint.rg, &quot;consec&quot;, simple = &quot;percent&quot;)</code></pre>
 <pre class="ro"><code>## source = fish:
 ##  contrast estimate     SE df t.ratio p.value
-##  12 - 9     0.1849 0.1061 17  1.742  0.2360 
+##  12 - 9     0.1849 0.1061 17  1.742  0.2357 
 ##  15 - 12    0.0045 0.1061 17  0.042  0.9999 
 ##  18 - 15    0.0407 0.1061 17  0.383  0.9626 
 ## 
 ## source = soy:
 ##  contrast estimate     SE df t.ratio p.value
-##  12 - 9     0.1412 0.0949 17  1.487  0.3594 
+##  12 - 9     0.1412 0.0949 17  1.487  0.3595 
 ##  15 - 12   -0.0102 0.0949 17 -0.108  0.9992 
 ##  18 - 15    0.0895 0.1342 17  0.666  0.8571 
 ## 
@@ -218,7 +228,7 @@ contrast(pigsint.rg, &quot;consec&quot;, simple = &quot;percent&quot;)</code></p
 ##  contrast estimate     SE df t.ratio p.value
 ##  12 - 9     0.2043 0.0949 17  2.152  0.1186 
 ##  15 - 12    0.1398 0.1061 17  1.317  0.4520 
-##  18 - 15    0.1864 0.1424 17  1.309  0.4568 
+##  18 - 15    0.1864 0.1424 17  1.309  0.4569 
 ## 
 ## Results are given on the log (not the response) scale. 
 ## P value adjustment: mvt method for 3 tests</code></pre>

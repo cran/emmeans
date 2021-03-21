@@ -245,13 +245,44 @@ joint_tests = function(object, by = NULL, show0df = FALSE, cov.reduce = range, .
         object = do.call(ref_grid, args)
     }
     facs = setdiff(names(object@levels), by)
+    
+    # Use "factors" attr if avail to screen-out interactions not in model
+    # For any factors not in model (created by emmeans fcns), assume they interact w/ everything
+    trmtbl = attr(object@model.info$terms, "factors")
+    if (is.null(trmtbl) || (length(trmtbl) == 0))
+        trmtbl = matrix(1, nrow = length(facs), dimnames = list(facs, NULL))
+    else
+        row.names(trmtbl) = sapply(row.names(trmtbl), function(x)
+            .all.vars(reformulate(x)))
+    xtras = setdiff(facs, row.names(trmtbl))
+    if (length(xtras) > 0) {
+        xt = matrix(1, nrow = length(xtras), ncol = ncol(trmtbl), dimnames = list(xtras, NULL))
+        trmtbl = rbind(trmtbl, xt)
+    }
+    nesting = object@model.info$nesting
+    for (nst in names(nesting)) { # make sure all complete nests are in the table
+        trmtbl = cbind(trmtbl, 0)
+        n = ncol(trmtbl)
+        trmtbl[c(nst, nesting[[nst]]), n] = 1
+    }
+
     do.test = function(these, facs, result, ...) {
         if ((k <- length(these)) > 0) {
-            emm = emmeans(object, these, by = by, ...)
-            tst = test(contrast(emm, interaction = "consec"), 
-                       joint = TRUE, status = TRUE)
-            tst = cbind(ord = k, `model term` = paste(these, collapse = ":"), tst)
-            result = rbind(result, tst)
+            if(any(apply(trmtbl[these, , drop = FALSE], 2, prod) != 0)) { # term is in model
+                nesters = NULL
+                if (!is.null(nesting)) {
+                    nst = intersect(these, names(nesting))
+                    if (length(nst) > 0) 
+                        nesters = unlist(nesting[nst]) # proceed only if these includes all nesters
+                }
+                if (is.null(nesting) || length(setdiff(nesters, these)) == 0) {   
+                    emm = emmeans(object, these, by = by, ...)
+                    tst = test(contrast(emm, interaction = "consec", by = union(by, nesters)), 
+                               by = by, joint = TRUE, status = TRUE)
+                    tst = cbind(ord = k, `model term` = paste(these, collapse = ":"), tst)
+                    result = rbind(result, tst)
+                }
+            }
             last = max(match(these, facs))
         }
         else
