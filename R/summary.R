@@ -470,6 +470,8 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df, calc,
     fam.info = c(misc$famSize, by.size, et)
     cnm = NULL
     adjust = tolower(adjust)
+    if (adjust %in% c("bh", "by"))  # special cases in p.adjust.methods
+        adjust = toupper(adjust)
     
     # get vcov matrix only if needed (adjust == "mvt")
     corrmat = sch.rank = NULL
@@ -653,9 +655,22 @@ predict.emmGrid <- function(object, type,
 #' @param row.names passed to \code{\link{as.data.frame}}
 #' @param optional passed to \code{\link{as.data.frame}}
 #' @return The \code{as.data.frame} method returns a plain data frame,
-#'   equivalent to \code{as.data.frame(summary(.))}.
+#'   equivalent to \code{as.data.frame(summary(.))}. 
+#' @note The \code{as.data.frame} method is intended primarily to allow for
+#'   \code{emmGrid} objects to be coerced to a data frame as needed internally.
+#'   However, we recommend \emph{against} users 
+#'   routinely using \code{as.data.frame}; instead, use \code{summary},
+#'   \code{confint}, or \code{test}, which already return a special
+#'   \code{data.frame} with added annotations. Those annotations display
+#'   important information such as adjustment methods and confidence levels.
+#'   If you need to see more digits, use \code{print(summary(object), digits = ...)};
+#'   and if you \emph{always} want to see more digits, use 
+#'   \code{emm_options(opt.digits = FALSE)}.
 #' @method as.data.frame emmGrid
 #' @export
+#' @examples
+#' # Show estimates to more digits
+#' print(test(con), digits = 7)
 as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     as.data.frame(summary(x, ...), row.names = row.names, optional = optional)
 }
@@ -808,9 +823,9 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
     if (n.contr == 1) # Force no adjustment when just one test
         adjust = "none"
     
-    # do a pmatch of the adjust method, case insensitive
+    # do a pmatch of the adjust method
     adj.meths = c("sidak", "tukey", "scheffe", "dunnettx", "mvt", p.adjust.methods)
-    k = pmatch(tolower(adjust), adj.meths)
+    k = pmatch(adjust, adj.meths)
     if(is.na(k))
         stop("Adjust method '", adjust, "' is not recognized or not valid")
     adjust = adj.meths[k]
@@ -907,7 +922,7 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
         adjust = "none"
     
     adj.meths = c("sidak", "tukey", "scheffe", "dunnettx", "mvt", "bonferroni", "none")
-    k = pmatch(tolower(adjust), adj.meths)
+    k = pmatch(adjust, adj.meths)
     if(is.na(k))
         k = which(adj.meths == "bonferroni") 
     adjust = adj.meths[k]
@@ -1118,8 +1133,9 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional = FALSE, ...) {
 # Format a data.frame produced by summary.emmGrid
 #' @method print summary_emm
 #' @export
-print.summary_emm = function(x, ..., digits=NULL, quote=FALSE, right=TRUE) {
+print.summary_emm = function(x, ..., digits=NULL, quote=FALSE, right=TRUE, export = FALSE) {
     x.save = x
+    if(export) x.save = list()
     for(i in which(sapply(x, is.matrix))) 
         x[[i]] = NULL   # hide matrices
     for (i in seq_along(names(x)))   # zapsmall the numeric columns
@@ -1160,26 +1176,38 @@ print.summary_emm = function(x, ..., digits=NULL, quote=FALSE, right=TRUE) {
     by.vars = attr(x, "by.vars")
     if (is.null(by.vars)) {
         m = .just.labs(m, just)
-        print(m, quote=FALSE, right=TRUE)
-        cat("\n")
+        if (export)
+            x.save$summary = m
+        else {
+            print(m, quote=FALSE, right=TRUE)
+            cat("\n")
+        }
     }
     else { # separate listing for each by variable
         m = .just.labs(m[, setdiff(names(x), by.vars), drop = FALSE], just)
+        if(export) 
+            x.save$summary = list()
         pargs = unname(as.list(x[,by.vars, drop=FALSE]))
         pargs$sep = ", "
         lbls = do.call(paste, pargs)
         for (lb in unique(lbls)) {
             rows = which(lbls==lb)
             levs = paste(by.vars, "=", xc[rows[1], by.vars])
-            cat(paste(paste(levs, collapse=", ")), ":\n", sep="")
-            print(m[rows, , drop=FALSE], ..., quote=quote, right=right)
-            cat("\n")
+            levs = paste(levs, collapse=", ")
+            if(export)
+                x.save$summary[[levs]] = m[rows, , drop = FALSE]
+            else {
+                cat(paste(levs, ":\n", sep=""))
+                print(m[rows, , drop=FALSE], ..., quote=quote, right=right)
+                cat("\n")
+            }
         }
     }
     
     msg = unique(attr(x, "mesg"))
-    if (!is.null(msg))
+    if (!is.null(msg) && !export)
         for (j in seq_len(length(msg))) cat(paste(msg[j], "\n"))
+    else (x.save$annotations = msg)
     
     invisible(x.save)
 }

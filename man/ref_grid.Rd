@@ -155,6 +155,17 @@ Some earlier versions of \pkg{emmeans} offer a \code{covnest} argument.
   with the reference grid as \code{newdata}. (This is done \emph{after} the
   reference grid is determined.) A formula is appropriate here when you think
   experimental conditions affect the covariate as well as the response.
+  
+  To allow for situations where a simple \code{lm()} call as described above won't
+  be adequate, a formula of the form \code{ext ~ fcnname} is also supported,
+  where the left-hand side may be \code{ext}, \code{extern}, or
+  \code{external} (and must \emph{not} be a predictor name) and the
+  right-hand side is the name of an existing function. The function is called
+  with one argument, a data frame with columns for each variable in the
+  reference grid. The function is expected to use that frame as new data to
+  be used to obtain predictions for one or more models; and it should return
+  a named list or data frame with replacement values for one or more of the
+  covariates.
 
   If \code{cov.reduce} is a named list, then the above criteria are used to
   determine what to do with covariates named in the list. (However, formula
@@ -285,21 +296,21 @@ Some earlier versions of \pkg{emmeans} offer a \code{covnest} argument.
   \code{\link{regrid}}.
 }
 
-\section{Side effect}{
- The most recent result of \code{ref_grid}, whether
+\section{Optional side effect}{
+ If the \code{save.ref_grid} option is set to
+  \code{TRUE} (see \code{\link{emm_options}}),
+  The most recent result of \code{ref_grid}, whether
   called directly or indirectly via \code{\link{emmeans}},
   \code{\link{emtrends}}, or some other function that calls one of these, is
   saved in the user's environment as \code{.Last.ref_grid}. This facilitates
   checking what reference grid was used, or reusing the same reference grid
-  for further calculations. This automatic saving is enabled by default, but
-  may be disabled via \samp{emm_options(save.ref_grid = FALSE)}, and
-  re-enabled by specifying \code{TRUE}.
+  for further calculations. This automatic saving is disabled by default, but
+  may be enabled via \samp{emm_options(save.ref_grid = TRUE)}.
 }
 
 \examples{
 fiber.lm <- lm(strength ~ machine*diameter, data = fiber)
 ref_grid(fiber.lm)
-summary(.Last.ref_grid)
 
 ref_grid(fiber.lm, at = list(diameter = c(15, 25)))
 
@@ -322,6 +333,21 @@ mtcars.lm <- lm(mpg ~ disp + wt + vs * am, data = mtcars)
 # Two of these have the same grid but different weights:
 rg.default@grid
 rg.at@grid
+
+### Using cov.reduce formulas...
+# Above suggests we can vary disp indep. of other factors - unrealistic
+rg.alt <- ref_grid(mtcars.lm, at = list(wt = c(2.5, 3, 3.5)),
+    cov.reduce = disp ~ vs * wt)
+rg.alt@grid
+
+# Alternative to above where we model sqrt(disp)
+disp.mod <- lm(sqrt(disp) ~ vs * wt, data = mtcars)
+disp.fun <- function(dat)
+    list(disp = predict(disp.mod, newdata = dat)^2)
+rg.alt2 <- ref_grid(mtcars.lm, at = list(wt = c(2.5, 3, 3.5)),
+    cov.reduce = external ~ disp.fun)
+rg.alt2@grid
+
 
 # Multivariate example
 MOats.lm = lm(yield ~ Block + Variety, data = MOats)

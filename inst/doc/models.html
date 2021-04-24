@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.5.5.1" />
+<meta name="author" content="emmeans package, Version 1.6.0" />
 
 
 <title>Models supported by emmeans</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Models supported by emmeans</h1>
-<h4 class="author">emmeans package, Version 1.5.5.1</h4>
+<h4 class="author">emmeans package, Version 1.6.0</h4>
 
 
 
@@ -58,6 +58,12 @@
 <!-- @index Models!Quick reference -->
 <p>Here is an alphabetical list of model classes that are supported, and the arguments that apply. Detailed documentation follows, with objects grouped by the code in the “Group” column. Scroll down or follow the links to those groups for more information.</p>
 <table>
+<colgroup>
+<col width="14%" />
+<col width="9%" />
+<col width="9%" />
+<col width="66%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="left">Object.class</th>
@@ -310,8 +316,8 @@
 <tr class="odd">
 <td align="left">mblogit</td>
 <td align="left">mclogit</td>
-<td align="center"><a href="#N">N</a></td>
-<td align="left"><code>mode = c(&quot;prob&quot;, &quot;latent&quot;)</code></td>
+<td align="center"><a href="#P">P</a></td>
+<td align="left">Supported in <strong>mclogit</strong> (overrides previous minimal support here)</td>
 </tr>
 <tr class="even">
 <td align="left">mcmc</td>
@@ -543,7 +549,6 @@
 <p>The reference grid includes a pseudo-factor with the same name and levels as the multinomial response. There is an optional <code>mode</code> argument which should match <code>&quot;prob&quot;</code> or <code>&quot;latent&quot;</code>. With <code>mode = &quot;prob&quot;</code>, the reference-grid predictions consist of the estimated multinomial probabilities. The <code>&quot;latent&quot;</code> mode returns the linear predictor, recentered so that it averages to zero over the levels of the response variable (similar to sum-to-zero contrasts). Thus each latent variable can be regarded as the log probability at that level minus the average log probability over all levels.</p>
 <p>There are two optional arguments: <code>mode</code> and <code>rescale</code> (which defaults to <code>c(0, 1)</code>).</p>
 <p>Please note that, because the probabilities sum to 1 (and the latent values sum to 0) over the multivariate-response levels, all sensible results from <code>emmeans()</code> must involve that response as one of the factors. For example, if <code>resp</code> is a response with <em>k</em> levels, <code>emmeans(model, ~ resp | trt)</code> will yield the estimated multinomial distribution for each <code>trt</code>; but <code>emmeans(model, ~ trt)</code> will just yield the average probability of 1/<em>k</em> for each <code>trt</code>.</p>
-<p><em>NOTE:</em> Due to a coding error, the SEs for these models are incorrect when obtained with <strong>emmeans</strong> versions 1.5.3 and earlier (the estimates themselves are correct). Re-run the analysis to obtain the correct results.</p>
 <p><a href="#quickref">Back to quick reference</a></p>
 </div>
 <div id="O" class="section level2">
@@ -560,7 +565,7 @@
 </div>
 <div id="P" class="section level2">
 <h2>P – Other packages</h2>
-<p>Models in this group have their <strong>emmeans</strong> support provided by the package that implements the model-fitting procedure. Users should refer to the package documentation for details on <strong>emmeans</strong> support.</p>
+<p>Models in this group have their <strong>emmeans</strong> support provided by the package that implements the model-fitting procedure. Users should refer to the package documentation for details on <strong>emmeans</strong> support. In some cases, a package’s models may have been supported here in <strong>emmeans</strong>; if so, the other package’s support overrides it.</p>
 </div>
 <div id="Q" class="section level2">
 <h2>Q – Quantile regression</h2>

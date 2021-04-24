@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.5.5.1" />
+<meta name="author" content="emmeans package, Version 1.6.0" />
 
 
 <title>Prediction in emmeans</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Prediction in <strong>emmeans</strong></h1>
-<h4 class="author">emmeans package, Version 1.5.5.1</h4>
+<h4 class="author">emmeans package, Version 1.6.0</h4>
 
 
 
@@ -81,9 +81,8 @@ rg@misc$sigma</code></pre>
 <!-- @index Examples!`feedlot`; Predictions!Total SD; Predictions!graphics -->
 <p>To illustrate, consider the <code>feedlot</code> dataset provided with the package. Here we have several herds of feeder cattle that are sent to feed lots and given one of three diets. The weights of the cattle are measured at time of entry (<code>ewt</code>) and at time of slaughter (<code>swt</code>). Different herds have possibly different entry weights, based on breed and ranching practices, so we will center each herd’s <code>ewt</code> measurements, then use that as a covariate in a mixed model:</p>
 <pre class="r"><code>feedlot = transform(feedlot, adj.ewt = ewt - predict(lm(ewt ~ herd)))
-require(lme4)</code></pre>
-<pre><code>## Warning: package &#39;lme4&#39; was built under R version 4.0.4</code></pre>
-<pre class="r"><code>feedlot.lmer &lt;- lmer(swt ~ adj.ewt + diet + (1|herd), data = feedlot)
+require(lme4)
+feedlot.lmer &lt;- lmer(swt ~ adj.ewt + diet + (1|herd), data = feedlot)
 feedlot.rg &lt;- ref_grid(feedlot.lmer, at = list(adj.ewt = 0))
 summary(feedlot.rg)  ## point predictions</code></pre>
 <pre class="ro"><code>##  adj.ewt diet   prediction   SE   df

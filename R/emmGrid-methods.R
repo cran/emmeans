@@ -90,11 +90,18 @@ str.emmGrid <- function(object, ...) {
 
 
 #' @rdname emmGrid-methods
+#' @param export Logical value. If \code{FALSE}, the object is printed. 
+#'   If \code{TRUE}, a list is invisibly returned, which contains character
+#'   elements named \code{summary} and \code{annotations} that may be saved 
+#'   or displayed as the user sees fit. \code{summary} is a character matrix 
+#'   (or list of such matrices, if a \code{by} variable is in effect).
+#'   \code{annotations} is a character vector of the annotations that would 
+#'   have been printed below the summary or summaries.
 #' @method print emmGrid
 #' @param x An \code{emmGrid} object
 #' @export
-print.emmGrid = function(x,...)
-    print(summary.emmGrid(x, ...))
+print.emmGrid = function(x, ..., export = FALSE)
+    print(summary.emmGrid(x, ...), export = export)
 
 
 # vcov method
@@ -515,7 +522,8 @@ update.emmGrid = function(object, ..., silent = FALSE) {
 #' rank-deficient cases. If absent, the value in \code{emm_defaults$estble.tol)}
 #' is used.}
 #' \item{\code{save.ref_grid}}{Logical value of \code{TRUE} if you wish the 
-#' latest reference grid created to be saved in \code{.Last.ref_grid}}
+#' latest reference grid created to be saved in \code{.Last.ref_grid}.
+#' The default is \code{FALSE}.}
 #' \item{Options for \code{lme4::lmerMod} models}{Options \code{lmer.df},
 #' \code{disable.pbkrtest}, \code{pbkrtest.limit}, \code{disable.lmerTest},
 #' and \code{lmerTest.limit}
@@ -628,7 +636,7 @@ emm_defaults = list (
     ref_grid = list(is.new.rg = TRUE, infer = c(FALSE, FALSE)),
     emmeans = list(infer = c(TRUE, FALSE)),
     contrast = list(infer = c(FALSE, TRUE)),
-    save.ref_grid = TRUE,     # save new ref_grid in .Last.ref_grid
+    save.ref_grid = FALSE,    # save new ref_grid in .Last.ref_grid
     cov.keep = "2",           # default for cov.keep arg in ref_grid
     sep = " ",                # separator for combining factor levels
     parens = c("-|\\+|\\/|\\*", "(", ")"), # patterns for what/how to parenthesize in contrast

@@ -1,5 +1,32 @@
 ## NEWS for the emmeans package
 
+emmeans 1.6.0
+-------------
+This version has some changes that affect all users, e.g., not saving
+`.Last.ref_grid`, so we incremented the sub-version number.
+
+  * Changed handling of logit transformations in `contrast()`, so that the 
+    odds-ratio transformation persists into subsequent `contrast()` calls
+    e.g., interaction contrasts.
+  * We also made `contrast(..., type = ...)` work correctly
+  * Bug fix so that all `p.adjust.methods` work (#267)
+  * Support for `mblogit` extended to work with `mmblogit` models (#268)
+    (However, since, **mclogit** pkg incorporates its own interface)
+  * Added `export` option in `print.emmGrid()` and `print.emm_summary()`
+  * Changed default for `emm_options(save.ref_grid = FALSE)`. Years ago, it
+    seemed potentially useful to save the last reference grid, but this is
+    extra overhead, and writes in the user's global environment. 
+    The option remains if you want it.
+  * Added a note advising against using `as.data.frame` (because we lose
+    potentially important annotations), and information/example on how to
+    see more digits (which I guess is why I'm seeing users do this).
+  * Further refinement to nesting detection. A model like `y ~ A:B` detected
+    `A %in% B` and `B %in% A`, and hence `A %in% A*B` and `B %in% A*B` 
+    due to a change in 1.4.6. Now we omit cases where factors are nested in themselves!
+  * Expansion of `cov.reduce` formulas to allow use of custom models for
+    predicting mediating covariates
+  
+
 emmeans 1.5.5
 -------------
 

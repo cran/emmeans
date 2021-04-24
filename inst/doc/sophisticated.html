@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.5.5.1" />
+<meta name="author" content="emmeans package, Version 1.6.0" />
 
 
 <title>Sophisticated models in emmeans</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Sophisticated models in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.5.5.1</h4>
+<h4 class="author">emmeans package, Version 1.6.0</h4>
 
 
 
@@ -354,7 +354,6 @@ cbpp_prior.rg &lt;- ref_grid(cbpp_prior.rstan)</code></pre>
 <p>We can access the posterior EMMs via the <code>as.mcmc</code> method for <code>emmGrid</code> objects. This gives us an object of class <code>mcmc</code> (defined in the <strong>coda</strong> package), which can be summarized and explored as we please.</p>
 <pre class="r"><code>require(&quot;coda&quot;)</code></pre>
 <pre><code>## Loading required package: coda</code></pre>
-<pre><code>## Warning: package &#39;coda&#39; was built under R version 4.0.4</code></pre>
 <pre class="r"><code>summary(as.mcmc(cbpp.rg))</code></pre>
 <pre class="ro"><code>## 
 ## Iterations = 1:500
