@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.6.0" />
+<meta name="author" content="emmeans package, Version 1.6.1" />
 
 
 <title>Comparisons and contrasts in emmeans</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Comparisons and contrasts in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.6.0</h4>
+<h4 class="author">emmeans package, Version 1.6.1</h4>
 
 
 
@@ -230,8 +230,8 @@ org.emml</code></pre>
 ##  contrast estimate   SE df t.ratio p.value
 ##  2 - 1      -0.772 3.78 25 -0.204  0.9997 
 ##  3 - 2       6.658 3.78 25  1.763  0.3245 
-##  4 - 3      -5.716 3.78 25 -1.513  0.4679 
-##  5 - 4       4.882 3.78 25  1.293  0.6130 
+##  4 - 3      -5.716 3.78 25 -1.513  0.4681 
+##  5 - 4       4.882 3.78 25  1.293  0.6127 
 ##  6 - 5      -1.321 3.78 25 -0.350  0.9965 
 ## 
 ## P value adjustment: mvt method for 5 tests</code></pre>
@@ -316,10 +316,10 @@ org.emml</code></pre>
 ## Results are given on the log (not the response) scale. 
 ## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre>
 <pre class="r"><code>pairs(pigs.emm.s, type = &quot;response&quot;)</code></pre>
-<pre class="ro"><code>##  contrast    ratio     SE df t.ratio p.value
-##  fish / soy  0.761 0.0403 23 -5.153  0.0001 
-##  fish / skim 0.669 0.0362 23 -7.428  &lt;.0001 
-##  soy / skim  0.879 0.0466 23 -2.442  0.0570 
+<pre class="ro"><code>##  contrast    ratio     SE df null t.ratio p.value
+##  fish / soy  0.761 0.0403 23    1 -5.153  0.0001 
+##  fish / skim 0.669 0.0362 23    1 -7.428  &lt;.0001 
+##  soy / skim  0.879 0.0466 23    1 -2.442  0.0570 
 ## 
 ## Results are averaged over the levels of: percent 
 ## P value adjustment: tukey method for comparing a family of 3 estimates 

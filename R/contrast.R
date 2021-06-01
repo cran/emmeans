@@ -382,7 +382,7 @@ contrast.emmGrid = function(object, method = "eff", interaction = FALSE,
     }
     misc$methDesc = attr(cmat, "desc")
     misc$famSize = ifelse(is.null(fs <- attr(cmat, "famSize")), length(by.rows[[1]]), fs)
-    misc$pri.vars = setdiff(names(grid), c(".offset.",".wgt."))
+    misc$pri.vars = setdiff(names(grid), c(by, ".offset.",".wgt."))
     if (missing(adjust)) adjust = attr(cmat, "adjust")
     if (is.null(adjust)) adjust = "none"
     if (!is.null(attr(cmat, "offset")))
@@ -398,6 +398,8 @@ contrast.emmGrid = function(object, method = "eff", interaction = FALSE,
     misc$adjust = adjust
     misc$infer = c(FALSE, TRUE)
     misc$by.vars = by
+    if(!is.na(misc$estType) && misc$estType == "pairs") # internal flag to keep track of original by vars for paired comps
+        misc$.pairby = paste(c("", by), collapse = ",")
     # save contrast coefs
     by.cols = seq_len(ncol(tcmat))
     if(!is.null(by.rows))
@@ -414,7 +416,8 @@ contrast.emmGrid = function(object, method = "eff", interaction = FALSE,
     # zap the transformation info except in special cases
     if (!is.null(misc$tran)) {
         misc$orig.tran = .fmt.tran(misc)
-        if (ratios && true.con && misc$tran %in% c("log", "genlog", "logit", "log.o.r.")) {
+        if (ratios && true.con && misc$tran %in% c("log", "log2", "log10", ### REMOVED "genlog", 
+                                                   "logit", "log.o.r.")) {
             misc$log.contrast = TRUE      # remember how we got here; used by summary
             misc$orig.inv.lbl = misc$inv.lbl
             if (misc$tran == "logit") {
@@ -427,7 +430,7 @@ contrast.emmGrid = function(object, method = "eff", interaction = FALSE,
             }
             else {
                 misc$inv.lbl = "ratio"
-                misc$tran = "log"
+                ### (stays at log, log2, log10)   misc$tran = "log"
                 misc$tran.mult = misc$tran.offset = NULL
             }
         }

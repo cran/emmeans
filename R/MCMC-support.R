@@ -465,9 +465,9 @@ recover_data.mcmc = function(object, formula, data, ...) {
     recover_data(cl, trms, NULL, data, ...)
 }
 
-emm_basis.mcmc = function(object, trms, xlev, grid, vcov., ...) {
+emm_basis.mcmc = function(object, trms, xlev, grid, vcov., contrasts.arg = NULL, ...) {
     m = model.frame(trms, grid, na.action = na.pass, xlev = xlev)
-    X = model.matrix(trms, m, contrasts.arg = NULL)
+    X = model.matrix(trms, m, contrasts.arg = contrasts.arg)
     samp = as.matrix(object)[, seq_len(ncol(X)), drop = FALSE]
     bhat = apply(samp, 2, mean)
     if (missing(vcov.))
@@ -487,7 +487,7 @@ recover_data.mcmc.list = function(object, formula, data, ...) {
 }
 
 emm_basis.mcmc.list = function(object, trms, xlev, grid, vcov., ...) {
-    result = emm_basis.mcmc(object[[1]], trms, xlev, grid, vcov, ...)
+    result = emm_basis.mcmc(object[[1]], trms, xlev, grid, vcov., ...)
     cols = seq_len(ncol(result$post.beta))
     for (i in 2:length(object))
         result$post.beta = rbind(result$post.beta, 

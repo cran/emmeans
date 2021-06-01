@@ -42,6 +42,23 @@ pairs(neuralgia.emm, reverse = TRUE)
 ## -------------------------------------------------------------------------------------------------
 emmip(neuralgia.glm, Sex ~ Treatment)
 
+## ---- fig.height = 1.5----------------------------------------------------------------------------
+neur.Trt.emm <- suppressMessages(emmeans(neuralgia.glm, "Treatment"))
+plot(neur.Trt.emm)   # Link scale by default
+plot(neur.Trt.emm, type = "response")
+
+## ---- fig.height = 1.5----------------------------------------------------------------------------
+plot(neur.Trt.emm, type = "scale")
+
+## ---- fig.height = 1.5----------------------------------------------------------------------------
+plot(neur.Trt.emm, type = "scale", breaks = seq(0.10, 0.90, by = 0.10),
+     minor_breaks = seq(0.05, 0.95, by = 0.05))
+
+## ---- fig.height = 1.5----------------------------------------------------------------------------
+plot(neur.Trt.emm, type = "response") +
+  ggplot2::scale_x_continuous(trans = scales::asn_trans(),
+                              breaks = seq(0.10, 0.90, by = 0.10))
+
 ## -------------------------------------------------------------------------------------------------
 warp.glm <- glm(sqrt(breaks) ~ wool*tension, family = Gamma, data = warpbreaks)
 ref_grid(warp.glm)

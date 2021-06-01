@@ -41,6 +41,7 @@
 #' The functions \code{\link{emmeans}}, \code{\link{ref_grid}}, and related ones
 #' automatically detect response transformations that are recognized by
 #' examining the model formula. These are \code{log}, \code{log2}, \code{log10},
+#' \code{log1p},
 #' \code{sqrt}, \code{logit}, \code{probit}, \code{cauchit}, \code{cloglog}; as
 #' well as (for a response variable \code{y}) \code{asin(sqrt(y))},
 #' \code{asinh(sqrt(y))}, and \code{sqrt(y) + sqrt(y+1)}. In addition, any
@@ -324,6 +325,12 @@ make.tran = function(type = c("genlog", "power", "boxcox", "sympower",
              mu.eta = function(eta) 2^eta * log(2),
              name = "log2"
          ),
+         log1p = list(
+             linkfun = log1p,
+             linkinv = expm1,
+             mu.eta = exp,
+             name = "log1p"
+         ),
          asin.sqrt = make.tran("asin.sqrt"),
          `asin.sqrt./` = make.tran("asin.sqrt", 100),
          asinh.sqrt = list(
@@ -355,5 +362,29 @@ make.tran = function(type = c("genlog", "power", "boxcox", "sympower",
          }
     )
     result
+}
+
+
+### Internal routine to make a scales::trans object
+.make.scale = function(misc) {
+    if (!requireNamespace("scales", quiet = TRUE)) 
+        stop("type = \"scale\" requires the 'scales' package to be installed")
+    tran = misc$tran
+    if (is.character(tran)) {
+        # is it a canned scale?
+        if ((length(intersect(names(misc), c("tran.mult", "tran.offset"))) == 0) && 
+            tran %in% c("log", "log1p", "log2", "log10", "sqrt", "logit", "probit", 
+                        "exp", "identity"))
+            return(get(paste(tran, "trans", sep = "_"), envir = asNamespace("scales"))())
+        # not built-in, so let's get a list
+        tran = .make.link(tran)
+    }
+    # tran is a list. we'll incorporate any scaling
+    tran$mult = ifelse(is.null(misc$tran.mult), 1, misc$tran.mult)
+    tran$offset = ifelse(is.null(misc$tran.offset), 0, misc$tran.offset)
+    with(tran, 
+         scales::trans_new(name, 
+                           function(x) mult * linkfun(x + offset), 
+                           function(z) linkinv(z / mult) - offset))
 }
 

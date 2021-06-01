@@ -1,5 +1,27 @@
 ## NEWS for the emmeans package
 
+emmeans 1.6.1
+-------------
+
+  * Fixed a bug in parsing a response transformation (#274)
+  * Changed `handling of`contrast()` so that `log2` and `log10` transformations 
+    are handled just like `log`. (#273) Also disabled making ratios with
+    `genlog` as it seems ill-advised.
+  * Added support for `log1p` transformation
+  * Improved detection of cases where Tukey adjustment is [in]appropriate (#275)
+  * Added `type = "scale"` argument to `plot.emmGrid()` and `emmip()`. This
+    is the same as `type = "response"` except the scale itself is transformed
+    (i.e., a log scale if the log transformation was used). Since the same
+    transformation is used, the appearance of the plot will be the same as with
+    `type = "lp"`, but with an altered axis scale. Currently this is implemented
+    only with `engine = "ggplot"`.
+  * Fixed bug whereby Scheffe is ignored when there is only one contrast, even
+    though `scheffe.rank` > 1 was specified. (#171)
+  * Added a `subset()` method for `emmGrid` objects
+  * Bug fixes for `mcmc` and `mcmc.list` objects (#278, #279)
+  * `test()` shows `null` whenever it is nonzero on the chosen scale (#280)
+
+
 emmeans 1.6.0
 -------------
 This version has some changes that affect all users, e.g., not saving

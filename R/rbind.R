@@ -29,8 +29,10 @@
 #' doing this would be to obtain multiplicity-adjusted results for smaller
 #' or larger families of tests or confidence intervals. 
 #' 
-#' @param ... In \code{rbind}, object(s) of class \code{emmGrid}. 
-#'   In \code{"["}, it is ignored.
+#' @param ... Additional arguments:
+#'   In \code{rbind}, object(s) of class \code{emmGrid}. 
+#'   In \code{"["}, it is ignored. 
+#'   In \code{subset}, it is passed to \code{[.emmGrid]}
 #' @param deparse.level (required but not used)
 #' @param adjust Character value passed to \code{\link{update.emmGrid}}
 #' 
@@ -97,8 +99,10 @@ rbind.emmGrid = function(..., deparse.level = 1, adjust = "bonferroni") {
     obj@levels = lapply(gnms, function(nm) unique(grid[[nm]]))
     names(obj@levels) = gnms
     obj@roles$predictors = setdiff(names(obj@levels), obj@roles$multresp)
+    obj@misc$con.coef = obj@misc$orig.grid = obj@misc$.pairby = NULL
     update(obj, pri.vars = gnms, by.vars = NULL, adjust = adjust,
-           famSize = round((1 + sqrt(1 + 8*n)) / 2, 3),
+           estType = "rbind",
+           famSize = n,   # instead of round((1 + sqrt(1 + 8*n)) / 2, 3),
            avgd.over = avgd.over)
 }
 #' @rdname rbind.emmGrid
@@ -132,7 +136,8 @@ rbind.emmGrid = function(..., deparse.level = 1, adjust = "bonferroni") {
 "[.emmGrid" = function(x, i, adjust, drop.levels = TRUE, ...) {
     x@linfct = x@linfct[i, , drop = FALSE]
     x@grid = x@grid[i, , drop = FALSE]                  
-    x = update(x, pri.vars = names(x@grid), famSize = length(i))
+    x = update(x, pri.vars = names(x@grid), famSize = length(i), estType = "[")
+    x@misc$orig.grid = x@misc$con.coef = x@misc$.pairby = NULL
     x@misc$by.vars = NULL
     if(!missing(adjust))
         x@misc$adjust = adjust
@@ -143,5 +148,19 @@ rbind.emmGrid = function(..., deparse.level = 1, adjust = "bonferroni") {
             x@levels[[nm]] = unique(x@grid[[nm]])
     }
     x
+}
+
+#' @rdname rbind.emmGrid
+#' @param subset logical expression indicating which rows of the grid to keep
+#' @method subset emmGrid
+#' @export
+#' @examples
+#' 
+#' # After-the-fact 'at' specification
+#' subset(warp.rg, wool == "A")  ## or warp.rg |> subset(wool == "A")
+#' 
+subset.emmGrid = function(x, subset, ...) {
+    sel = eval(substitute(subset), envir = x@grid)
+    x[sel, ...]
 }
 

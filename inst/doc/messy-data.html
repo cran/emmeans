@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.6.0" />
+<meta name="author" content="emmeans package, Version 1.6.1" />
 
 
 <title>Working with messy data</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Working with messy data</h1>
-<h4 class="author">emmeans package, Version 1.6.0</h4>
+<h4 class="author">emmeans package, Version 1.6.1</h4>
 
 
 
@@ -112,6 +112,8 @@ car::Anova(nutr.lm)</code></pre>
 <p>We can’t make predictions for all the cases we are averaging over in the above EMMs, and that is why some of them are non-estimable. The bottom line is that we simply cannot include Hispanics in the mix when comparing factor effects. That’s a limitation of this study that cannot be overcome without collecting additional data. Our choices for further analysis are to focus only on Black and White populations; or to focus only on age group 3. For example (the latter):</p>
 <pre class="r"><code>summary(emmeans(nutr.lm, pairwise ~ group | race, at = list(age = &quot;3&quot;)), 
     by = NULL)</code></pre>
+<pre><code>## Note: adjust = &quot;tukey&quot; was changed to &quot;sidak&quot;
+## because &quot;tukey&quot; is only appropriate for one set of pairwise comparisons</code></pre>
 <pre class="ro"><code>## $emmeans
 ##  group      race     emmean   SE df lower.CL upper.CL
 ##  FoodStamps Black      7.50 2.67 92     2.19   12.807
@@ -125,9 +127,11 @@ car::Anova(nutr.lm)</code></pre>
 ## 
 ## $contrasts
 ##  contrast           race     estimate   SE df t.ratio p.value
-##  FoodStamps - NoAid Black       11.17 3.45 92  3.237  0.0017 
-##  FoodStamps - NoAid Hispanic    -2.50 6.55 92 -0.382  0.7034 
-##  FoodStamps - NoAid White        5.62 1.53 92  3.666  0.0004</code></pre>
+##  FoodStamps - NoAid Black       11.17 3.45 92  3.237  0.0050 
+##  FoodStamps - NoAid Hispanic    -2.50 6.55 92 -0.382  0.9739 
+##  FoodStamps - NoAid White        5.62 1.53 92  3.666  0.0012 
+## 
+## P value adjustment: sidak method for 3 tests</code></pre>
 <p>(We used trickery with providing a <code>by</code> variable, and then taking it away, to make the output more compact.) Evidently, the training program has been beneficial to the Black and White groups in that age category. There is no conclusion for the Hispanic group – for which we have very little data.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
@@ -198,6 +202,8 @@ emmeans(emmeans(model, c(&quot;A&quot;, &quot;B&quot;), weights = &quot;prop&quo
 <p>We have just seen that we can assign different weights to the levels of containing factors. Another option is to constrain the effects of those containing factors to zero. In essence, that means fitting a different model without those containing effects; however, for certain models (not all), an <code>emmGrid</code> may be updated with a <code>submodel</code> specification so as to impose such a constraint. For illustration, return again to the nutrition example, and consider the analysis of <code>group</code> and <code>race</code> as before, after removing interactions involving <code>age</code>:</p>
 <pre class="r"><code>summary(emmeans(nutr.lm, pairwise ~ group | race, submodel = ~ age + group*race), 
         by = NULL)</code></pre>
+<pre><code>## Note: adjust = &quot;tukey&quot; was changed to &quot;sidak&quot;
+## because &quot;tukey&quot; is only appropriate for one set of pairwise comparisons</code></pre>
 <pre class="ro"><code>## $emmeans
 ##  group      race     emmean    SE df lower.CL upper.CL
 ##  FoodStamps Black      4.91 2.061 92    0.817    9.003
@@ -213,11 +219,12 @@ emmeans(emmeans(model, c(&quot;A&quot;, &quot;B&quot;), weights = &quot;prop&quo
 ## 
 ## $contrasts
 ##  contrast           race     estimate   SE df t.ratio p.value
-##  FoodStamps - NoAid Black        7.92 2.62 92  3.021  0.0033 
-##  FoodStamps - NoAid Hispanic    -2.50 6.55 92 -0.382  0.7034 
-##  FoodStamps - NoAid White        5.54 1.27 92  4.364  &lt;.0001 
+##  FoodStamps - NoAid Black        7.92 2.62 92  3.021  0.0098 
+##  FoodStamps - NoAid Hispanic    -2.50 6.55 92 -0.382  0.9739 
+##  FoodStamps - NoAid White        5.54 1.27 92  4.364  0.0001 
 ## 
-## Results are averaged over the levels of: age</code></pre>
+## Results are averaged over the levels of: age 
+## P value adjustment: sidak method for 3 tests</code></pre>
 <p>If you like, you may confirm that we would obtain exactly the same estimates if we had fitted that sub-model to the data, except we continue to use the residual variance from the full model in tests and confidence intervals. Without the interactions with <code>age</code>, all of the marginal means become estimable. The results are somewhat different from those obtained earlier where we narrowed the scope to just age 3. These new estimates include all ages, averaging over them equally, but with constraints that the interaction effects involving <code>age</code> are all zero.</p>
 <div id="type2submodel" class="section level6">
 <h6></h6>
