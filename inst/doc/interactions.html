@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.6.1" />
+<meta name="author" content="emmeans package, Version 1.6.2.1" />
 
 
 <title>Interaction analysis in emmeans</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Interaction analysis in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.6.1</h4>
+<h4 class="author">emmeans package, Version 1.6.2.1</h4>
 
 
 
@@ -58,6 +58,7 @@
 <li><a href="#simple">Simple contrasts</a></li>
 </ol></li>
 <li><a href="#contrasts">Interaction contrasts</a></li>
+<li><a href="#multiv">Multivariate contrasts</a></li>
 <li><a href="#covariates">Interactions with covariates</a></li>
 <li><a href="#summary">Summary</a></li>
 </ol>
@@ -98,9 +99,9 @@ anova(noise.lm)</code></pre>
 ## 
 ## $contrasts
 ##  contrast estimate    SE df t.ratio p.value
-##  S - M      -0.958 0.156 24 -6.147  &lt;.0001 
-##  S - L       5.167 0.156 24 33.140  &lt;.0001 
-##  M - L       6.125 0.156 24 39.287  &lt;.0001 
+##  S - M      -0.958 0.156 24  -6.147  &lt;.0001
+##  S - L       5.167 0.156 24  33.140  &lt;.0001
+##  M - L       6.125 0.156 24  39.287  &lt;.0001
 ## 
 ## Results are averaged over the levels of: type, side 
 ## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre>
@@ -132,15 +133,15 @@ anova(noise.lm)</code></pre>
 ## $contrasts
 ## type = Std:
 ##  contrast estimate   SE df t.ratio p.value
-##  S - M     -2.0000 0.22 24 -9.071  &lt;.0001 
-##  S - L      5.0833 0.22 24 23.056  &lt;.0001 
-##  M - L      7.0833 0.22 24 32.127  &lt;.0001 
+##  S - M     -2.0000 0.22 24  -9.071  &lt;.0001
+##  S - L      5.0833 0.22 24  23.056  &lt;.0001
+##  M - L      7.0833 0.22 24  32.127  &lt;.0001
 ## 
 ## type = Octel:
 ##  contrast estimate   SE df t.ratio p.value
-##  S - M      0.0833 0.22 24  0.378  0.9245 
-##  S - L      5.2500 0.22 24 23.812  &lt;.0001 
-##  M - L      5.1667 0.22 24 23.434  &lt;.0001 
+##  S - M      0.0833 0.22 24   0.378  0.9245
+##  S - L      5.2500 0.22 24  23.812  &lt;.0001
+##  M - L      5.1667 0.22 24  23.434  &lt;.0001
 ## 
 ## Results are averaged over the levels of: side 
 ## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre>
@@ -158,26 +159,26 @@ anova(noise.lm)</code></pre>
 <p>Ordinarily, when <code>simple</code> is a list (or equal to <code>&quot;each&quot;</code>), a list of contrast sets is returned. However, if the additional argument <code>combine</code> is set to <code>TRUE</code>, they are all combined into one family:</p>
 <pre class="r"><code>contrast(noise.emm, &quot;consec&quot;, simple = &quot;each&quot;, combine = TRUE, adjust = &quot;mvt&quot;)</code></pre>
 <pre class="ro"><code>##  side type  size contrast    estimate    SE df t.ratio p.value
-##  L    Std   .    M - S          1.500 0.312 24   4.811 0.0012 
-##  L    Std   .    L - M         -8.667 0.312 24 -27.795 &lt;.0001 
-##  R    Std   .    M - S          2.500 0.312 24   8.018 &lt;.0001 
-##  R    Std   .    L - M         -5.500 0.312 24 -17.639 &lt;.0001 
-##  L    Octel .    M - S         -0.333 0.312 24  -1.069 0.9770 
-##  L    Octel .    L - M         -5.667 0.312 24 -18.174 &lt;.0001 
-##  R    Octel .    M - S          0.167 0.312 24   0.535 0.9999 
-##  R    Octel .    L - M         -4.667 0.312 24 -14.967 &lt;.0001 
-##  .    Std   S    R - L         -1.833 0.312 24  -5.880 0.0001 
-##  .    Std   M    R - L         -0.833 0.312 24  -2.673 0.1712 
-##  .    Std   L    R - L          2.333 0.312 24   7.483 &lt;.0001 
-##  .    Octel S    R - L         -0.500 0.312 24  -1.604 0.7746 
-##  .    Octel M    R - L          0.000 0.312 24   0.000 1.0000 
-##  .    Octel L    R - L          1.000 0.312 24   3.207 0.0562 
-##  L    .     S    Octel - Std   -1.000 0.312 24  -3.207 0.0563 
-##  L    .     M    Octel - Std   -2.833 0.312 24  -9.087 &lt;.0001 
-##  L    .     L    Octel - Std    0.167 0.312 24   0.535 0.9999 
-##  R    .     S    Octel - Std    0.333 0.312 24   1.069 0.9769 
-##  R    .     M    Octel - Std   -2.000 0.312 24  -6.414 &lt;.0001 
-##  R    .     L    Octel - Std   -1.167 0.312 24  -3.742 0.0163 
+##  L    Std   .    M - S          1.500 0.312 24   4.811  0.0011
+##  L    Std   .    L - M         -8.667 0.312 24 -27.795  &lt;.0001
+##  R    Std   .    M - S          2.500 0.312 24   8.018  &lt;.0001
+##  R    Std   .    L - M         -5.500 0.312 24 -17.639  &lt;.0001
+##  L    Octel .    M - S         -0.333 0.312 24  -1.069  0.9769
+##  L    Octel .    L - M         -5.667 0.312 24 -18.174  &lt;.0001
+##  R    Octel .    M - S          0.167 0.312 24   0.535  0.9999
+##  R    Octel .    L - M         -4.667 0.312 24 -14.967  &lt;.0001
+##  .    Std   S    R - L         -1.833 0.312 24  -5.880  0.0001
+##  .    Std   M    R - L         -0.833 0.312 24  -2.673  0.1719
+##  .    Std   L    R - L          2.333 0.312 24   7.483  &lt;.0001
+##  .    Octel S    R - L         -0.500 0.312 24  -1.604  0.7744
+##  .    Octel M    R - L          0.000 0.312 24   0.000  1.0000
+##  .    Octel L    R - L          1.000 0.312 24   3.207  0.0565
+##  L    .     S    Octel - Std   -1.000 0.312 24  -3.207  0.0559
+##  L    .     M    Octel - Std   -2.833 0.312 24  -9.087  &lt;.0001
+##  L    .     L    Octel - Std    0.167 0.312 24   0.535  0.9999
+##  R    .     S    Octel - Std    0.333 0.312 24   1.069  0.9768
+##  R    .     M    Octel - Std   -2.000 0.312 24  -6.414  &lt;.0001
+##  R    .     L    Octel - Std   -1.167 0.312 24  -3.742  0.0163
 ## 
 ## P value adjustment: mvt method for 20 tests</code></pre>
 <p>The dots (<code>.</code>) in this result correspond to which simple effect is being displayed. If we re-run this same call with <code>combine = FALSE</code> or omitted, these twenty comparisons would be displayed in three broad sets of contrasts, each broken down further by combinations of <code>by</code> variables, each separately multiplicity-adjusted (a total of 16 different tables).</p>
@@ -192,21 +193,21 @@ anova(noise.lm)</code></pre>
 <pre class="r"><code>contrast(emm_s.t[[1]], &quot;poly&quot;)   ## &#39;by = &quot;type&quot;&#39; already in previous result </code></pre>
 <pre class="ro"><code>## type = Std:
 ##  contrast  estimate    SE df t.ratio p.value
-##  linear       -5.08 0.220 24 -23.056 &lt;.0001 
-##  quadratic    -9.08 0.382 24 -23.786 &lt;.0001 
+##  linear       -5.08 0.220 24 -23.056  &lt;.0001
+##  quadratic    -9.08 0.382 24 -23.786  &lt;.0001
 ## 
 ## type = Octel:
 ##  contrast  estimate    SE df t.ratio p.value
-##  linear       -5.25 0.220 24 -23.812 &lt;.0001 
-##  quadratic    -5.08 0.382 24 -13.311 &lt;.0001 
+##  linear       -5.25 0.220 24 -23.812  &lt;.0001
+##  quadratic    -5.08 0.382 24 -13.311  &lt;.0001
 ## 
 ## Results are averaged over the levels of: side</code></pre>
 <p>The comparison of these contrasts may be done using the <code>interaction</code> argument in <code>contrast()</code> as follows:</p>
 <pre class="r"><code>IC_st &lt;- contrast(emm_s.t[[1]], interaction = c(&quot;poly&quot;, &quot;consec&quot;), by = NULL)
 IC_st</code></pre>
 <pre class="ro"><code>##  size_poly type_consec estimate    SE df t.ratio p.value
-##  linear    Octel - Std   -0.167 0.312 24 -0.535  0.5979 
-##  quadratic Octel - Std    4.000 0.540 24  7.407  &lt;.0001 
+##  linear    Octel - Std   -0.167 0.312 24  -0.535  0.5979
+##  quadratic Octel - Std    4.000 0.540 24   7.407  &lt;.0001
 ## 
 ## Results are averaged over the levels of: side</code></pre>
 <p>(Using <code>by = NULL</code> restores <code>type</code> to a primary factor in these contrasts.) The practical meaning of this is that there isn’t a statistical difference in the linear trends, but the quadratic trend for Octel is greater than for standard filter types. (Both quadratic trends are negative, so in fact it is the standard filters that have more pronounced <em>downward</em> curvature, as is seen in the plot.) In case you need to understand more clearly what contrasts are being estimated, the <code>coef()</code> method helps:</p>
@@ -222,39 +223,75 @@ IC_st</code></pre>
 <p>By the way, “type III” tests of interaction effects can be obtained via interaction contrasts:</p>
 <pre class="r"><code>test(IC_st, joint = TRUE)</code></pre>
 <pre class="ro"><code>##  df1 df2 F.ratio p.value
-##    2  24  27.571 &lt;.0001</code></pre>
+##    2  24  27.571  &lt;.0001</code></pre>
 <p>This result is exactly the same as the <em>F</em> test of <code>size:type</code> in the <code>anova</code> output.</p>
 <p>The three-way interaction may be explored via interaction contrasts too:</p>
 <pre class="r"><code>contrast(emmeans(noise.lm, ~ size*type*side),
          interaction = c(&quot;poly&quot;, &quot;consec&quot;, &quot;consec&quot;))</code></pre>
 <pre class="ro"><code>##  size_poly type_consec side_consec estimate    SE df t.ratio p.value
-##  linear    Octel - Std R - L          -2.67 0.624 24 -4.276  0.0003 
-##  quadratic Octel - Std R - L          -1.67 1.080 24 -1.543  0.1359</code></pre>
+##  linear    Octel - Std R - L          -2.67 0.624 24  -4.276  0.0003
+##  quadratic Octel - Std R - L          -1.67 1.080 24  -1.543  0.1359</code></pre>
 <p>One interpretation of this is that the comparison by <code>type</code> of the linear contrasts for <code>size</code> is different on the left side than on the right side; but the comparison of that comparison of the quadratic contrasts, not so much. Refer again to the plot, and this can be discerned as a comparison of the interaction in the left panel versus the interaction in the right panel.</p>
 <!-- @index `joint_tests()` -->
 <p>Finally, <strong>emmeans</strong> provides a <code>joint_tests()</code> function that obtains and tests the interaction contrasts for all effects in the model and compiles them in one Type-III-ANOVA-like table:</p>
 <pre class="r"><code>joint_tests(noise.lm)</code></pre>
 <pre class="ro"><code>##  model term     df1 df2 F.ratio p.value
-##  size             2  24 893.190 &lt;.0001 
-##  type             1  24  72.429 &lt;.0001 
-##  side             1  24   0.048 0.8291 
-##  size:type        2  24  27.571 &lt;.0001 
-##  size:side        2  24  44.333 &lt;.0001 
-##  type:side        1  24   1.190 0.2861 
-##  size:type:side   2  24  10.333 0.0006</code></pre>
+##  size             2  24 893.190  &lt;.0001
+##  type             1  24  72.429  &lt;.0001
+##  side             1  24   0.048  0.8291
+##  size:type        2  24  27.571  &lt;.0001
+##  size:side        2  24  44.333  &lt;.0001
+##  type:side        1  24   1.190  0.2861
+##  size:type:side   2  24  10.333  0.0006</code></pre>
 <p>You may even add <code>by</code> variable(s) to obtain separate ANOVA tables for the remaining factors:</p>
 <pre class="r"><code>joint_tests(noise.lm, by = &quot;side&quot;)</code></pre>
 <pre class="ro"><code>## side = L:
 ##  model term df1 df2 F.ratio p.value
-##  size         2  24 651.714 &lt;.0001 
-##  type         1  24  46.095 &lt;.0001 
-##  size:type    2  24  23.524 &lt;.0001 
+##  size         2  24 651.714  &lt;.0001
+##  type         1  24  46.095  &lt;.0001
+##  size:type    2  24  23.524  &lt;.0001
 ## 
 ## side = R:
 ##  model term df1 df2 F.ratio p.value
-##  size         2  24 285.810 &lt;.0001 
-##  type         1  24  27.524 &lt;.0001 
-##  size:type    2  24  14.381 0.0001</code></pre>
+##  size         2  24 285.810  &lt;.0001
+##  type         1  24  27.524  &lt;.0001
+##  size:type    2  24  14.381  0.0001</code></pre>
+<p><a href="#contents">Back to Contents</a></p>
+</div>
+<div id="multiv" class="section level2">
+<h2>Multivariate contrasts</h2>
+<!-- @index Multivariate contrasts; Contrasts!Multivariate; Hotelling's $T^2$;
+            `mvcontrast()`    -->
+<p>In the preceding sections, the way we addressed interacting factors was to do comparisons or contrasts of some factors()) separately at levels of other factor(s). This leads to a lot of estimates and associated tests.</p>
+<p>Another approach is to compare things in a multivariate way. In the auto-noise example, for example, we have four means (corresponding to the four combinations of <code>type</code> and <code>size</code>) with each size of car, and we could consider comparing these <em>sets</em> of means. Such multivariate comparisons can be done via the <em>Mahalanobis distance</em> (a kind of standardized distance measure) between one set of four means and another. This is facilitated by the <code>mvcontrast()</code> function:</p>
+<pre class="r"><code>mvcontrast(noise.emm, &quot;pairwise&quot;, mult.name = c(&quot;type&quot;, &quot;side&quot;))</code></pre>
+<pre class="ro"><code>##  contrast T.square df1 df2 F.ratio p.value
+##  S - M      88.857   4  21  19.438  &lt;.0001
+##  S - L    1199.429   4  21 262.375  &lt;.0001
+##  M - L    1638.000   4  21 358.312  &lt;.0001
+## 
+## P value adjustment: sidak</code></pre>
+<p>In this output, the <code>T.square</code> values are Hotelling’s <span class="math inline">\(T^2\)</span> statistics, which are the squared Mahalanobis distances among the sets of four means. These results thus accomplish a similar objective as the initial comparisons presented in this vignette, but are not complicated by the issue that the factors interact. (Instead, we lose the directionality of the comparisons.) While all comparisons are “significant,” the <code>T.square</code> values indicate that large cars are statistically most different from the other sizes.</p>
+<p>We may still break things down using <code>by</code> variables. Suppose, for example, we wish to compare the two filter types for each size of car, without regard to which side:</p>
+<pre class="r"><code>update(mvcontrast(noise.emm, &quot;consec&quot;, mult.name = &quot;side&quot;, by = &quot;size&quot;), 
+       by = NULL)</code></pre>
+<pre class="ro"><code>##  contrast    size T.square df1 df2 F.ratio p.value
+##  Octel - Std S      11.429   2  23   5.476  0.0113
+##  Octel - Std M     123.714   2  23  59.280  &lt;.0001
+##  Octel - Std L      14.286   2  23   6.845  0.0047
+## 
+## P value adjustment: sidak</code></pre>
+<p>One detail to note about multivariate comparisons: in order to make complete sense, all the factors involved must interact. Suppose we were to repeat the initial multivariate comparison after removing all interactions:</p>
+<pre class="r"><code>mvcontrast(update(noise.emm, submodel = ~ side + size + type), 
+           &quot;pairwise&quot;, mult.name = c(&quot;type&quot;, &quot;side&quot;))</code></pre>
+<pre class="ro"><code>##  contrast T.square df1 df2  F.ratio p.value
+##  S - M      37.786   1  24   37.786  &lt;.0001
+##  S - L    1098.286   1  24 1098.286  &lt;.0001
+##  M - L    1543.500   1  24 1543.500  &lt;.0001
+## 
+## P value adjustment: sidak 
+## NOTE: Some or all d.f. are reduced due to singularities</code></pre>
+<p>Note that each <span class="math inline">\(F\)</span> ratio now has 1 d.f. Also, note that <code>T.square = F.ratio</code>, and you can verify that these values are equal to the squares of the <code>t.ratio</code>s in the initial example in this vignette (<span class="math inline">\((-6.147)^2 = 37.786\)</span>, etc.). That is, if we ignore all interactions, the multivariate tests are exactly equivalent to the univariate tests of the marginal means.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="covariates" class="section level2">
@@ -274,9 +311,9 @@ IC_st</code></pre>
 ## 
 ## $contrasts
 ##  contrast estimate    SE df t.ratio p.value
-##  A - B     0.24714 0.296  9  0.835  0.6919 
-##  A - C     0.24008 0.284  9  0.845  0.6863 
-##  B - C    -0.00705 0.306  9 -0.023  0.9997 
+##  A - B     0.24714 0.296  9   0.835  0.6919
+##  A - C     0.24008 0.284  9   0.845  0.6863
+##  B - C    -0.00705 0.306  9  -0.023  0.9997
 ## 
 ## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre>
 <p>We see the three slopes, but no two of them test as being statistically different.</p>
@@ -322,7 +359,7 @@ org.add &lt;- lm(cbind(sales1, sales2) ~ price1 + price2 + day + store, data = o
 ## 
 ## $contrasts
 ##  contrast        estimate   SE df t.ratio p.value
-##  sales1 - sales2   -0.887 0.24 22 -3.690  0.0013 
+##  sales1 - sales2   -0.887 0.24 22  -3.690  0.0013
 ## 
 ## Results are averaged over the levels of: day, store</code></pre>
 <p>From this, we can say that, starting with <code>price1</code> and <code>price2</code> both at their average values, we expect <code>sales1</code> to decrease by about .75 per unit increase in <code>price1</code>; meanwhile, there is a suggestion of a slight increase of <code>sales2</code>, but without much statistical evidence. Marginally, the first variety has a 0.89 disadvantage relative to sales of the second variety.</p>
@@ -339,7 +376,7 @@ org.add &lt;- lm(cbind(sales1, sales2) ~ price1 + price2 + day + store, data = o
 ## 
 ## $contrasts
 ##  contrast        estimate    SE df t.ratio p.value
-##  sales1 - sales2    0.917 0.143 22 6.387   &lt;.0001 
+##  sales1 - sales2    0.917 0.143 22   6.387  &lt;.0001
 ## 
 ## Results are averaged over the levels of: day, store</code></pre>
 <p>At the averages, increasing the price of variety 2 has the effect of decreasing sales of variety 2 while slightly increasing sales of variety 1 – a marginal difference of about .92.</p>
@@ -348,7 +385,7 @@ org.add &lt;- lm(cbind(sales1, sales2) ~ price1 + price2 + day + store, data = o
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
-<p>Interaction, by nature, make things more complicated. One must resist pressures and inclinations to try to produce simple bottom-line conclusions. Interactions require more work and more patience; they require presenting more cases – more than are presented in the examples in this vignette – in order to provide a complete picture.</p>
+<p>Interactions, by nature, make things more complicated. One must resist pressures and inclinations to try to produce simple bottom-line conclusions. Interactions require more work and more patience; they require presenting more cases – more than are presented in the examples in this vignette – in order to provide a complete picture.</p>
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
 </div>
 <div class="footnotes">

@@ -38,6 +38,8 @@
 
 
 ### Lingering support for multcomp::cld -- registered dynamically in zzz.R
+### NOTE: MUST KEEP the rdname of CLD.emmGrid 
+###       because it's referenced by augmentedRCBD package
 #' Compact letter displays
 #' 
 #' A method for \code{multicomp::cld()} is provided for users desiring to produce 
@@ -177,8 +179,12 @@ cld.emmGrid = function(object, details=FALSE, sort=TRUE,
         emmtbl[r, ] = emmtbl[rev(r), ]
     }
     
+    dontusemsg = paste0("NOTE: Compact letter displays can be misleading\n",
+                        "      because they show NON-findings rather than findings.\n",
+                        "      Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.")
+    
     attr(emmtbl, "mesg") = c(attr(emmtbl,"mesg"), attr(pwtbl, "mesg"), 
-                             paste("significance level used: alpha =", alpha))
+                             paste("significance level used: alpha =", alpha), dontusemsg)
     
     if (details)
         list(emmeans = emmtbl, comparisons = pwtbl)
@@ -186,28 +192,15 @@ cld.emmGrid = function(object, details=FALSE, sort=TRUE,
         emmtbl
 }
 
-
-# I mean it this time!
-# ### Not yet Deprecated as of version 1.5.0 (sigh)
-# #' @rdname CLD.emmGrid
-# #' @order 2
-# #' @export
-# CLD = function (object, ...) {
-#     dmsg = c("'CLD' will be deprecated. Its use is discouraged.\n",
-#              "See '?cld.emmGrid' for an explanation. Use 'pwpp' or 'multcomp::cld' instead.")
-#     .Deprecated(new = "pwpp", msg = dmsg, old = "CLD")
-#     UseMethod("CLD")
-# # }
-# # 
-# # #' @rdname CLD.emmGrid
-# #' @order 3
-# #' @note
-# #' The \code{CLD} generic function and methods are deprecated and will disappear 
-# #' in \pkg{emmeans} versions > 1.5.0. You should use 
-# #' \code{multcomp::cld} instead.
-# #' @export
-# CLD.emmGrid = function(object, ...) {
-#     cld.emmGrid(object, ...)
-# }
-# # 
+### Registered dynamically in zzz.R
+### NOTE: MUST KEEP the rdname of CLD.emmGrid 
+###       because it's referenced by augmentedRCBD package
+#' @rdname CLD.emmGrid
+#' @order 2
+#' @method cld emm_list
+#' @param which Which element of the \code{emm_list} object to process
+#'   (If length exceeds one, only the first one is used)
+cld.emm_list = function(object, ..., which = 1) {
+    multcomp::cld(object[[which[1]]], ...)
+}
 

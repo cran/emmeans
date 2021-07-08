@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.6.1" />
+<meta name="author" content="emmeans package, Version 1.6.2.1" />
 
 
 <title>Working with messy data</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Working with messy data</h1>
-<h4 class="author">emmeans package, Version 1.6.1</h4>
+<h4 class="author">emmeans package, Version 1.6.2.1</h4>
 
 
 
@@ -127,9 +127,9 @@ car::Anova(nutr.lm)</code></pre>
 ## 
 ## $contrasts
 ##  contrast           race     estimate   SE df t.ratio p.value
-##  FoodStamps - NoAid Black       11.17 3.45 92  3.237  0.0050 
-##  FoodStamps - NoAid Hispanic    -2.50 6.55 92 -0.382  0.9739 
-##  FoodStamps - NoAid White        5.62 1.53 92  3.666  0.0012 
+##  FoodStamps - NoAid Black       11.17 3.45 92   3.237  0.0050
+##  FoodStamps - NoAid Hispanic    -2.50 6.55 92  -0.382  0.9739
+##  FoodStamps - NoAid White        5.62 1.53 92   3.666  0.0012
 ## 
 ## P value adjustment: sidak method for 3 tests</code></pre>
 <p>(We used trickery with providing a <code>by</code> variable, and then taking it away, to make the output more compact.) Evidently, the training program has been beneficial to the Black and White groups in that age category. There is no conclusion for the Hispanic group – for which we have very little data.</p>
@@ -219,9 +219,9 @@ emmeans(emmeans(model, c(&quot;A&quot;, &quot;B&quot;), weights = &quot;prop&quo
 ## 
 ## $contrasts
 ##  contrast           race     estimate   SE df t.ratio p.value
-##  FoodStamps - NoAid Black        7.92 2.62 92  3.021  0.0098 
-##  FoodStamps - NoAid Hispanic    -2.50 6.55 92 -0.382  0.9739 
-##  FoodStamps - NoAid White        5.54 1.27 92  4.364  0.0001 
+##  FoodStamps - NoAid Black        7.92 2.62 92   3.021  0.0098
+##  FoodStamps - NoAid Hispanic    -2.50 6.55 92  -0.382  0.9739
+##  FoodStamps - NoAid White        5.54 1.27 92   4.364  0.0001
 ## 
 ## Results are averaged over the levels of: age 
 ## P value adjustment: sidak method for 3 tests</code></pre>
@@ -246,12 +246,12 @@ emmeans(emmeans(model, c(&quot;A&quot;, &quot;B&quot;), weights = &quot;prop&quo
 <p>This submodel constrains all effects involving <code>age</code> to be zero. Another interesting option is <code>&quot;type2&quot;</code>, whereby we in essence analyze the residuals of the model with all contained or overlapping effects, then constrain the containing effects to be zero. So what is left if only the interaction effects of the factors involved. This is most useful with <code>joint_tests()</code>:</p>
 <pre class="r"><code>joint_tests(nutr.lm, submodel = &quot;type2&quot;)</code></pre>
 <pre class="ro"><code>##  model term df1 df2 F.ratio p.value note
-##  age          3  92   0.961 0.4145      
-##  group        1  92  23.044 &lt;.0001      
-##  race         2  92   0.196 0.8227      
-##  age:group    3  92   1.069 0.3663      
-##  age:race     3  92   1.019 0.3880   d e
-##  group:race   2  92   1.991 0.1424      
+##  age          3  92   0.961  0.4145     
+##  group        1  92  23.044  &lt;.0001     
+##  race         2  92   0.196  0.8227     
+##  age:group    3  92   1.069  0.3663     
+##  age:race     3  92   1.019  0.3880  d e
+##  group:race   2  92   1.991  0.1424     
 ## 
 ## d: df1 reduced due to linear dependence 
 ## e: df1 reduced due to non-estimability</code></pre>
@@ -305,19 +305,19 @@ drug.emm</code></pre>
 <p>Here are the associated pairwise comparisons:</p>
 <pre class="r"><code>pairs(route.emm, reverse = TRUE)</code></pre>
 <pre class="ro"><code>##  contrast         estimate    SE df t.ratio p.value
-##  oral - injection    -10.9 0.742  9 -14.671 &lt;.0001 
+##  oral - injection    -10.9 0.742  9 -14.671  &lt;.0001
 ## 
 ## Results are averaged over the levels of: drug</code></pre>
 <pre class="r"><code>pairs(drug.emm, by = &quot;route&quot;, reverse = TRUE)</code></pre>
 <pre class="ro"><code>## route = injection:
 ##  contrast                    estimate    SE df t.ratio p.value
-##  Charloisazepam - Bovineumab     9.17 1.182  9   7.757 &lt;.0001 
+##  Charloisazepam - Bovineumab     9.17 1.182  9   7.757  &lt;.0001
 ## 
 ## route = oral:
 ##  contrast                    estimate    SE df t.ratio p.value
-##  Herefordmycin - Angustatin     -8.75 1.121  9  -7.805 0.0001 
-##  Mollycoddle - Angustatin       -9.92 0.989  9 -10.030 &lt;.0001 
-##  Mollycoddle - Herefordmycin    -1.17 1.182  9  -0.987 0.6026 
+##  Herefordmycin - Angustatin     -8.75 1.121  9  -7.805  0.0001
+##  Mollycoddle - Angustatin       -9.92 0.989  9 -10.030  &lt;.0001
+##  Mollycoddle - Herefordmycin    -1.17 1.182  9  -0.987  0.6026
 ## 
 ## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre>
 <p>In the latter result, the contrast itself becomes a nested factor in the returned <code>emmGrid</code> object. That would not be the case if there had been no <code>by</code> variable.</p>

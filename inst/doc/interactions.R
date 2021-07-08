@@ -47,6 +47,17 @@ joint_tests(noise.lm)
 joint_tests(noise.lm, by = "side")
 
 ## -----------------------------------------------------------------------------
+mvcontrast(noise.emm, "pairwise", mult.name = c("type", "side"))
+
+## -----------------------------------------------------------------------------
+update(mvcontrast(noise.emm, "consec", mult.name = "side", by = "size"), 
+       by = NULL)
+
+## -----------------------------------------------------------------------------
+mvcontrast(update(noise.emm, submodel = ~ side + size + type), 
+           "pairwise", mult.name = c("type", "side"))
+
+## -----------------------------------------------------------------------------
 fiber.lm <- lm(strength ~ diameter*machine, data = fiber)
 
 ## -----------------------------------------------------------------------------

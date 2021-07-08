@@ -18,7 +18,7 @@ mkmat <- function(V, rho = 0, indexes = list(1:3, 4:6)) {
         V[i,i] = (1 - rho)*diag(sd[i]^2) + rho*outer(sd[i], sd[i])
     V
 }
-# Intraclass correrlation = 0.3
+# Intraclass correlation = 0.3
 foo3 = foo
 foo3@V <- mkmat(foo3@V, 0.3)
 plot(foo3, CIs = FALSE, comparisons = TRUE)

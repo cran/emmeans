@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.6.1" />
+<meta name="author" content="emmeans package, Version 1.6.2.1" />
 
 
 <title>FAQs for emmeans</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">FAQs for emmeans</h1>
-<h4 class="author">emmeans package, Version 1.6.1</h4>
+<h4 class="author">emmeans package, Version 1.6.2.1</h4>
 
 
 
@@ -127,7 +127,7 @@
 </div>
 <div id="numeric" class="section level2">
 <h2>emmeans() doesn’t work as expected</h2>
-<!-- @index Covariates!`emmeans()` doesn't work; Covariates!`cov.keep; Covariates!`cov.reduce;  -->
+<!-- @index Covariates!`emmeans()` doesn't work; Covariates!`cov.keep`; Covariates!`cov.reduce`;  -->
 <p>Equivalently, users ask how to get <em>post hoc</em> comparisons when we have covariates rather than factors. Yes, it does work, but you have to tell it the appropriate reference grid.</p>
 <p>But before saying more, I have a question for you: <em>Are you sure your model is meaningful?</em></p>
 <ul>
@@ -166,9 +166,9 @@ emmeans(pg.lm, consec ~ percent)</code></pre>
 ## 
 ## $contrasts
 ##  contrast estimate     SE df t.ratio p.value
-##  12 - 9     0.1796 0.0561 23 3.202   0.0107 
-##  15 - 12    0.0378 0.0582 23 0.650   0.8613 
-##  18 - 15    0.0825 0.0691 23 1.194   0.5201 
+##  12 - 9     0.1796 0.0561 23   3.202  0.0109
+##  15 - 12    0.0378 0.0582 23   0.650  0.8613
+##  18 - 15    0.0825 0.0691 23   1.194  0.5200
 ## 
 ## Results are averaged over the levels of: source 
 ## Results are given on the log (not the response) scale. 

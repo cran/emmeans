@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.6.1" />
+<meta name="author" content="emmeans package, Version 1.6.2.1" />
 
 
 <title>Sophisticated models in emmeans</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Sophisticated models in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.6.1</h4>
+<h4 class="author">emmeans package, Version 1.6.2.1</h4>
 
 
 
@@ -111,9 +111,9 @@ Oats.emm.n</code></pre>
 <p>Comparisons and contrasts are pretty much the same as with other models. As <code>nitro</code> has quantitative levels, we might want to test polynomial contrasts:</p>
 <pre class="r"><code>contrast(Oats.emm.n, &quot;poly&quot;)</code></pre>
 <pre class="ro"><code>##  contrast  estimate    SE   df t.ratio p.value
-##  linear      152.69 15.58 43.2  9.802  &lt;.0001 
-##  quadratic    -8.27  6.95 44.2 -1.190  0.2402 
-##  cubic        -6.32 15.21 42.8 -0.415  0.6800 
+##  linear      152.69 15.58 43.2   9.802  &lt;.0001
+##  quadratic    -8.27  6.95 44.2  -1.190  0.2402
+##  cubic        -6.32 15.21 42.8  -0.415  0.6800
 ## 
 ## Results are averaged over the levels of: Variety 
 ## Degrees-of-freedom method: kenward-roger</code></pre>
@@ -131,9 +131,9 @@ Oats.emm.n</code></pre>
 ## 
 ## $contrasts
 ##  contrast                 estimate   SE   df t.ratio p.value
-##  Golden Rain - Marvellous    -3.23 6.55 9.56 -0.493  0.8764 
-##  Golden Rain - Victory        8.31 6.71 9.80  1.238  0.4595 
-##  Marvellous - Victory        11.54 6.67 9.80  1.729  0.2431 
+##  Golden Rain - Marvellous    -3.23 6.55 9.56  -0.493  0.8764
+##  Golden Rain - Victory        8.31 6.71 9.80   1.238  0.4595
+##  Marvellous - Victory        11.54 6.67 9.80   1.729  0.2431
 ## 
 ## Results are averaged over the levels of: nitro 
 ## Degrees-of-freedom method: kenward-roger 
@@ -218,7 +218,7 @@ ins.glm &lt;- glm(claims ~ size + age + offset(log(n)),
 ## 
 ## $`pairwise differences of temp`
 ##  1           estimate    SE  df z.ratio p.value
-##  cold - warm    -1.07 0.422 Inf -2.547  0.0109 
+##  cold - warm    -1.07 0.422 Inf  -2.547  0.0109
 ## 
 ## Results are averaged over the levels of: contact, judge 
 ## 
@@ -232,7 +232,7 @@ ins.glm &lt;- glm(claims ~ size + age + offset(log(n)),
 ## 
 ## $`pairwise differences of contact`
 ##  1        estimate    SE  df z.ratio p.value
-##  no - yes   -0.684 0.304 Inf -2.251  0.0244 
+##  no - yes   -0.684 0.304 Inf  -2.251  0.0244
 ## 
 ## Results are averaged over the levels of: temp, judge</code></pre>
 <p>These results are on the “latent” scale; the idea is that there is a continuous random variable (in this case normal, due to the probit link) having a mean that depends on the predictors; and that the ratings are a discretization of the latent variable based on a fixed set of cut points (which are estimated). In this particular example, we also have a scale model that says that the variance of the latent variable depends on the judges. The latent results are quite a bit like those for measurement data, making them easy to interpret. The only catch is that they are not uniquely defined: we could apply a linear transformation to them, and the same linear transformation to the cut points, and the results would be the same.</p>

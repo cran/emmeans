@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.6.1" />
+<meta name="author" content="emmeans package, Version 1.6.2.1" />
 
 
 <title>Comparisons and contrasts in emmeans</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Comparisons and contrasts in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.6.1</h4>
+<h4 class="author">emmeans package, Version 1.6.2.1</h4>
 
 
 
@@ -58,7 +58,8 @@
 <li><a href="#formulas">Formula interface</a></li>
 <li><a href="#linfcns">Custom contrasts and linear functions</a></li>
 <li><a href="#logs">Special behavior with log transformations</a></li>
-<li>Interaction contrasts (see <a href="interactions.html">“interactions” vignette</a>)</li>
+<li>Interaction contrasts (in <a href="interactions.html#contrasts">“interactions” vignette</a>)</li>
+<li>Multivariate contrasts (in <a href="interactions.html#multiv">“interactions” vignette</a>)</li>
 </ol>
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
 </div>
@@ -70,9 +71,9 @@
 pigs.emm.s &lt;- emmeans(pigs.lm, &quot;source&quot;)
 pairs(pigs.emm.s)</code></pre>
 <pre class="ro"><code>##  contrast    estimate     SE df t.ratio p.value
-##  fish - soy    -0.273 0.0529 23 -5.153  0.0001 
-##  fish - skim   -0.402 0.0542 23 -7.428  &lt;.0001 
-##  soy - skim    -0.130 0.0530 23 -2.442  0.0570 
+##  fish - soy    -0.273 0.0529 23  -5.153  0.0001
+##  fish - skim   -0.402 0.0542 23  -7.428  &lt;.0001
+##  soy - skim    -0.130 0.0530 23  -2.442  0.0570
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
@@ -187,9 +188,9 @@ pwpp(pigs.cells, type = &quot;response&quot;)</code></pre>
 ply &lt;- contrast(pigs.emm.p, &quot;poly&quot;)
 ply</code></pre>
 <pre class="ro"><code>##  contrast  estimate     SE df t.ratio p.value
-##  linear      0.9374 0.2106 23  4.452  0.0002 
-##  quadratic  -0.0971 0.0883 23 -1.099  0.2830 
-##  cubic       0.1863 0.1877 23  0.992  0.3313 
+##  linear      0.9374 0.2106 23   4.452  0.0002
+##  quadratic  -0.0971 0.0883 23  -1.099  0.2830
+##  cubic       0.1863 0.1877 23   0.992  0.3313
 ## 
 ## Results are averaged over the levels of: source 
 ## Results are given on the log (not the response) scale.</code></pre>
@@ -228,11 +229,11 @@ org.emml</code></pre>
 ## 
 ## $contrasts
 ##  contrast estimate   SE df t.ratio p.value
-##  2 - 1      -0.772 3.78 25 -0.204  0.9997 
-##  3 - 2       6.658 3.78 25  1.763  0.3245 
-##  4 - 3      -5.716 3.78 25 -1.513  0.4681 
-##  5 - 4       4.882 3.78 25  1.293  0.6127 
-##  6 - 5      -1.321 3.78 25 -0.350  0.9965 
+##  2 - 1      -0.772 3.78 25  -0.204  0.9997
+##  3 - 2       6.658 3.78 25   1.763  0.3245
+##  4 - 3      -5.716 3.78 25  -1.513  0.4678
+##  5 - 4       4.882 3.78 25   1.293  0.6129
+##  6 - 5      -1.321 3.78 25  -0.350  0.9965
 ## 
 ## P value adjustment: mvt method for 5 tests</code></pre>
 <p>The contrasts shown are the day-to-day changes.</p>
@@ -275,9 +276,9 @@ org.emml</code></pre>
 <p>(The latter is the same as <code>&quot;consec&quot;</code> contrasts.) Now try it with the <code>oranges</code> example we had previously:</p>
 <pre class="r"><code>contrast(org.emml[[1]], &quot;skip_comp&quot;, skip = 2, reverse = TRUE)</code></pre>
 <pre class="ro"><code>##  contrast estimate   SE df t.ratio p.value
-##  4 - 1        0.17 3.78 25  0.045  0.9645 
-##  5 - 2        5.82 3.78 25  1.542  0.4069 
-##  6 - 3       -2.15 3.78 25 -0.571  0.8601 
+##  4 - 1        0.17 3.78 25   0.045  0.9645
+##  5 - 2        5.82 3.78 25   1.542  0.4069
+##  6 - 3       -2.15 3.78 25  -0.571  0.8601
 ## 
 ## P value adjustment: fdr method for 3 tests</code></pre>
 <div id="linfct" class="section level7">
@@ -308,18 +309,18 @@ org.emml</code></pre>
 <p>However, logs are an exception, in that <span class="math inline">\(\log\mu_j - \log\mu_k = \log(\mu_j/\mu_k)\)</span>. Accordingly, when <code>contrast()</code> (or <code>pairs()</code>) notices that the response is on the log scale, it back-transforms contrasts to ratios when results are to be of <code>response</code> type. For example:</p>
 <pre class="r"><code>pairs(pigs.emm.s, type = &quot;lp&quot;)</code></pre>
 <pre class="ro"><code>##  contrast    estimate     SE df t.ratio p.value
-##  fish - soy    -0.273 0.0529 23 -5.153  0.0001 
-##  fish - skim   -0.402 0.0542 23 -7.428  &lt;.0001 
-##  soy - skim    -0.130 0.0530 23 -2.442  0.0570 
+##  fish - soy    -0.273 0.0529 23  -5.153  0.0001
+##  fish - skim   -0.402 0.0542 23  -7.428  &lt;.0001
+##  soy - skim    -0.130 0.0530 23  -2.442  0.0570
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
 ## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre>
 <pre class="r"><code>pairs(pigs.emm.s, type = &quot;response&quot;)</code></pre>
 <pre class="ro"><code>##  contrast    ratio     SE df null t.ratio p.value
-##  fish / soy  0.761 0.0403 23    1 -5.153  0.0001 
-##  fish / skim 0.669 0.0362 23    1 -7.428  &lt;.0001 
-##  soy / skim  0.879 0.0466 23    1 -2.442  0.0570 
+##  fish / soy  0.761 0.0403 23    1  -5.153  0.0001
+##  fish / skim 0.669 0.0362 23    1  -7.428  &lt;.0001
+##  soy / skim  0.879 0.0466 23    1  -2.442  0.0570
 ## 
 ## Results are averaged over the levels of: percent 
 ## P value adjustment: tukey method for comparing a family of 3 estimates 

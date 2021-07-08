@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.6.1" />
+<meta name="author" content="emmeans package, Version 1.6.2.1" />
 
 
 <title>Basics of estimated marginal means</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Basics of estimated marginal means</h1>
-<h4 class="author">emmeans package, Version 1.6.1</h4>
+<h4 class="author">emmeans package, Version 1.6.2.1</h4>
 
 
 
@@ -472,10 +472,10 @@ class(pigs.emm.s)</code></pre>
 <pre class="r"><code># equivalent to summary(emmeans(pigs.lm1, &quot;percent&quot;), level = 0.90, infer = TRUE))
 emmeans(pigs.lm1, &quot;percent&quot;, level = 0.90, infer = TRUE)</code></pre>
 <pre class="ro"><code>##  percent emmean     SE df lower.CL upper.CL t.ratio p.value
-##        9   3.45 0.0409 23     3.38     3.52 84.262  &lt;.0001 
-##       12   3.62 0.0384 23     3.56     3.69 94.456  &lt;.0001 
-##       15   3.66 0.0437 23     3.59     3.74 83.757  &lt;.0001 
-##       18   3.75 0.0530 23     3.65     3.84 70.716  &lt;.0001 
+##        9   3.45 0.0409 23     3.38     3.52  84.262  &lt;.0001
+##       12   3.62 0.0384 23     3.56     3.69  94.456  &lt;.0001
+##       15   3.66 0.0437 23     3.59     3.74  83.757  &lt;.0001
+##       18   3.75 0.0530 23     3.65     3.84  70.716  &lt;.0001
 ## 
 ## Results are averaged over the levels of: source 
 ## Results are given on the log (not the response) scale. 

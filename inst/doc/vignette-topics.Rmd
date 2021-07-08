@@ -11,13 +11,12 @@ vignette: >
 
 
 
-### Jump to:  ["](#") [A](#a) [B](#b) [C](#c) [D](#d) [E](#e) [F](#f) [G](#g) [H](#h) [I](#i) [J](#j) [K](#k) [L](#l) [M](#m) [N](#n) [O](#o) [P](#p) [Q](#q) [R](#r) [S](#s) [T](#t) [U](#u) [V](#v) [W](#w) [X](#x) [Z](#z)  {#topnav}
+### Jump to:  [A](#a) [B](#b) [C](#c) [D](#d) [E](#e) [F](#f) [G](#g) [H](#h) [I](#i) [J](#j) [K](#k) [L](#l) [M](#m) [N](#n) [O](#o) [P](#p) [Q](#q) [R](#r) [S](#s) [T](#t) [U](#u) [V](#v) [W](#w) [X](#x) [Z](#z)  {#topnav}
 
 
-  * [`"scale"` type](transformations.html#trangraph)
 
 
-### " {#"}
+### A {#a}
 
 
   * [`add_grouping()`](utilities.html#groups)
@@ -44,7 +43,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### A {#a}
+### B {#b}
 
 
   * [Back story of **emmeans**](basics.html#backstory)
@@ -72,7 +71,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### B {#b}
+### C {#c}
 
 
   * [`cld()`](comparisons.html#CLD)
@@ -110,6 +109,7 @@ vignette: >
       * [of other contrasts](interactions.html#contrasts)
       * [Custom](comparisons.html#linfcns)
       * [Formula](comparisons.html#formulas)
+      * [Multivariate](interactions.html#multiv)
       * [Pairwise](comparisons.html#pairwise)
       * [Polynomial](comparisons.html#contrasts)
       * Tests of
@@ -118,8 +118,8 @@ vignette: >
   * [`cov.reduce`](messy-data.html#med.covred)
   * Covariates
       * [Adjusted](messy-data.html#adjcov)
-      * [`cov.keep](FAQs.html#numeric)
-      * [`cov.reduce](FAQs.html#numeric)
+      * [`cov.keep`](FAQs.html#numeric)
+      * [`cov.reduce`](FAQs.html#numeric)
       * [Derived](basics.html#depcovs)
       * [`emmeans()` doesn't work](FAQs.html#numeric)
       * [Interacting with factors](FAQs.html#trends)
@@ -128,7 +128,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### C {#c}
+### D {#d}
 
 
   * [Degrees of freedom](sophisticated.html#dfoptions)
@@ -139,7 +139,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### D {#d}
+### E {#e}
 
 
   * [`eff` contrasts](comparisons.html#contrasts)
@@ -240,7 +240,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### E {#e}
+### F {#f}
 
 
   * *F* test
@@ -253,7 +253,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### F {#f}
+### G {#g}
 
 
   * [`gam` models](models.html#G)
@@ -276,17 +276,18 @@ vignette: >
 
 [Back to top](#topnav)
 
-### G {#g}
+### H {#h}
 
 
   * [Hook functions](xtending.html#hooks)
+  * [Hotelling's $T^2$](interactions.html#multiv)
   * [`hpd.summary()`](sophisticated.html#mcmc)
   * [`hurdle` models](models.html#C)
 
 
 [Back to top](#topnav)
 
-### H {#h}
+### I {#i}
 
 
   * [Infinite degrees of freedom](FAQs.html#asymp)
@@ -301,7 +302,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### I {#i}
+### J {#j}
 
 
   * [`joint`](confidence-intervals.html#joint)
@@ -313,7 +314,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### J {#j}
+### K {#k}
 
 
   * [`kable`](basics.html#formatting)
@@ -322,7 +323,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### K {#k}
+### L {#l}
 
 
   * Labels
@@ -345,7 +346,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### L {#l}
+### M {#m}
 
 
   * [`make.tran()`](transformations.html#special)
@@ -376,25 +377,20 @@ vignette: >
   * [Multinomial models](models.html#N)
   * [Multiple imputation](models.html#I)
   * [Multiplicity adjustments](confidence-intervals.html#adjust)
+  * [Multivariate contrasts](interactions.html#multiv)
   * Multivariate models
       * [in *basics: multiv*](basics.html#multiv)
       * [in *interactions: oranges*](interactions.html#oranges)
       * [in *models: M*](models.html#M)
       * [with `submodel`](xplanations.html#mult.submodel)
   * [Multivariate *t* (`"mvt"`) adjustment](confidence-intervals.html#adjmore)
+  * [`mvcontrast()`](interactions.html#multiv)
   * [**mvtnorm** package](confidence-intervals.html#adjmore)
 
 
 [Back to top](#topnav)
 
-### M {#m}
-
-
-
-
-[Back to top](#topnav)
-
-### Z {#z}
+### N {#n}
 
 
   * [`NA`s in the output](FAQs.html#NAs)
@@ -408,7 +404,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### N {#n}
+### O {#o}
 
 
   * [Observational data](messy-data.html#issues)
@@ -427,7 +423,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### O {#o}
+### P {#p}
 
 
   * *P* values
@@ -470,7 +466,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### P {#p}
+### Q {#q}
 
 
   * [`qdrg()`](FAQs.html#qdrg)
@@ -480,7 +476,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### Q {#q}
+### R {#r}
 
 
   * [`rbind()`](utilities.html#rbind)
@@ -519,13 +515,14 @@ vignette: >
 
 [Back to top](#topnav)
 
-### R {#r}
+### S {#s}
 
 
   * [Sample size, displaying](confidence-intervals.html#summary)
   * Satterthwaite d.f.
       * [in *models: K*](models.html#K)
       * [in *models: L*](models.html#L)
+  * [`"scale"` type](transformations.html#trangraph)
   * [`scale()`](transformations.html#stdize)
   * [Selecting results](utilities.html#brackets)
   * [Sidak adjustment](confidence-intervals.html#adjust)
@@ -570,7 +567,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### S {#s}
+### T {#t}
 
 
   * [*t* tests vs. *z* tests](FAQs.html#asymp)
@@ -614,7 +611,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### T {#t}
+### U {#u}
 
 
   * [Unadjusted tests](confidence-intervals.html#adjmore)
@@ -626,7 +623,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### U {#u}
+### V {#v}
 
 
   * [Variables that are not predictors](basics.html#params)
@@ -649,7 +646,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### V {#v}
+### W {#w}
 
 
   * [`weights`](messy-data.html#weights)
@@ -659,7 +656,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### W {#w}
+### X {#x}
 
 
   * [`xtable` method](basics.html#formatting)
@@ -667,7 +664,7 @@ vignette: >
 
 [Back to top](#topnav)
 
-### X {#x}
+### Z {#z}
 
 
   * [*z* tests](sophisticated.html#dfoptions)
