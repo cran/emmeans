@@ -1,5 +1,17 @@
 ## NEWS for the emmeans package
 
+emmeans 1.6.3
+-------------
+
+    * Clarification of documentation of `ref_grid(object, vcov. = ...)` (#283)
+    * Fix to `emmtrends()` with covariate formulas (#284)
+    * Improved parts of "Basics" vignette - removed "back story",
+      revised guidance on $P$ values and models
+    * Allow for > 1 reference factor in `add_grouping()` (#286)
+    * Repairs to `contrast()` to avoid all-`nonEst` results in irregular
+      nested structures
+
+
 emmeans 1.6.2
 -------------
 

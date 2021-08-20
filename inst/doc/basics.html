@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.6.2.1" />
+<meta name="author" content="emmeans package, Version 1.6.3" />
 
 
 <title>Basics of estimated marginal means</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Basics of estimated marginal means</h1>
-<h4 class="author">emmeans package, Version 1.6.2.1</h4>
+<h4 class="author">emmeans package, Version 1.6.3</h4>
 
 
 
@@ -66,9 +66,8 @@
 <li><a href="#multiv">Multivariate models</a></li>
 </ol></li>
 <li><a href="#emmobj">Objects, structures, and methods</a></li>
-<li><a href="#pvalues">P values, “significance”, and scientific integrity</a></li>
+<li><a href="#pvalues">P values, “significance”, and recommendations</a></li>
 <li><a href="#summary">Summary</a></li>
-<li><a href="#backstory">The back story of <strong>emmeans</strong></a></li>
 <li><a href="#more">Further reading</a></li>
 </ol>
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
@@ -139,7 +138,8 @@ cell.means</code></pre>
 ##     source = fish, soy, skim
 ##     percent =  9, 12, 15, 18
 ## Transformation: &quot;log&quot;</code></pre>
-<p>Both predictors are factors, and the reference grid consists of the <span class="math inline">\(3\times4 = 12\)</span> combinations of these factor levels. It can be seen explicitly by looking at the <code>grid</code> slot of this object:</p>
+<p>(<em>Note:</em> Many of the calculations that follow are meant to illustrate what is inside this reference-grid object; You don’t need to do such calculations yourself in routine analysis; just use the <code>emmeans()</code> (or possibly <code>ref_grid()</code>) function as we do later.)</p>
+<p>In this model, both predictors are factors, and the reference grid consists of the <span class="math inline">\(3\times4 = 12\)</span> combinations of these factor levels. It can be seen explicitly by looking at the <code>grid</code> slot of this object:</p>
 <pre class="r"><code>ref_grid(pigs.lm1) @ grid</code></pre>
 <pre class="ro"><code>##    source percent .wgt.
 ## 1    fish       9     2
@@ -487,23 +487,36 @@ emmeans(pigs.lm1, &quot;percent&quot;, level = 0.90, infer = TRUE)</code></pre>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="pvalues" class="section level2">
-<h2>P values, “significance”, and scientific integrity</h2>
+<h2>P values, “significance”, and recommendations</h2>
 <!-- @index Significance!Assessing; 
     *P* values!Interpreting; ATOM; 
     ASA Statement on *P* values -->
-<p>There is a growing consensus among statisticians and researchers that <em>P</em> values are widely misunderstood, and that the term “statistical significance” is downright misleading. If you have a small <em>P</em> value, it <em>only</em> means that the effect being tested is unlikely to be explained by chance variation alone, in the context of the current study and the current statistical model underlying the test. If you have a large <em>P</em> value, it <em>only</em> means that the observed effect could plausibly be due to chance alone: it is <em>wrong</em> to conclude that there is no effect.</p>
-<p>The American Statistical Association has for some time been advocating very cautious use of <em>P</em> values (Wasserman <em>et al.</em> 2014, 2019). The ASA now <em>advises against ever using the term “statistically significant”</em> (or a related descriptor) because it is too often misinterpreted, and too often used carelessly.</p>
-<p>Wasserman <em>et al.</em> (2019), and the 43 articles it accompanies in the same issue of <em>TAS</em>, recommend a number of alternatives. I do not agree with all that is said in the main article, and there are portions that are too cutesy or wander off-topic. Further, it is quite dizzying to try to digest all the accompanying articles, and to reconcile their disagreeing viewpoints. But the basic ideas are summarized with the help of the acronym <strong>ATOM</strong>, for the four highlighted words below:</p>
-<ul>
-<li><p><strong>Acceptance</strong> of uncertainty. If you were to repeat your study, you would get somewhat different results and perhaps different effects will stand out. Likewise, there are other reasonable models that you might have chosen, and those would have yielded different results. If the topic is worth studying, others will try to replicate it, perhaps with different study designs and different ways of operationalizing important concepts – again, yielding different results.</p></li>
-<li><p><strong>Thoughtfulness</strong>. Design your study with clear objectives in mind, and spend time considering the best way to address those objectives in your study design. Pilot the study to ensure that the procedures actually work, how much variability to expect, and ensure that the sample size is adequate. How do your results fit in the big picture, scientifically? Think about the importance of the effects you have observed in your model(s)/data in the context of the science. Think carefully about how well your model fits the data and if there are other possibilities.</p></li>
-<li><p><strong>Openness</strong>. Be transparent in disclosing the methods used, and reporting comprehensively all the successes and failures, the small and large effects. If hypothesis tests are used, report the actual <em>P</em> values found (e.g., “<em>P</em> = 0.075”) and don’t suppress or withhold results just because they are “nonsignificant,” because those results may still be useful to other researchers via meta-analysis. Trust in the expert judgment of other researchers.</p></li>
-<li><p><strong>Modesty</strong>. Be clear in examining and expressing the limitations of your work. Understand that other researchers with different subject-area strengths may choose other models that may cast a different light on your work. Encourage others to try to reproduce your work, and be a good scientific colleague to them. Do not exaggerate the importance of your findings. Your study is not final or definitive; recognize that it is just one part of a broader picture. Ironically, the more important the research, the more related research will be undertaken, making that picture bigger (and, potentially, your part of it smaller).</p></li>
-</ul>
-<div id="references" class="section level3">
-<h3>References</h3>
-<p>Wasserman RL, Lazar NA (2016) “The ASA’s Statement on <em>p</em>-Values: Context, Process, and Purpose,” <em>The American Statistician</em>, <strong>70</strong>, 129–133, <a href="https://doi.org/10.1080/00031305.2016.1154108" class="uri">https://doi.org/10.1080/00031305.2016.1154108</a></p>
-<p>Wasserman RL, Schirm AL, Lazar, NA (2019) “Moving to a World Beyond ‘p &lt; 0.05’,” <em>The American Statistician</em>, <strong>73</strong>, 1–19, <a href="https://doi.org/10.1080/00031305.2019.1583913" class="uri">https://doi.org/10.1080/00031305.2019.1583913</a></p>
+<p>There is some debate among statisticians and researchers about the appropriateness of <em>P</em> values, and that the term “statistical significance” can be misleading. If you have a small <em>P</em> value, it <em>only</em> means that the effect being tested is unlikely to be explained by chance variation alone, in the context of the current study and the current statistical model underlying the test. If you have a large <em>P</em> value, it <em>only</em> means that the observed effect could plausibly be due to chance alone: it is <em>wrong</em> to conclude that there is no effect.</p>
+<p>The American Statistical Association has for some time been advocating very cautious use of <em>P</em> values (Wasserman <em>et al.</em> 2014) because it is too often misinterpreted, and too often used carelessly. Wasserman <em>et al.</em> (2019) even goes so far as to advise against <em>ever</em> using the term “statistically significant”. The 43 articles it accompanies in the same issue of <em>TAS</em>, recommend a number of alternatives. I do not agree with all that is said in the main article, and there are portions that are too cutesy or wander off-topic. Further, it is quite dizzying to try to digest all the accompanying articles, and to reconcile their disagreeing viewpoints.</p>
+<p>For some time I included a summary of Wasserman <em>et al.</em>’s recommendations and their <em>ATOM</em> paradigm (Acceptance of uncertainty, Thoughtfulness, Openness, Modesty). But in the meantime, I have handled a large number of user questions, and many of those have made it clear to me that there are more important fish to fry in a vignette section like this. It is just a fact that <em>P</em> values are used, and are useful. So I have my own set of recommendations regarding them.</p>
+<div id="recs1" class="section level4">
+<h4>A set of comparisons or well-chosen contrasts is more useful and interpretable than an omnibus <em>F</em> test</h4>
+<!-- @index Recommended practices; Practices, recommended;
+     *P* values!Adjusted; *F* test!Role in *post hoc* tests; -->
+<p><em>F</em> tests are useful for model selection, but don’t tell you anything specific about the nature of an effect. If <em>F</em> has a small <em>P</em> value, it suggests that there is some effect, somewhere. It doesn’t even necessarily imply that any two means differ statistically.</p>
+</div>
+<div id="use-adjusted-p-values" class="section level4">
+<h4>Use <em>adjusted</em> <em>P</em> values</h4>
+<p>When you run a bunch of tests, there is a risk of making too many type-I errors, and adjusted <em>P</em> values (e.g., the Tukey adjustment for pairwise comparisons) keep you from making too many mistakes. That said, it is possible to go overboard; and it’s usually reasonable to regard each “by” group as a separate family of tests for purposes of adjustment.</p>
+</div>
+<div id="recs2" class="section level4">
+<h4>It is <em>not</em> necessary to have a significant <em>F</em> test as a prerequisite to doing comparisons or contrasts</h4>
+<!-- @index LSD!protected; Model!Get it right first -->
+<p>… as long as an appropriate adjustment is used. There do exist rules such as the “protected LSD” by which one is given license to do unadjusted comparisons provided the <span class="math inline">\(F\)</span> statistic is “significant.” However, this is a very weak form of protection for which the justification is, basically, “if <span class="math inline">\(F\)</span> is significant, you can say absolutely anything you want.”</p>
+</div>
+<div id="get-the-model-right-first" class="section level4">
+<h4>Get the model right first</h4>
+<p>Everything the <strong>emmeans</strong> package does is an interpretation of the model that you fitted to the data. If the model is bad, you will get bad results from <code>emmeans()</code> and other functions. Every single limitation of your model, be it presuming constant error variance, omitting interaction terms, etc., becomes a limitation of the results <code>emmeans()</code> produces. So do a responsible job of fitting the model. And if you don’t know what’s meant by that…</p>
+</div>
+<div id="recs3" class="section level4">
+<h4>Consider seeking the advice of a statistical consultant</h4>
+<!-- @index Statistical consultants; Consultants; Statistics is hard -->
+<p>Statistics is hard. It is a lot more than just running programs and copying output. It is <em>your</em> research; is it important that it be done right? Many academic statistics and biostatistics departments can refer you to someone who can help.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 </div>
@@ -516,19 +529,15 @@ emmeans(pigs.lm1, &quot;percent&quot;, level = 0.90, infer = TRUE)</code></pre>
 <li>EMMs are then predictions on this reference grid, or marginal averages thereof (equally weighted by default).</li>
 <li>Reference grids may be modified using <code>at</code> or <code>cov.reduce</code>; the latter may be logical, a function, or a formula.</li>
 <li>Reference grids and <code>emmeans()</code> results may be plotted via <code>plot()</code> (for parallel confidence intervals) or <code>emmip()</code> (for an interaction-style plot).</li>
-<li>Be cautious with the terms “significant” and “nonsignificant”, and avoid using hard thresholds like <em>P</em> &lt; 0.05 as a criterion for scientific meaning or importance. The importance of a result is established by scientific context, not by some <em>P</em> value. Remember ATOM.</li>
+<li>Be cautious with the terms “significant” and “nonsignificant”, and don’t ever interpret a “nonsignificant” result as saying that there is no effect.</li>
+<li>Follow good practices such as getting the model right first, and using adjusted <em>P</em> values for appropriately chosen families of comparisons or contrasts.</li>
 </ul>
 <p><a href="#contents">Back to Contents</a></p>
+<div id="references" class="section level3">
+<h3>References</h3>
+<p>Wasserman RL, Lazar NA (2016) “The ASA’s Statement on <em>p</em>-Values: Context, Process, and Purpose,” <em>The American Statistician</em>, <strong>70</strong>, 129–133, <a href="https://doi.org/10.1080/00031305.2016.1154108" class="uri">https://doi.org/10.1080/00031305.2016.1154108</a></p>
+<p>Wasserman RL, Schirm AL, Lazar, NA (2019) “Moving to a World Beyond ‘p &lt; 0.05’,” <em>The American Statistician</em>, <strong>73</strong>, 1–19, <a href="https://doi.org/10.1080/00031305.2019.1583913" class="uri">https://doi.org/10.1080/00031305.2019.1583913</a></p>
 </div>
-<div id="backstory" class="section level2">
-<h2>The back story of <strong>emmeans</strong></h2>
-<!-- @index Back story of **emmeans**; University administration; **lsmeans** -->
-<p>The <strong>emmeans</strong> package and its predecessor, <strong>lsmeans</strong>, were developed in part because I wanted it for teaching. This is hardly a surprise, as I am an academic. I had taught experimental design and analysis a number of times, usually requiring SAS to do the kind of <em>post hoc</em> comparisons that I like to encourage people to do. SAS is fine software (in spite of the opinions of some Rusers with attitude), but it is quite different from R, and more and more, I had students who were bewildered by it. Some colleagues of mine think it is absolutely essential that masters-level students learn to use SAS. I can see that point, but my job was to teach design, not SAS – and there are a lot of topics to cover.</p>
-<p>But here’s what you wouldn’t expect: the real impetus to develop the package came from doing some consulting work for the university administration. They wanted help in analyzing faculty salaries, especially with regard to gender and ethnicity differences. Accordingly, we fitted a pretty complicated regression model with effects for gender and ethnicity, as well as such things as college department, rank, tenure status, seniority, etc. It is a really messy model. I first came to the conclusion that to make sense of the model results in terms that the administration could understand, I could obtain predictions from that model and average them together in meaningful ways to summarize the primary factor effects. I figured out how to write R code to estimate those averages and test differences among them. Only after all that did I realize that really what I was computing was least-squares means (or EMMs); so the package was born.</p>
-<p>It grew from there, especially in terms of supporting more models, evolving from a spaghetti-code design to one incorporating essential building blocks with methods for different models. Meanwhile, I retired, so I had time on my hands to dink around with it (and to keep learning about new or unfamiliar models and data-analysis approaches).</p>
-<p>One aspect of the package that I am especially proud of is the ability to express results in accessible ways when there is a transformed response or link function (see the <a href="transformations.html">“transformations” vignette</a>). Again, this grew out of my needs for that administrative salary analysis. The model that fitted the best used a reciprocal transformation, but I wanted to express the predicted salaries in dollars. Moreover, I wanted to compare them using ratios. Those requirements led directly to the development of the <code>regrid()</code> function and the options to metamorphose any <code>emmGrid</code> object to the response or the log scale.</p>
-<p>The lesson is that it is possible that even university service duties can lead to technical developments in statistics. One never knows where new ideas and inspirations will arise. Speaking of this, I have learned and benefited enormously from users’ questions about the package, and basically all recent improvements to <strong>emmeans</strong> are a direct result of those communications. So don’t be shy about asking questions or requesting features.</p>
-<p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="more" class="section level2">
 <h2>Further reading</h2>
