@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.6.3" />
+<meta name="author" content="emmeans package, Version 1.7.0" />
 
 
 <title>FAQs for emmeans</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">FAQs for emmeans</h1>
-<h4 class="author">emmeans package, Version 1.6.3</h4>
+<h4 class="author">emmeans package, Version 1.7.0</h4>
 
 
 
@@ -69,6 +69,7 @@
 <li><a href="#additive">I get exactly the same comparisons for each “by” group</a></li>
 <li><a href="#anova">My ANOVA <em>F</em> is significant, but no pairwise comparisons are</a></li>
 <li><a href="#notukey">I asked for a Tukey adjustments, but that’s not what I got</a></li>
+<li><a href="#noadjust"><code>emmeans()</code> completely ignores my P-value adjustments</a></li>
 <li><a href="#nowelch"><code>emmeans()</code> gives me pooled <em>t</em> tests, but I expected Welch’s <em>t</em></a></li>
 </ol>
 <p><a href="vignette-topics.html">Index of all vignette topics</a></p>
@@ -166,7 +167,7 @@ emmeans(pg.lm, consec ~ percent)</code></pre>
 ## 
 ## $contrasts
 ##  contrast estimate     SE df t.ratio p.value
-##  12 - 9     0.1796 0.0561 23   3.202  0.0110
+##  12 - 9     0.1796 0.0561 23   3.202  0.0108
 ##  15 - 12    0.0378 0.0582 23   0.650  0.8613
 ##  18 - 15    0.0825 0.0691 23   1.194  0.5201
 ## 
@@ -217,9 +218,19 @@ emmeans(pg.lm, consec ~ percent)</code></pre>
 <!-- @index Tukey adjustment!Ignored or changed -->
 <p>There are two reasons this could happen:</p>
 <ol style="list-style-type: decimal">
-<li>There are only two means (or only two in each <code>by</code> group). Thus there is only one comparison. When there is only one thing to test, there is no multiplicity issue, and hence no multiplicity adjustment to the <em>P</em> values.</li>
+<li>There is only one comparison in each <code>by</code> group (see next topic).</li>
 <li>A Tukey adjustment is inappropriate. The Tukey adjustment is appropriate for pairwise comparisons of means. When you have some other set of contrasts, the Tukey method is deemed unsuitable and the Sidak method is used instead. A suggestion is to use <code>&quot;mvt&quot;</code> adjustment (which is exact); we don’t default to this because it can require a lot of computing time for a large set of contrasts or comparisons.</li>
 </ol>
+</div>
+<div id="noadjust" class="section level2">
+<h2><code>emmeans()</code> completely ignores my P-value adjustments</h2>
+<!-- @index *P* values!Adjustment is ignored -->
+<p>This happens when there are only two means (or only two in each <code>by</code> group). Thus there is only one comparison. When there is only one thing to test, there is no multiplicity issue, and hence no multiplicity adjustment to the <em>P</em> values.</p>
+<p>If you wish to apply a <em>P</em>-value adjustment to all tests across all groups, you need to null-out the <code>by</code> variable and summarize, as in the following:</p>
+<pre class="r"><code>EMM &lt;- emmeans(model, ~ treat | group)   # where treat has 2 levels
+pairs(EMM, adjust = &quot;sidak&quot;)   # adjustment is ignored - only 1 test per group
+summary(pairs(EMM), by = NULL, adjust = &quot;sidak&quot;)   # all are in one group now</code></pre>
+<p>Note that if you put <code>by = NULL</code> <em>inside</em> the call to <code>pairs()</code>, then this causes all <code>treat</code>,<code>group</code> combinations to be compared.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="nowelch" class="section level2">

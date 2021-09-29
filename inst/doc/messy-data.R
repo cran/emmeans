@@ -46,6 +46,33 @@ sapply(c("equal", "prop", "outer", "cells", "flat"), function(w)
     predict(emmeans(nutr.lm, ~ race, weights = w)))
 
 ## -----------------------------------------------------------------------------
+mtcars.lm <- lm(mpg ~ factor(cyl)*am + disp + hp + drat + log(wt) + vs + 
+                  factor(gear) + factor(carb), data = mtcars)
+
+## -----------------------------------------------------------------------------
+rg.usual <- ref_grid(mtcars.lm)
+rg.usual
+nrow(rg.usual@linfct)
+rg.nuis = ref_grid(mtcars.lm, non.nuisance = "cyl")
+rg.nuis
+nrow(rg.nuis@linfct)
+
+## -----------------------------------------------------------------------------
+emmeans(rg.usual, ~ cyl * am)
+emmeans(rg.nuis, ~ cyl * am)
+
+## -----------------------------------------------------------------------------
+predict(emmeans(mtcars.lm, ~ cyl * am, non.nuis = c("cyl", "am"), 
+                wt.nuis = "prop"))
+predict(emmeans(mtcars.lm, ~ cyl * am, weights = "outer"))
+
+## -----------------------------------------------------------------------------
+emmeans(mtcars.lm, ~ gear | am, non.nuis = quote(all.vars(specs)))
+
+## ---- error = TRUE------------------------------------------------------------
+ref_grid(mtcars.lm, rg.limit = 200)
+
+## -----------------------------------------------------------------------------
 summary(emmeans(nutr.lm, pairwise ~ group | race, submodel = ~ age + group*race), 
         by = NULL)
 

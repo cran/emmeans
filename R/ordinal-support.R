@@ -82,6 +82,15 @@ emm_basis.clm = function (object, trms, xlev, grid,
     trms = delete.response(object$terms)
     m = model.frame(trms, grid, na.action = na.pass, xlev = object$xlevels)
     X = model.matrix(trms, m, contrasts.arg = contrasts)
+    # Need following code because clmm objects don't have NAs for dropped columns...
+    nms.needed = c(names(object$alpha), setdiff(colnames(X), "(Intercept)"))
+    if (length(setdiff(nms.needed, bnm <- names(bhat))) > 0) {
+        bhat = seq_along(nms.needed) * NA
+        names(bhat) = nms.needed
+        bhat[bnm] = coef(object)
+        object$coefficients = bhat # will be needed by model.matrix
+        object$beta = bhat[setdiff(nms.needed, names(object$alpha))]
+    }
     xint = match("(Intercept)", colnames(X), nomatch = 0L)
     if (xint > 0L) {
         X = X[, -xint, drop = FALSE]
@@ -123,7 +132,13 @@ emm_basis.clm = function (object, trms, xlev, grid,
     ### ----- Get non-estimability basis ----- ###
     nbasis = snbasis = estimability::all.estble
     if (any(is.na(bhat))) {
-        mm = model.matrix(object)
+        obj = object   # work around fact that model.matrix.clmm doesn't work
+        class(obj) = "clm"
+        mm = try(model.matrix(obj), silent = TRUE)
+        if (inherits(mm, "try-error"))
+            stop("Currently, it is not possible to construct a reference grid for this\n",
+                 "object, because it is rank-deficient and no model matrix is available.")
+        
         # note: mm has components X, NOM, and S
         if (any(is.na(c(object$alpha, object$beta)))) {
             NOMX = if (is.null(mm$NOM)) mm$X
@@ -204,7 +219,7 @@ emm_basis.clm = function (object, trms, xlev, grid,
          dfargs = list(), misc = misc)
 }
 
-# fuction called at end of ref_grid
+# function called at end of ref_grid
 # I use this for polr as well
 # Also used for stanreg result of stan_polr & potentially other MCMC ordinal models
 .clm.postGrid = function(object, ...) {
@@ -240,37 +255,49 @@ emm_basis.clm = function (object, trms, xlev, grid,
 .clm.prob.grid = function(object, thresh = "cut", newname = object@misc$respName, ...) {
     byv = setdiff(names(object@levels), thresh)
     newrg = contrast(object, ".diff_cum", by = byv, ...)
+    newrg@grid$.offset. = (apply(newrg@linfct, 1, sum) < 0) + 0
     if (!is.null(wgt <- object@grid[[".wgt."]])) {
         km1 = length(object@levels[[thresh]])
         wgt = wgt[seq_len(length(wgt) / km1)] # unique weights for byv combs
-        newrg@grid[[".wgt."]] = rep(wgt, each = km1 + 1)
+        newrg = force_regular(newrg)
+        key = do.call(paste, object@grid[byv])[seq_along(wgt)]
+        tgt = do.call(paste, newrg@grid[byv])
+        for (i in seq_along (wgt))
+            newrg@grid[[".wgt."]][tgt == key[i]] = wgt[i]
     }
     # proceed to disavow that this was ever exposed to 'emmeans' or 'contrast'
     ## class(newrg) = "ref.grid"
     misc = newrg@misc
+    if(!is.null(misc$display) && all(misc$display))
+        misc$display = NULL
     misc$is.new.rg = TRUE
     misc$infer = c(FALSE,FALSE)
     misc$estName = "prob"
     misc$pri.vars = misc$by.vars = misc$con.coef = misc$orig.grid = NULL
     newrg@misc = misc
-    names(newrg@levels)[1] = names(newrg@grid)[1] = newname
+    conid = which(names(newrg@levels) == "contrast")
+    names(newrg@levels)[conid] = names(newrg@grid)[conid] = newname
     newrg@roles = object@roles
     newrg@roles$multresp = newname
     newrg
 }
 
+# special 'contrast' fcn used by .clm.mean.class
+.meanclass.emmc = function(levs, lf, ...) 
+    data.frame(mean = lf)
+
 .clm.mean.class = function(object, ...) {
     prg = .clm.prob.grid(object, newname = "class", ...)
     byv = setdiff(names(prg@levels), "class")
     lf = as.numeric(prg@levels$class)
-    newrg = contrast(prg, list(mean = lf), by = byv, ...)
+    newrg = contrast(prg, ".meanclass", lf = lf, by = byv, ...)
     newrg = update(newrg, infer = c(FALSE, FALSE), 
         pri.vars = NULL, by.vars = NULL, estName = "mean.class")
     newrg@levels$contrast = newrg@grid$contrast = NULL
     prg@roles$multresp = NULL
     newrg@roles = prg@roles
     ## class(newrg) = "ref.grid"
-    update(newrg, is.new.rg = TRUE)
+    update(force_regular(newrg), is.new.rg = TRUE)
 }
 
 # Contrast fcn for turning estimates of cumulative probabilities
@@ -354,7 +381,7 @@ emm_basis.clmm = function (object, trms, xlev, grid, ...) {
     }
     result = emm_basis.clm(object, trms, xlev, grid, ...)
     # strip off covariances of random effects
-    keep = seq_along(result$bhat)
+    keep = seq_along(result$bhat[!is.na(result$bhat)])
     result$V = result$V[keep,keep]
     result
 }

@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.6.3" />
+<meta name="author" content="emmeans package, Version 1.7.0" />
 
 
 <title>Working with messy data</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Working with messy data</h1>
-<h4 class="author">emmeans package, Version 1.6.3</h4>
+<h4 class="author">emmeans package, Version 1.7.0</h4>
 
 
 
@@ -55,6 +55,7 @@
 <li><a href="#issues">Issues with observational data</a></li>
 <li><a href="#mediators">Mediating covariates</a></li>
 <li><a href="#weights">Mediating factors and weights</a></li>
+<li><a href="#nuisance">Nuisance factors</a></li>
 <li><a href="#submodels">Sub-models</a></li>
 <li><a href="#nesting">Nested fixed effects</a>
 <ol style="list-style-type: lower-alpha">
@@ -194,6 +195,109 @@ emmeans(emmeans(model, c(&quot;A&quot;, &quot;B&quot;), weights = &quot;prop&quo
 ## [3,] 2.932008 2.522821 3.142940 2.7951807 1.6103407</code></pre>
 <p>In the other hand, if we do <code>group * race</code> EMMs, only one factor (<code>age</code>) is averaged over; thus, the results for <code>&quot;prop&quot;</code> and <code>&quot;outer&quot;</code> weights will be identical in that case.</p>
 <p><a href="#contents">Back to Contents</a></p>
+</div>
+<div id="nuisance" class="section level2">
+<h2>Nuisance factors</h2>
+<!-- @index Nuisance factors; `nuisance`; `non.nuisance`; `wt.nuis`;
+     Memory usage; Large models; Models!Large -->
+<p>Consider a situation where we have a model with 15 factors, each at 5 levels. Regardless of how simple or complex the model is, the reference grid consists of all combinations of these factors – and there are <span class="math inline">\(%^15\)</span> of these, or over 30 billion. If there are, say, 100 regression coefficients in the model, then just the <code>linfct</code> slot in the reference grid requires <span class="math inline">\(100\times5^15\times8\)</span> bytes of storage, or almost 23,000 gigabytes. Suppose in addition the model has a multivariate response with 5 levels. That multiplies <em>both</em> the rows and columns in <code>linfct</code>, increasing the storage requirements by a factor of 25. Either way, your computer can’t store that much – so this definitely qualifies as a messy situation!</p>
+<p>The <code>ref_grid()</code> function now provides some relief, in the way of specifying some of the factors as “nuisance” factors. The reference grid is then constructed with those factors already averaged-out. So, for example with the same scenario, if only three of those 15 factors are of primary interest, and we specify the other 12 as nuisance factors to be averaged, that leaves us with only <span class="math inline">\(3^5=125\)</span> rows in the reference grid, and hence <span class="math inline">\(125\times100\times8=10,000\)</span> bytes of storage required for <code>linfct</code>. If there is a 5-level multivariate response, we’ll have 625 rows in the reference grid and <span class="math inline">\(25\times1000=250,000\)</span> bytes in <code>linfct</code>. Suddenly a horribly unmanageable situation becomes quite manageable!</p>
+<p>But of course, there is a restriction: nuisance factors must not interact with any other factors – not even other nuisance factors. And a multivariate response (or an implied multivariate response, e.g., in an ordinal model) can never be a nuisance factor. Under that condition, the average effects of a nuisance factor are the same regardless of the levels of other factors, making it possible to pre-average them by considering just one case.</p>
+<p>We specify nuisance factors by listing their names in a <code>nuisance</code> argument to <code>ref_grid()</code> (in <code>emmeans()</code>, this argument is passed to <code>ref_grid)</code>). Often, it is much more convenient to give the factors that are <em>not</em> nuisance factors, via a <code>non.nuisance</code> argument. If you do specify a nuisance factor that does interact with others, or doesn’t exist, it is quietly excluded from the nuisance list.</p>
+<div id="nuis.example" class="section level6">
+<h6></h6>
+<!-- @index Examples!`mtcars` -->
+<p>Time for an example. Consider the <code>mtcars</code> dataset standard in R, and the model</p>
+<pre class="r"><code>mtcars.lm &lt;- lm(mpg ~ factor(cyl)*am + disp + hp + drat + log(wt) + vs + 
+                  factor(gear) + factor(carb), data = mtcars)</code></pre>
+<p>And let’s construct two different reference grids:</p>
+<pre class="r"><code>rg.usual &lt;- ref_grid(mtcars.lm)
+rg.usual</code></pre>
+<pre class="ro"><code>## &#39;emmGrid&#39; object with variables:
+##     cyl = 4, 6, 8
+##     am = 0, 1
+##     disp = 230.72
+##     hp = 146.69
+##     drat = 3.5966
+##     wt = 3.2172
+##     vs = 0, 1
+##     gear = 3, 4, 5
+##     carb = 1, 2, 3, 4, 6, 8</code></pre>
+<pre class="r"><code>nrow(rg.usual@linfct)</code></pre>
+<pre class="ro"><code>## [1] 216</code></pre>
+<pre class="r"><code>rg.nuis = ref_grid(mtcars.lm, non.nuisance = &quot;cyl&quot;)
+rg.nuis</code></pre>
+<pre class="ro"><code>## &#39;emmGrid&#39; object with variables:
+##     cyl = 4, 6, 8
+##     am = 0, 1
+## Nuisance factors that have been collapsed by averaging:
+##     disp(1), hp(1), drat(1), wt(1), vs(2), gear(3), carb(6)</code></pre>
+<pre class="r"><code>nrow(rg.nuis@linfct)</code></pre>
+<pre class="ro"><code>## [1] 6</code></pre>
+<p>Notice that we left <code>am</code> out of <code>non.nuisance</code> and hence included it in <code>nuisance</code>. However, it interacts with <code>cyl</code>, so it was not allowed as a nuisance factor. But <code>rg.nuis</code> requires 1/36 as much storage. There’s really nothing else to show, other than to demonstrate that we get the same EMMs either way, with slightly different annotations:</p>
+<pre class="r"><code>emmeans(rg.usual, ~ cyl * am)</code></pre>
+<pre class="ro"><code>##  cyl am emmean   SE df lower.CL upper.CL
+##    4  0   19.0 4.29 14    9.823     28.2
+##    6  0   19.7 3.32 14   12.556     26.8
+##    8  0   29.0 5.98 14   16.130     41.8
+##    4  1   15.4 4.29 14    6.206     24.6
+##    6  1   27.3 4.90 14   16.741     37.8
+##    8  1   11.2 5.56 14   -0.718     23.1
+## 
+## Results are averaged over the levels of: vs, gear, carb 
+## Confidence level used: 0.95</code></pre>
+<pre class="r"><code>emmeans(rg.nuis, ~ cyl * am)</code></pre>
+<pre class="ro"><code>##  cyl am emmean   SE df lower.CL upper.CL
+##    4  0   19.0 4.29 14    9.823     28.2
+##    6  0   19.7 3.32 14   12.556     26.8
+##    8  0   29.0 5.98 14   16.130     41.8
+##    4  1   15.4 4.29 14    6.206     24.6
+##    6  1   27.3 4.90 14   16.741     37.8
+##    8  1   11.2 5.56 14   -0.718     23.1
+## 
+## Results are averaged over the levels of: 7 nuisance factors 
+## Confidence level used: 0.95</code></pre>
+<p>By default, the pre-averaging is done with equal weights. If we specify <code>wt.nuis</code> as anything other than <code>&quot;equal&quot;</code>, they are averaged proportionally. As described above, this really amounts to <code>&quot;outer&quot;</code> weights since they are averaged separately. Let’s try it to see how the estimates differ:</p>
+<pre class="r"><code>predict(emmeans(mtcars.lm, ~ cyl * am, non.nuis = c(&quot;cyl&quot;, &quot;am&quot;), 
+                wt.nuis = &quot;prop&quot;))</code></pre>
+<pre class="ro"><code>## [1] 16.51254 17.17869 26.45709 12.90600 24.75053  8.70546</code></pre>
+<pre class="r"><code>predict(emmeans(mtcars.lm, ~ cyl * am, weights = &quot;outer&quot;))</code></pre>
+<pre class="ro"><code>## [1] 16.51254 17.17869 26.45709 12.90600 24.75053  8.70546</code></pre>
+<p>These are the same as each other, but different from the equally-weighted EMMs we obtained before. By the way, to help make things consistent, if <code>weights</code> is character, <code>emmeans()</code> passes <code>wt.nuis = weights</code> to <code>ref_grid</code> (if it is called), unless <code>wt.nuis</code> is also specified.</p>
+<p>There is a trick to get <code>emmeans</code> to use the smallest possible reference grid: Pass the <code>specs</code> argument to <code>ref_grid()</code> as <code>non.nuisance</code>. But we have to quote it to delay evaluation, and also use <code>all.vars()</code> if (and only if) <code>specs</code> is a formula:</p>
+<pre class="r"><code>emmeans(mtcars.lm, ~ gear | am, non.nuis = quote(all.vars(specs)))</code></pre>
+<pre class="ro"><code>## am = 0:
+##  gear emmean   SE df lower.CL upper.CL
+##     3   15.2 2.65 14     9.56     20.9
+##     4   22.4 3.36 14    15.20     29.6
+##     5   30.0 4.54 14    20.28     39.7
+## 
+## am = 1:
+##  gear emmean   SE df lower.CL upper.CL
+##     3   10.6 4.49 14     1.02     20.3
+##     4   17.8 2.62 14    12.19     23.4
+##     5   25.4 4.05 14    16.72     34.1
+## 
+## Results are averaged over the levels of: 6 nuisance factors, cyl 
+## Confidence level used: 0.95</code></pre>
+<p>Observe that <code>cyl</code> was passed over as a nuisance factor because it interacts with another factor.</p>
+</div>
+<div id="rg.limit" class="section level3">
+<h3>Limiting the size of the reference grid</h3>
+<!-- @index  `rg.limit` option; Memory usage!Limiting -->
+<p>We have just seen how easily the size of a reference grid can get out of hand. The <code>rg.limit</code> option (set via <code>emm_options()</code> or as an optional argument in <code>ref_grid()</code> or <code>emmeans()</code>) serves to guard against excessive memory demands. It specifies the number of allowed rows in the reference grid. But because of the way <code>ref_grid()</code> works, this check is made <em>before</em> any multivariate-response levels are taken into account. If the limit is exceeded, an error is thrown:</p>
+<pre class="r"><code>ref_grid(mtcars.lm, rg.limit = 200)</code></pre>
+<pre><code>## Error: The rows of your requested reference grid would be 216, which exceeds
+## the limit of 200 (not including any multivariate responses).
+## Your options are:
+##   1. Specify some (or more) nuisance factors using the &#39;nuisance&#39; argument
+##      (see ?ref_grid). These must be factors that do not interact with others.
+##   2. Add the argument &#39;rg.limit = &lt;new limit&gt;&#39; to the call. Be careful,
+##      because this could cause excessive memory use and performance issues.
+##      Or, change the default via &#39;emm_options(rg.limit = &lt;new limit&gt;)&#39;.</code></pre>
+<p>The default <code>rg.limit</code> is 10,000. With this limit, and if we have 1,000 columns in the model matrix, then the size of <code>linfct</code> is limited to about 80MB. If in addition, there is a 5-level multivariate response, the limit is 2GB – darn big, but perhaps manageable. Even so, I suspect that the 10000-row default may be to loose to guard against some users getting into a tight situation.</p>
+<p><a href="#contents">Back to Contents</a></p>
+</div>
 </div>
 <div id="submodels" class="section level2">
 <h2>Sub-models</h2>

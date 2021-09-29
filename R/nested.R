@@ -54,6 +54,13 @@
 #'   alphabetically. To dictate a different ordering of levels, supply 
 #'   \code{newlevs} as a \code{factor} having its levels in the desired order.
 #'   
+#' @note When \code{refname} specifies more than one factor, this can
+#'   fundamentally (and permanently) change what is meant by the levels of those
+#'   individual factors. For instance, in the \code{gwrg} example below, there
+#'   are two levels of \code{wool} nested in each \code{prod}; and that implies
+#'   that we now regard these as four different kinds of wool. Similarly, there
+#'   are five different tensions (L, M, H in prod 1, and L, M in prod 2).
+#'   
 #' @export
 #'
 #' @examples
@@ -253,7 +260,8 @@ add_grouping = function(object, newname, refname, newlevs) {
     if(!is.character(method))
         stop ("Non-character contrast methods are not supported with nested objects")
     
-    testcon = get(paste0(method, ".emmc"))(1:3)
+    testcon = try(get(paste0(method, ".emmc"))(1:3), silent = TRUE)
+    if(inherits(testcon, "try-error")) testcon = NULL
     if(missing(adjust)) 
         adjust = attr(testcon, "adjust")
     estType = attr(testcon, "type")
@@ -328,6 +336,48 @@ add_grouping = function(object, newname, refname, newlevs) {
         }
     }
     keep
+}
+
+# Fill-in extra elements to make a grid regular
+#' @rdname rbind.emmGrid
+#' @order 9
+#' @param object an object of class \code{emmGrid}
+#' @return \code{force_regular} adds extra (invisible) rows to an \code{emmGrid} object
+#'   to make it a regular grid (all combinations of factors). This regular structure is 
+#'   needed by \code{emmeans}. An object can become irregular by, for example,
+#'   subsetting rows, or by obtaining contrasts of a nested structure.
+#' @export
+#' @examples
+#' 
+#' ### Irregular object
+#' tmp <- warp.rg[-1]
+#' ## emmeans(tmp, "tension")   # will fail because tmp is irregular
+#' emmeans(force_regular(tmp), "tension")   # will show some results
+force_regular = function(object) {
+    newgrid = do.call(expand.grid, object@levels)
+    newkey = do.call(paste, newgrid)
+    newlf = matrix(NA, nrow = nrow(newgrid), ncol = ncol(object@linfct))
+    colnames(newlf) = colnames(object@linfct) 
+    newdisp = rep(FALSE, nrow(newgrid))
+    
+    oldgrid = object@grid
+    oldkey = do.call(paste, oldgrid[setdiff(names(oldgrid), c(".wgt.", ".offset."))])
+    if (wtd <- (".wgt." %in% names(oldgrid))) 
+        newgrid$.wgt. = 0
+    if (ofs <- (".offset." %in% names(oldgrid))) 
+        newgrid$.offset. = NA
+    for (j in seq_along(oldkey)) {
+        key = oldkey[j]
+        i = which(newkey == key)
+        newlf[i, ] = object@linfct[j, ]
+        newdisp[i] = TRUE
+        if(wtd) newgrid$.wgt.[i] = oldgrid$.wgt.[j]
+        if(ofs) newgrid$.offset.[i] = oldgrid$.offset.[j]
+    }
+    object@grid = newgrid
+    object@linfct = newlf
+    object@misc$display = newdisp
+    object
 }
 
 

@@ -1,30 +1,62 @@
-## NEWS for the emmeans package
-
-emmeans 1.6.3
--------------
-
-    * Clarification of documentation of `ref_grid(object, vcov. = ...)` (#283)
-    * Fix to `emmtrends()` with covariate formulas (#284)
-    * Improved parts of "Basics" vignette - removed "back story",
-      revised guidance on $P$ values and models
-    * Allow for > 1 reference factor in `add_grouping()` (#286)
-    * Repairs to `contrast()` to avoid all-`nonEst` results in irregular
-      nested structures
+---
+title: "NEWS for the emmeans package"
+---
 
 
-emmeans 1.6.2
--------------
+## emmeans 1.7.0
+#### Notable changes
+  * New `rg.limit` option (and argument for `ref_grid()`) to limit the number
+    of rows in the reference grid (#282, #292). **This change could affect
+    existing code that used to work** -- but only in fairly extreme situations.
+    Some users report extreme performance issues that can be traced to the size
+    of the reference grid being in the billions, causing memory to be paged,
+    etc. So providing this limit really is necessary. The default is 10,000
+    rows. I hope that most existing users don't bump up against that too often.
+    The `nuisance` (or `non.nuisance`) argument in `ref_grid()` (see below) can
+    help work around this limit.
+  * New `nuisance` option in `ref_grid()`, by which we can specify names of
+    factors to exclude from the reference grid (accommodating them by averaging)
+    (#282, #292). These must be factors that don't interact with anything, even
+    other nuisance factors. This provides a remedy for excessive grid sizes.
+  * Improvements to and broadening of `qdrg()`:
+    - Changed the order of arguments in to something a bit more natural
+    - Default for `contrasts` now `object$contrasts` when `object` is specified
+    - Detection of multivariate situations
+    - Added `ordinal.dim` argument to support ordinal models
+  * New `force_regular()` function adds invisible rows to an irregular `emmGrid`
+    to make it regular (i.e., covers all factor combinations)
+      
+#### Bug fixes and tweaks     
+  * Removed dependency on **plyr** package (#298)
+  * Fix to bug in `regrid()` with nested structures (#287)
+  * Fix bug in `rbind()` which mishandled `@grid$.offset.`
+  * Major repairs to `clm` and `clmm` support to fix issues related to
+    rank deficiency and nested models, particularly with `mode = "prob"` (#300)
+  * Allow `type` to be passed in `emmeans()` when `object` is already an `emmGrid`
+    (incidentally noticed in #287)
+  * Code to prevent a warning when an existing factor is coerced to a factor
+    in the model formula -- see [SO question](https://stackoverflow.com/questions/68969384)
+  * Add documentation note for `add_grouping` with multiple reference factors (#291)
 
-    * Fixed navigation error in vignette index
-    * Discouraging message added to `cld()` results. 
-      Also am providing an `emm_list` method for `emm_list` objects.
-    * Added `mvcontrast()` function (#281) and assoc vignette material
-    * Added `update.summary_emm()`
+## emmeans 1.6.3
+  * Clarification of documentation of `ref_grid(object, vcov. = ...)` (#283)
+  * Fix to `emmtrends()` with covariate formulas (#284)
+  * Improved parts of "Basics" vignette - removed "back story",
+    revised guidance on $P$ values and models
+  * Allow for > 1 reference factor in `add_grouping()` (#286)
+  * Repairs to `contrast()` to avoid all-`nonEst` results in irregular
+    nested structures
+
+
+## emmeans 1.6.2
+  * Fixed navigation error in vignette index
+  * Discouraging message added to `cld()` results. 
+    Also am providing an `emm_list` method for `emm_list` objects.
+  * Added `mvcontrast()` function (#281) and assoc vignette material
+  * Added `update.summary_emm()`
     
 
-emmeans 1.6.1
--------------
-
+## emmeans 1.6.1
   * Fixed a bug in parsing a response transformation (#274)
   * Changed handling of `contrast()` so that `log2` and `log10` transformations 
     are handled just like `log`. (#273) Also disabled making ratios with
@@ -91,7 +123,7 @@ emmeans 1.5.5
     facets are labeled (#261)
   * Efficiency improvements in `joint_tests()` (#265)
   * Bug fixes in `joint_tests()` and interaction contrasts for nested models (#266)
-  * Improvement to `multinom` support suggested by this [SO question](https://stackoverflow.com/questions/66675697/wrapping-nnetmultinom-ggeffectsggemmeans-in-a-custom-function-fails-th/66681184#66681184)
+  * Improvement to `multinom` support suggested by this [SO question](https://stackoverflow.com/questions/66675697)
   
     
 
@@ -128,7 +160,7 @@ emmeans 1.5.3
     This makes it possible for `pwpp()` to work (#239)
   * Fixed a coding error in `plot()` that occurs if we use `type = "response"
     but there is in fact no transformation 
-    ([reported on StackOverflow](https://stackoverflow.com/questions/64962094/in-r-plot-emmeans-of-glmmtmb-linear-model-error-in-linkinvsummthe-emmean/64995896#64995896))
+    ([reported on StackOverflow](https://stackoverflow.com/questions/64962094))
   * Added `"log10"` and `"log2"` as legal transformations in `regrid()`
   * Revised vignette example for MCMC models, added example with **bayestestR**
   * Expanded support for ordinal models to all link functions available in
@@ -155,7 +187,7 @@ emmeans 1.5.2
 
   * Change to `plot.emmGrid(... comparisons = TRUE)` where we determine arrow 
     bounds and unnecessary-arrow deletions *separately* in each `by` group. 
-    See also [Stack Overflow posting](https://stackoverflow.com/questions/63713439/interpreting-results-from-emmeans-comparison/63734042#63734042)
+    See also [Stack Overflow posting](https://stackoverflow.com/questions/63713439)
   * `emmeans()` with contrasts specified ignores `adjust` and passes to 
     `contrast()` instead. Associated documentation improved (I hope)
   * Bug-fix for missing cases in `plot(..., comparisons = TRUE)` (#228)
@@ -180,7 +212,7 @@ emmeans 1.5.1
     so that an external package's methods are always found and given priority
     whether or not they are registered (#220)
   * Patches to `gamlss` support. Smoothers are not supported but other aspects
-   are more reliable. See [CV posting](https://stats.stackexchange.com/questions/484886/post-hoc-analysis-for-gamlss-model-in-r)
+   are more reliable. See [CV posting](https://stats.stackexchange.com/questions/484886)
   * Improvement to auto-detection of transformations (#223)
   * Added `aes` argument in `pwpp()` for more control over rendering (#178)
   * Fix to a situation in `plot.emmGrid()` where ordering of factor levels

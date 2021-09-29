@@ -125,6 +125,12 @@ emmeans.list = function(object, specs, ...) {
 #'   section below.)
 #' @param weights Character value, numeric vector, or numeric matrix specifying
 #'   weights to use in averaging predictions. See \dQuote{Weights} section below.
+#'   Also, if \code{object} is not already a reference grid, \code{weights}
+#'   (if it is character) is passed to \code{ref_grid} as \code{wt.nuis} in case 
+#'   nuisance factors are specified. We can override this by specifying 
+#'   \code{wt.nuis} explicitly.
+#'   This more-or-less makes the weighting of nuisance factors consistent with
+#'   that of primary factors.
 #' @param offset Numeric vector or scalar. If specified, this adds an offset to
 #'   the predictions, or overrides any offset in the model or its
 #'   reference grid. If a vector of length differing from the number of rows in 
@@ -217,6 +223,7 @@ emmeans.list = function(object, specs, ...) {
 #' \code{"cells"}, except nonempty cells are weighted equally and empty cells
 #' are ignored.
 #' 
+#' 
 #' @section Offsets:
 #' Unlike in \code{ref_grid}, an offset need not be scalar. If not enough values
 #' are supplied, they are cyclically recycled. For a vector of offsets, it is 
@@ -295,6 +302,8 @@ emmeans = function(object, specs, by = NULL,
     
     if(!is(object, "emmGrid")) {
         args = .zap.args(object = object, ..., omit = "submodel")
+        if (is.null(args$wt.nuis)) # pass weights as wt.nuis
+            args$wt.nuis = ifelse(!missing(weights) && is.character(weights), weights, "equal")
         object = do.call(ref_grid, args)
     }
     if (is.list(specs)) {
@@ -330,7 +339,8 @@ emmeans = function(object, specs, by = NULL,
         # Check that grid is complete
         # This isn't a 100% reliable check, but...
         if(nrow(RG@grid) != prod(sapply(RG@levels, length)))
-            stop("Irregular reference grid: Marginal means cannot be determined")
+            stop("Irregular reference grid: Marginal means cannot be determined.\n",
+                 "You can possibly fix this with the 'force_regular' function.")
         
         if (!is.null(RG@misc$display)) {
             RG@misc$display = NULL
@@ -366,14 +376,16 @@ emmeans = function(object, specs, by = NULL,
                     wopts = c("equal","proportional","outer","cells","flat","show.levels","invalid")
                     weights = switch(wopts[pmatch(weights, wopts, 7)],
                                      equal = rep(1, prod(dims[avgd.mars])),
-                                     proportional = as.numeric(plyr::aaply(row.idx, avgd.mars,
+                                     proportional = as.numeric(apply(row.idx, avgd.mars,
                                                                            function(idx) sum(wgt[idx]))),
                                      outer = {
-                                         ftbl = plyr::aaply(row.idx, avgd.mars,
-                                                            function(idx) sum(wgt[idx]), .drop = FALSE)
+                                         ftbl = apply(row.idx, avgd.mars,
+                                                            function(idx) sum(wgt[idx]))
+                                         # Fix up the dimensions
+                                         ftbl = array(ftbl, dim(row.idx)[avgd.mars])
                                          w = N = sum(ftbl)
                                          for (d in seq_along(dim(ftbl)))
-                                             w = outer(w, plyr::aaply(ftbl, d, sum) / N)
+                                             w = outer(w, apply(ftbl, d, sum) / N)
                                          as.numeric(w)
                                      },
                                      cells = "fq",
@@ -416,18 +428,18 @@ emmeans = function(object, specs, by = NULL,
         }
         combs = do.call("expand.grid", levs)
         if (!missing(weights) && is.character(weights) && (weights %in% c("fq", "fl")))
-            K = plyr::alply(row.idx, use.mars, function(idx) {
+            K = apply(row.idx, use.mars, function(idx) {
                 fq = RG@grid[[".wgt."]][idx]
                 if (weights == "fl")
                     fq = 0 + (fq > 0)  # fq = 1 if > 0, else 0
                 apply(.diag(fq) %*% RG@linfct[idx, , drop=FALSE], 2, sum) / sum(fq)
             })
         else
-            K = plyr::alply(row.idx, use.mars, function(idx) {
+            K = apply(row.idx, use.mars, function(idx) {
                 fac.reduce(RG@linfct[idx, , drop=FALSE])
             })
         
-        linfct = t(as.matrix(as.data.frame(K)))
+        linfct = t(matrix(K, nrow = ncol(RG@linfct)))
         row.names(linfct) = NULL
         
         if(.some.term.contains(union(facs, RG@roles$trend), RG@model.info$terms))
@@ -437,8 +449,8 @@ emmeans = function(object, specs, by = NULL,
         
         # Figure offset, if any
         if (hasName(RG@grid, ".offset.")) {
-            combs[[".offset."]] = as.numeric(plyr::aaply(row.idx, use.mars, function(idx)
-                fac.reduce(as.matrix(RG@grid[idx, ".offset.", drop=FALSE]))))
+            combs[[".offset."]] = as.numeric(apply(row.idx, use.mars, function(idx)
+                fac.reduce(as.matrix(RG@grid[idx, ".offset.", drop = FALSE]))))
         }
         
         avgd.over = names(RG@levels[avgd.mars])
@@ -451,7 +463,7 @@ emmeans = function(object, specs, by = NULL,
         
         # Update .wgt column of grid, if it exists
         if (!is.null(wgt)) {
-            combs[[".wgt."]] = as.numeric(plyr::aaply(row.idx, use.mars, 
+            combs[[".wgt."]] = as.numeric(apply(row.idx, use.mars, 
                                                       function(idx) sum(wgt[idx])))
         }
         
@@ -483,6 +495,8 @@ emmeans = function(object, specs, by = NULL,
         object@model.info$nesting = NULL
         result = .nested_emm(object, specs, by = by, fac.reduce = fac.reduce, 
                        options = options, weights = weights, offset = offset, nesting = nesting)
+        if(!is.null(type <- list(...)$type))
+            result = update(result, type = type)
     }
     
 
@@ -490,7 +504,7 @@ emmeans = function(object, specs, by = NULL,
         # NULL-out a bunch of arguments to not pass. 
         dontpass = c("data", "avgd.over", "by.vars", "df", "initMesg", "estName", "estType",
                      "famSize", "inv.lbl", "methDesc", "nesting", "pri.vars", 
-                     "tran", "tran.mult", "tran.offset", "tran2", "type", "is.new.rg")
+                     "tran", "tran.mult", "tran.offset", "tran2", "is.new.rg")
         args = .zap.args(object = result, method = contr, by = by, ..., omit = dontpass)
         ctrs = do.call(contrast, args)
         result = .cls.list("emm_list", emmeans = result, contrasts = ctrs)
