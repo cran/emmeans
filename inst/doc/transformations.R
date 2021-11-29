@@ -93,6 +93,17 @@ pairs(piglog.emm.s, type = "response")
 ## ---- eval = FALSE--------------------------------------------------------------------------------
 #  regrid(emm, transform = "probit")
 
+## -------------------------------------------------------------------------------------------------
+pct.diff.tran <- list(
+    linkfun = function(mu) log(mu/100 + 1),
+    linkinv = function(eta) 100 * (exp(eta) - 1),
+    mu.eta = function(eta) 100 * exp(eta),
+    name = "log(pct.diff)"
+)
+
+update(pairs(piglog.emm.s, type = "response"), 
+       tran = pct.diff.tran, inv.lbl = "pct.diff")
+
 ## ---- message = FALSE-----------------------------------------------------------------------------
 fiber.lm <- lm(scale(strength) ~ machine * scale(diameter), data = fiber)
 emmeans(fiber.lm, "machine")   # on the standardized scale

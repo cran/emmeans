@@ -313,8 +313,10 @@ contrast.emmGrid = function(object, method = "eff", interaction = FALSE,
     cmat = method(levs, ...)
     if (!is.data.frame(cmat))
         stop("Contrast function must provide a data.frame")
-    else if(ncol(cmat) == 0)
+    else if(ncol(cmat) == 0) {
         cmat = data.frame(`(nothing)` = rep(NA, nrow(args)), check.names = FALSE)
+        adjust = "none"
+    }
     # warning("No contrasts were generated! Perhaps only one emmean is involved.\n",
     #      "  This can happen, for example, when your predictors are not factors.")
     else if (nrow(cmat) != nrow(args))
@@ -365,7 +367,7 @@ contrast.emmGrid = function(object, method = "eff", interaction = FALSE,
         xlevs = list()
         for (v in by)
             xlevs[[v]] = rep(bylevs[row.1st, v], each=n.each)
-        grid = cbind(grid, as.data.frame(xlevs))
+        grid = cbind(grid, data.frame(xlevs, check.names = FALSE))
         if (hasName(object@grid, ".offset."))
             grid[[".offset."]] = tcmat %*% object@grid[unlist(by.rows), ".offset."]
     }

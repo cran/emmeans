@@ -28,3 +28,4 @@ test_that("Nested EMMs work", {
     expect_equal(colnames(emmeans(rgg, ~ source)@grid)[1:2], c("source","group"))
 })
 
+

@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.7.0" />
+<meta name="author" content="emmeans package, Version 1.7.1.1" />
 
 
 <title>Models supported by emmeans</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Models supported by emmeans</h1>
-<h4 class="author">emmeans package, Version 1.7.0</h4>
+<h4 class="author">emmeans package, Version 1.7.1.1</h4>
 
 
 
@@ -242,34 +242,46 @@
 <td align="left"><code>mode = c(&quot;auto&quot;, &quot;df.error&quot;, &quot;satterthwaite&quot;, &quot;asymptotic&quot;)</code></td>
 </tr>
 <tr class="odd">
+<td align="left">gnls</td>
+<td align="left">nlme</td>
+<td align="center"><a href="#A">A</a></td>
+<td align="left">Supports <code>params</code> part. Requires <code>param = &quot;&lt;name&gt;&quot;</code></td>
+</tr>
+<tr class="even">
 <td align="left">hurdle</td>
 <td align="left">pscl</td>
 <td align="center"><a href="#C">C</a></td>
 <td align="left"><code>mode = c(&quot;response&quot;, &quot;count&quot;, &quot;zero&quot;, &quot;prob0&quot;),</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"></td>
 <td align="left"></td>
 <td align="center"></td>
 <td align="left"><code>lin.pred = c(FALSE, TRUE)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">lm</td>
 <td align="left">stats</td>
 <td align="center"><a href="#A">A</a></td>
 <td align="left">Several other classes inherit from this and may be supported</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">lme</td>
 <td align="left">nlme</td>
 <td align="center"><a href="#K">K</a></td>
 <td align="left"><code>sigmaAdjust = c(TRUE, FALSE),</code></td>
 </tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left"></td>
+<td align="center"></td>
+<td align="left"><code>mode = c(&quot;auto&quot;, containment&quot;, &quot;satterthwaite&quot;, &quot;asymptotic&quot;),</code></td>
+</tr>
 <tr class="odd">
 <td align="left"></td>
 <td align="left"></td>
 <td align="center"></td>
-<td align="left"><code>mode = c(&quot;auto&quot;, containment&quot;, &quot;satterthwaite&quot;, &quot;asymptotic&quot;)</code></td>
+<td align="left"><code>extra.iter = 0</code></td>
 </tr>
 <tr class="even">
 <td align="left">lmerMod</td>
@@ -383,7 +395,7 @@
 <td align="left">nlme</td>
 <td align="left">nlme</td>
 <td align="center"><a href="#A">A</a></td>
-<td align="left">Supports fixed part. Requires <code>param</code></td>
+<td align="left">Supports fixed part. Requires <code>param = &quot;&lt;name&gt;&quot;</code></td>
 </tr>
 <tr class="odd">
 <td align="left">polr</td>
@@ -524,8 +536,9 @@
 <!-- @index `lme` models; `gls` models; Satterthwaite d.f.; Containment d.f.; 
      `appx-satterthwaite` method; `boot-satterthwaite` method -->
 <p>The <code>sigmaAdjust</code> argument is a logical value that defaults to <code>TRUE</code>. It is comparable to the <code>adjustSigma</code> option in <code>nlme::summary.lme</code> (the name-mangling is to avoid conflicts with the often-used <code>adjust</code> argument), and determines whether or not a degrees-of-freedom adjustment is performed with models fitted using the ML method.</p>
-<p>The optional <code>mode</code> argument affects the degrees of freedom. The <code>mode = &quot;satterthwaite&quot;</code> option determines degrees of freedom via the Satterthwaite method: If <code>s^2</code> is the estimate of some variance, then its Satterthwaite d.f. is <code>2*s^4 / Var(s^2)</code>. In case our numerical methods for this fail, we also offer <code>mode = &quot;appx-satterthwaite&quot;</code> as a backup, by which quantities related to <code>Var(s^2)</code> are obtained by randomly perturbing the response values. Currently, only <code>&quot;appx-satterthwaite&quot;</code> is available for <code>lme</code> objects, and it is used if <code>&quot;satterthwaite&quot;</code> is requested. (Note: Previously, <code>&quot;appx-satterthwaite&quot;</code> was termed <code>&quot;boot-satterthwaite&quot;</code>; this is still supported for backward compatibility. The “boot” was abandoned because it is really an approximation method, not a bootstrap method in the sense as many statistical methods.)</p>
+<p>The optional <code>mode</code> argument affects the degrees of freedom. The <code>mode = &quot;satterthwaite&quot;</code> option determines degrees of freedom via the Satterthwaite method: If <code>s^2</code> is the estimate of some variance, then its Satterthwaite d.f. is <code>2*s^4 / Var(s^2)</code>. In case our numerical methods for this fail, we also offer <code>mode = &quot;appx-satterthwaite&quot;</code> as a backup, by which quantities related to <code>Var(s^2)</code> are obtained by randomly perturbing the response values. Currently, only <code>&quot;appx-satterthwaite&quot;</code> is available for <code>lme</code> objects, and it is used if <code>&quot;satterthwaite&quot;</code> is requested. Because <code>appx-satterthwaite</code> is simulation-based, results may vary if the same analysis is repeated. An <code>extra.iter</code> argument may be added to request additional simulation runs (at [possibly considerable] cost of repeating the model-fitting that many more times). (Note: Previously, <code>&quot;appx-satterthwaite&quot;</code> was termed <code>&quot;boot-satterthwaite&quot;</code>; this is still supported for backward compatibility. The “boot” was abandoned because it is really an approximation method, not a bootstrap method in the sense as many statistical methods.)</p>
 <p>An alternative method is <code>&quot;df.error&quot;</code> (for <code>gls</code>) and <code>&quot;containment&quot;</code> (for <code>lme</code>). <code>df.error</code> is just the error degrees of freedom for the model, minus the number of extra random effects estimated; it generally over-estimates the degrees of freedom. The <code>asymptotic</code> mode simply sets the degrees of freedom to infinity. “containment”<code>mode (for</code>lme<code>models) determines the degrees of freedom for the coarsest grouping involved in the contrast or linear function involved, so it tends to under-estimate the degrees of freedom. The default is</code>mode = “auto”`, which uses Satterthwaite if there are estimated random effects and the non-Satterthwaite option otherwise.</p>
+<p>The <code>extra.iter</code> argument is ignored unless the d.f. method is (or defaults to) <code>appx-satterthwaite</code>.</p>
 <p><a href="#quickref">Back to quick reference</a></p>
 </div>
 <div id="L" class="section level2">

@@ -2,6 +2,26 @@
 title: "NEWS for the emmeans package"
 ---
 
+## emmeans 1.7.1
+  * Support from multinomial models in mgcv::gam (#303) thanks to Hannes Riebl
+  * Bug fix for spaces in `by` variable names (#305). Related to this are:
+      - `plot.emmGrid()` now forces all names to be syntactically valid
+      - In `as.data.frame.emmGrid()`, we changed the `optional` argument
+        to `check.names` (defaulting to `TRUE`), and it actually has an effect.
+        So by default, the result will have syntactically valid names; this is
+        a change, but only because `optional` did not work right (because
+        it is an argument for `as.data.frame.list()).
+  * Fix for missing column names in `linfct` from `emmeans()` (#308)
+  * Added `gnls` support (#313, #314, thanks to Fernando Miguez)
+  * Modified `glm` support so that `df.residual` is used when the
+    family is gaussian or gamma. Thus, e.g., we match `lm` results 
+    when the model is fitted with a Gaussian family. Previously we ignored
+    the d.f. for all `glm` objects.
+  * New vignette example with percentage differences
+  * More graceful handling of comparisons when there is only one mean;
+    and a related FAQ
+
+
 
 ## emmeans 1.7.0
 #### Notable changes

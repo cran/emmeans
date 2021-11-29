@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.7.0" />
+<meta name="author" content="emmeans package, Version 1.7.1.1" />
 
 
 <title>Transformations and link functions in emmeans</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Transformations and link functions in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.7.0</h4>
+<h4 class="author">emmeans package, Version 1.7.1.1</h4>
 
 
 
@@ -65,6 +65,7 @@
 <li><a href="#logs">Faking a log transformation</a>
 <ol style="list-style-type: lower-alpha">
 <li><a href="#faking">Faking other transformations</a></li>
+<li><a href="#altscale">Alternative scale</a></li>
 </ol></li>
 <li><a href="#bias-adj">Bias adjustment</a></li>
 </ol>
@@ -348,7 +349,29 @@ confint(piglog.emm.s, type = &quot;response&quot;)</code></pre>
 <p>It is possible to fake transformations other than the log. Just use the same method, e.g.</p>
 <pre class="r"><code>regrid(emm, transform = &quot;probit&quot;)</code></pre>
 <p>would re-grid the existing <code>emm</code> to the probit scale. Note that any estimates in <code>emm</code> outside of the interval <span class="math inline">\((0,1)\)</span> will be flagged as non-estimable.</p>
-<p>The section on standardized responses gives an example of reverse-engineering a standardized response transformation in this way.</p>
+<p>The <a href="#stdize">section on standardized responses</a> gives an example of reverse-engineering a standardized response transformation in this way.</p>
+</div>
+<div id="altscale" class="section level3">
+<h3>Alternative scale</h3>
+<!-- @index Transformations!Percent difference; Percentage differences; Examples!`pigs` -->
+<p>It is possible to create a report on an alternative scale by updating the <code>tran</code> component. For example, suppose we want percent differences instead of ratios in the preceding example with the <code>pigs</code> dataset. This is possible by modifying the inverse transformation: since the uusual inverse transformation is a ratio of the form <span class="math inline">\(r = a/b\)</span>, we have that the percentage difference between <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> is <span class="math inline">\(100(a-b)/b = 100(r-1)\)</span>. Thus,</p>
+<pre class="r"><code>pct.diff.tran &lt;- list(
+    linkfun = function(mu) log(mu/100 + 1),
+    linkinv = function(eta) 100 * (exp(eta) - 1),
+    mu.eta = function(eta) 100 * exp(eta),
+    name = &quot;log(pct.diff)&quot;
+)
+
+update(pairs(piglog.emm.s, type = &quot;response&quot;), 
+       tran = pct.diff.tran, inv.lbl = &quot;pct.diff&quot;)</code></pre>
+<pre class="ro"><code>##  contrast    pct.diff   SE df t.ratio p.value
+##  fish / soy     -24.0 4.54 23  -4.591  0.0004
+##  fish / skim    -33.7 3.91 23  -6.965  &lt;.0001
+##  soy / skim     -12.8 4.69 23  -2.548  0.0457
+## 
+## Results are averaged over the levels of: percent 
+## P value adjustment: tukey method for comparing a family of 3 estimates 
+## Tests are performed on the log(pct.diff) scale</code></pre>
 </div>
 </div>
 <div id="stdize" class="section level2">

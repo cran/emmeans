@@ -22,6 +22,12 @@
 # Functions used only internally and of fairly general use
 # More of these with specific uses only within a certain context remain there.
 
+
+## %in%-style operator with partial matching
+## e.g.,  ("bonf" %.pin% p.adjust.methods)  is TRUE
+"%.pin%" = function (x, table) pmatch(x, table, nomatch = 0L) > 0L
+
+
 ## Alternative to all.vars, but keeps vars like foo$x and foo[[1]] as-is
 ##   Passes ... to all.vars
 #' @export
@@ -278,6 +284,13 @@ model.frame = function(formula, data, ...) {
     for (j in seq_along(tbl[1,]))
         nms[nms == tbl[1, j]] = tbl[2, j]
     nms
+}
+
+# utility to make all names in a summary syntactically valid
+.validate.names = function(object) {
+    for (a in c("names", "pri.vars", "by.vars"))
+        attr(object, a) = make.names(attr(object, a))
+    object
 }
 
 # reorder columns of data frame to match numeric positions in num (if any)
