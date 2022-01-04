@@ -387,8 +387,18 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df, calc,
         type = .validate.type(type)
     
     # if there are two transformations and we want response, then we need to undo both
-    if ((type == "response") && (!is.null(misc$tran2)))
+    if ((type == "response") && (!is.null(misc$tran2))) {
+        tmp = match.call()
+        tmp$type = "unlink"
+        summ.unlink = eval(tmp) #this is summary with type = "unlink"
         object = regrid(object, transform = "mu")
+        two.trans = TRUE
+    }
+    else
+        two.trans = FALSE
+    
+
+    
     if ((type %in% c("mu", "unlink")) && (!is.null(t2 <- misc$tran2))) {
         if (!is.character(t2))
             t2 = "tran"
@@ -518,7 +528,14 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df, calc,
                 " so it is omitted")
         }
     }
-
+    
+    
+    # add linkname attribute
+    if (two.trans)
+        linkname = paste0(link$name, "[", attr(summ.unlink, "linkname"), "]")
+    else
+        linkname = link$name
+    
     if(infer[1]) { # add CIs
         acv = .adj.critval(level, result$df, adjust, fam.info, side, corrmat, by.rows, sch.rank)
         ###adjust = acv$adjust # in older versions, I forced same adj method for tests
@@ -533,8 +550,13 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df, calc,
                 .fmt.sigma(sigma)))
             estName = names(result)[1] = "prediction"
         }
-        result[[cnm[1]]] = result[[1]] + cv[, 1]*result$SE
-        result[[cnm[2]]] = result[[1]] + cv[, 2]*result$SE
+        if (!two.trans) {
+            result[[cnm[1]]] = result[[1]] + cv[, 1]*result$SE
+            result[[cnm[2]]] = result[[1]] + cv[, 2]*result$SE
+        }
+        else {
+            result[cnm] = summ.unlink[cnm]
+        }
         mesg = c(mesg, paste("Confidence level used:", level), acv$mesg)
         if (inv) {
             clims = with(link, cbind(linkinv(result[[cnm[1]]]), linkinv(result[[cnm[2]]])))
@@ -543,37 +565,47 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df, calc,
             idx = if (all(tmp >= 0)) 1:2 else 2:1
             result[[cnm[1]]] = clims[, idx[1]]
             result[[cnm[2]]] = clims[, idx[2]]
-            mesg = c(mesg, paste("Intervals are back-transformed from the", link$name, "scale"))
+            mesg = c(mesg, paste("Intervals are back-transformed from the", linkname, "scale"))
         }
     }
     if(infer[2]) { # add tests
-        result[["null"]] = null
-        if (inv && !is.null(link))
-            result[["null"]] = link$linkinv(null)
-        if (all(result$null == 0))
-            result[["null"]] = NULL
         tnm = ifelse (zFlag, "z.ratio", "t.ratio")
         tail = ifelse(side == 0, -sign(abs(delta)), side)
-        if (side == 0) {
-            if (delta == 0) # two-sided sig test
-                t.ratio = result[[tnm]] = (result[[1]] - null) / result$SE
-            else
-                t.ratio = result[[tnm]] = (abs(result[[1]] - null) - delta) / result$SE
+        if(!two.trans) {
+            result[["null"]] = null
+            if (inv && !is.null(link))
+                result[["null"]] = link$linkinv(null)
+            if (all(result$null == 0))
+                result[["null"]] = NULL
+            if (side == 0) {
+                if (delta == 0) # two-sided sig test
+                    t.ratio = result[[tnm]] = (result[[1]] - null) / result$SE
+                else
+                    t.ratio = result[[tnm]] = (abs(result[[1]] - null) - delta) / result$SE
+            }
+            else {
+                t.ratio = result[[tnm]] = (result[[1]] - null + side * delta) / result$SE            
+            }
+            apv = .adj.p.value(t.ratio, result$df, adjust, fam.info, tail, corrmat, by.rows, sch.rank)
+            adjust = apv$adjust   # in case it was abbreviated
+            result$p.value = apv$pval
+            mesg = c(mesg, apv$mesg)
         }
         else {
-            t.ratio = result[[tnm]] = (result[[1]] - null + side * delta) / result$SE            
+            result$null = ifelse(is.null(summ.unlink$null), link$linkinv(0), link$linkinv(summ.unlink$null))
+            result[[tnm]] = summ.unlink[[tnm]]
+            result$p.value = summ.unlink$p.value
+            apv = .adj.p.value(0, result$df, adjust, fam.info, tail, corrmat, by.rows, sch.rank)
+            # we ignore everything about apv except the message
+            mesg = c(mesg, apv$mesg)
         }
-        apv = .adj.p.value(t.ratio, result$df, adjust, fam.info, tail, corrmat, by.rows, sch.rank)
-        adjust = apv$adjust   # in case it was abbreviated
-        result$p.value = apv$pval
-        mesg = c(mesg, apv$mesg)
         if (delta > 0)
             mesg = c(mesg, paste("Statistics are tests of", c("nonsuperiority","equivalence","noninferiority")[side+2],
                                  "with a threshold of", signif(delta, 5)))
         if(tail != 0) 
             mesg = c(mesg, paste("P values are ", ifelse(tail<0,"left-","right-"),"tailed", sep=""))
         if (inv) 
-            mesg = c(mesg, paste("Tests are performed on the", link$name, "scale"))
+            mesg = c(mesg, paste("Tests are performed on the", linkname, "scale"))
     }
     if (inv) {
         result[["SE"]] = with(link, abs(mu.eta(result[[1]]) * result[["SE"]]))
@@ -601,6 +633,7 @@ summary.emmGrid <- function(object, infer, level, adjust, by, type, df, calc,
     attr(summ, "delta") = delta
     attr(summ, "type") = type
     attr(summ, "mesg") = unique(mesg)
+    attr(summ, "linkname") = linkname
     class(summ) = c("summary_emm", "data.frame")
     summ
 }
@@ -841,7 +874,7 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional, check.names = TR
     et = as.numeric(fam.info[3])
 
     # Force no adjustment when just one test, unless we're using scheffe
-    if ((n.contr == 1) && (adjust %.pin% "scheffe"))  ##(pmatch(adjust, "scheffe", 0) != 1)) 
+    if ((n.contr == 1) && !(adjust %.pin% "scheffe"))  ##(pmatch(adjust, "scheffe", 0) != 1)) 
         adjust = "none"
     
     # do a pmatch of the adjust method
@@ -940,7 +973,7 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional, check.names = TR
     et = as.numeric(fam.info[3])
     
     ragged.by = (is.character(fam.size))   # flag that we need to do groups separately
-    if (!ragged.by && (n.contr == 1) && (adjust %.pin% "scheffe"))  ##(pmatch(adjust, "scheffe", 0) != 1)) # Force no adjustment when just one interval, unless using Scheffe
+    if (!ragged.by && (n.contr == 1) && !(adjust %.pin% "scheffe"))  ##(pmatch(adjust, "scheffe", 0) != 1)) # Force no adjustment when just one interval, unless using Scheffe
         adjust = "none"
     
     adj.meths = c("sidak", "tukey", "scheffe", "dunnettx", "mvt", "bonferroni", "none")

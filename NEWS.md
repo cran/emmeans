@@ -1,6 +1,25 @@
 ---
 title: "NEWS for the emmeans package"
 ---
+## emmeans 1.7.2
+  * Improvements to `averaging` support (#319)
+  * Fixed bug in comparison arrows when `by = NULL` (#321)
+    (this bug was a subtle byproduct of the name-checking in #305)
+    Note this fixes visible errors in the vignettes for ver 1.7.1-1
+  * Patch for `gamlss` support (#323)
+  * Added `withAutoprint()` to documentation examples with `require()`
+    clauses, so we see interactive-style results
+  * Correction to a logic error in adjustment corrections in 
+    `summary.emmGrid` (#31)
+  * Revised `summary.emmGrid()` so that if we have both a response
+    transformation and a link function, then both transformations
+    are followed through with `type = "response"`. Previously, I took
+    the lazy way out and used 
+    `summary(regrid(object, transform = "unlink"), type = "response")`
+    (see #325)
+  * Fix to `force_regular()` which caused an unintended warning (#326)
+  * Fixes to issues in `emtrends()` (#327)
+    
 
 ## emmeans 1.7.1
   * Support from multinomial models in mgcv::gam (#303) thanks to Hannes Riebl

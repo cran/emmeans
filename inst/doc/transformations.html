@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.7.1.1" />
+<meta name="author" content="emmeans package, Version 1.7.2" />
 
 
 <title>Transformations and link functions in emmeans</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Transformations and link functions in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.7.1.1</h4>
+<h4 class="author">emmeans package, Version 1.7.2</h4>
 
 
 
@@ -252,32 +252,32 @@ ref_grid(warp.glm)</code></pre>
 <p>The canonical link for a gamma model is the reciprocal (or inverse); and there is the square-root response transformation besides. If we choose <code>type = &quot;response&quot;</code> in summarizing, we undo <em>both</em> transformations:</p>
 <pre class="r"><code>emmeans(warp.glm, ~ tension | wool, type = &quot;response&quot;)</code></pre>
 <pre class="ro"><code>## wool = A:
-##  tension response   SE  df asymp.LCL asymp.UCL
-##  L           42.9 5.24 Inf      33.2      53.7
-##  M           23.3 2.85 Inf      18.0      29.2
-##  H           23.6 2.88 Inf      18.3      29.6
+##  tension response   SE df lower.CL upper.CL
+##  L           42.9 5.24 48     34.0     55.7
+##  M           23.3 2.85 48     18.5     30.3
+##  H           23.6 2.88 48     18.7     30.7
 ## 
 ## wool = B:
-##  tension response   SE  df asymp.LCL asymp.UCL
-##  L           27.4 3.35 Inf      21.3      34.4
-##  M           28.1 3.43 Inf      21.8      35.2
-##  H           18.5 2.26 Inf      14.3      23.2
+##  tension response   SE df lower.CL upper.CL
+##  L           27.4 3.35 48     21.8     35.7
+##  M           28.1 3.43 48     22.3     36.5
+##  H           18.5 2.26 48     14.7     24.1
 ## 
 ## Confidence level used: 0.95 
-## Intervals are back-transformed from the sqrt scale</code></pre>
+## Intervals are back-transformed from the sqrt[inverse] scale</code></pre>
 <p>What happened here is first the linear predictor was back-transformed from the link scale (inverse); then the squares were obtained to back-transform the rest of the way. It is possible to undo the link, and not the response transformation:</p>
 <pre class="r"><code>emmeans(warp.glm, ~ tension | wool, type = &quot;unlink&quot;)</code></pre>
 <pre class="ro"><code>## wool = A:
-##  tension response    SE  df asymp.LCL asymp.UCL
-##  L           6.55 0.400 Inf      5.85      7.44
-##  M           4.83 0.295 Inf      4.31      5.48
-##  H           4.86 0.297 Inf      4.34      5.52
+##  tension response    SE df lower.CL upper.CL
+##  L           6.55 0.400 48     5.83     7.46
+##  M           4.83 0.295 48     4.30     5.50
+##  H           4.86 0.297 48     4.33     5.54
 ## 
 ## wool = B:
-##  tension response    SE  df asymp.LCL asymp.UCL
-##  L           5.24 0.320 Inf      4.68      5.95
-##  M           5.30 0.324 Inf      4.73      6.02
-##  H           4.30 0.263 Inf      3.84      4.89
+##  tension response    SE df lower.CL upper.CL
+##  L           5.24 0.320 48     4.67     5.97
+##  M           5.30 0.324 48     4.72     6.04
+##  H           4.30 0.263 48     3.83     4.90
 ## 
 ## Confidence level used: 0.95 
 ## Intervals are back-transformed from the inverse scale</code></pre>

@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.7.1.1" />
+<meta name="author" content="emmeans package, Version 1.7.2" />
 
 
 <title>Sophisticated models in emmeans</title>
@@ -44,7 +44,7 @@
 
 
 <h1 class="title toc-ignore">Sophisticated models in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.7.1.1</h4>
+<h4 class="author">emmeans package, Version 1.7.2</h4>
 
 
 
@@ -291,8 +291,6 @@ tmp</code></pre>
 ## Confidence level used: 0.95</code></pre>
 <p>Using <code>mode = &quot;mean.class&quot;</code> obtains the average of these probability distributions as probabilities of the integers 1–5:</p>
 <pre class="r"><code>emmeans(wine.clm, &quot;temp&quot;, mode = &quot;mean.class&quot;)</code></pre>
-<pre><code>## Warning in emmeans(wine.clm, &quot;temp&quot;, mode = &quot;mean.class&quot;): emmeans() results may be corrupted by
-## removal of a nesting structure</code></pre>
 <pre class="ro"><code>##  temp mean.class    SE  df asymp.LCL asymp.UCL
 ##  cold       2.35 0.144 Inf      2.06      2.63
 ##  warm       3.37 0.146 Inf      3.08      3.65
