@@ -22,10 +22,30 @@
 # Functions used only internally and of fairly general use
 # More of these with specific uses only within a certain context remain there.
 
+## create an lm-compatible set of coefficients in singular cases
+## requires both bhat and X to be named; if not, silently returns bhat
+.impute.NAs = function(bhat, X) {
+    if (is.null(bnm <- names(bhat)) || is.null(colnames(X)))
+        return(bhat)
+    nm = intersect(bnm, (xnm <- colnames(X)))
+    if(length(nm) == length(xnm))
+        return(bhat[nm])
+    tmp = rep(NA, length(xnm))
+    names(tmp) = xnm
+    tmp[nm] = bhat[nm]
+    tmp
+}
 
 ## %in%-style operator with partial matching
 ## e.g.,  ("bonf" %.pin% p.adjust.methods)  is TRUE
 "%.pin%" = function (x, table) pmatch(x, table, nomatch = 0L) > 0L
+
+## Like is.numeric() but returns TRUE for character vectors like c("1", "3", "2")
+## (but will return FALSE if any x is NA)
+.is.num = function(x) {
+    nx = suppressWarnings(as.numeric(as.character(x)))
+    !any(is.na(nx))
+}
 
 
 ## Alternative to all.vars, but keeps vars like foo$x and foo[[1]] as-is

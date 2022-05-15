@@ -20,8 +20,10 @@ qdrg(formula, data, coef, vcov, df, mcmc, object, subset, weights, contrasts,
 
 \item{mcmc}{Posterior sample of fixed-effect coefficients}
 
-\item{object}{Optional model object. If provided, it is used to set 
-certain other arguments, if not specified. See Details.}
+\item{object}{Optional model object. \emph{This rarely works!}; 
+but if provided, we try to set 
+other arguments based on an expectation that `object` has a similar
+structure to `lm` objects. See Details.}
 
 \item{subset}{Subset of \code{data} used in fitting the model}
 
@@ -32,12 +34,14 @@ certain other arguments, if not specified. See Details.}
 \item{link}{Link function (character or list) used, if a generalized linear model.
 (Note: response transformations are auto-detected from \code{formula})}
 
-\item{qr}{QR decomposition of the model matrix; needed only if there are \code{NA}s
+\item{qr}{QR decomposition of the model matrix; used only if there are \code{NA}s
 in \code{coef}.}
 
 \item{ordinal.dim}{Integer number of levels in an ordinal response. If not
 missing, the intercept terms are modified appropriate to predicting the latent
-response (see \code{vignette("models")}, Section O. In this case, we expect
+response (see \code{vignette("models")}, Section O, but note that the other 
+modes, e.g., \code{mode = "prob"} are not provided). 
+In this case, we expect
 the first \code{ordinal.dim - 1} elements of \code{coef} to be the
 estimated threshold parameters, followed by the coefficients for the
 linear predictor.)}
@@ -52,9 +56,26 @@ This function may make it possible to compute a reference grid for a model
 object that is otherwise not supported.
 }
 \details{
-If \code{object} is specified, it is used to try to obtain certain 
-other arguments, as detailed below. The user should ensure that these defaults
-will work. The default values for the arguments are as follows:
+Usually, you need to provide 
+\code{formula}, \code{data}, \code{coef}, and \code{vcov}, and perhaps other
+parameters. It is usually fairly straightforward to figure out how to get
+these from the model \code{object}; see the documentation for the model class that
+was fitted. Sometimes one or more of these quantities contains extra parameters,
+and if so, you may need to subset them to make everything conformable. For a given \code{formula} and \code{data},
+you can find out what is needed via \code{colnames(model.matrix(formula, data))}.
+(However, for an ordinal model, we expect the first \code{ordinal.dim - 1} coefficients
+to replace \code{(Intercept)}. And for a multivariate model, we expect \code{coef} 
+to be a matrix with these row names, and \code{vcov} to have as many rows and columns as
+the total number of elements of \code{coef}.)
+
+If your model object follows fairly closely the conventions of an \code{\link[stats]{lm}}
+object, you may be able to get by providing the model as \code{object}, plus and (probably) \code{data},
+and perhaps some other parameters to override the defaults.
+When \code{object} is specified, it is used as detailed below to try to obtain the 
+other arguments. The user should ensure that the defaults
+shown below do indeed work. 
+
+The default values for the arguments are as follows:
 \itemize{
   \item{\code{formula}: }{Required unless obtainable via \code{formula(object)}}
   \item{\code{data}: }{Required if variables are not in \code{parent.frame()} or 
@@ -72,6 +93,20 @@ they both produce \code{emmGrid} objects. When starting with summary
 statistics for an existing grid, \code{emmobj} is more useful, while
 \code{qdrg} is more useful when starting from a fitted model.
 }
+\section{Rank deficiencies}{
+
+Different model-fitting packages take different approaches when the model
+matrix is singular, but \code{qdrg} tries to reconcile them by comparing the
+linear functions created by \code{formula} to \code{coefs} and \code{vcov}.
+We may then use the \pkg{estimability} package to determine what quantities
+are estimable. For reconciling to work properly, \code{coef} should be named
+and \code{vcov} should have dimnames. To disable this name-matching
+action, remove the names from \code{coef}, e.g., by calling \code{unname()}.
+No reconciliation is attempted in multivariate-response cases. For more
+details on estimability, see the documentation in the \pkg{estimability}
+package.
+}
+
 \examples{
 if (require(biglm, quietly = TRUE)) withAutoprint({
   # Post hoc analysis of a "biglm" object -- not supported by emmeans

@@ -175,7 +175,7 @@ emm_basis.merMod = function(object, trms, xlev, grid, vcov.,
                               adjV = pbkrtest::vcovAdj.lmerMod(object, 0))
                 V = as.matrix(dfargs$adjV)
                 tst = try(pbkrtest::Lb_ddf)
-                if(class(tst) != "try-error")
+                if(!inherits(tst, "try-error"))
                     dffun = function(k, dfargs) pbkrtest::Lb_ddf (k, dfargs$unadjV, dfargs$adjV)
                 else {
                     mode = "asymptotic"
@@ -485,8 +485,10 @@ emm_basis.gls = function(object, trms, xlev, grid,
             2 * est^2 / varest
         }
     }
-    else if (mode %in%  c("df.error", "asymptotic")) { 
-        df = ifelse(mode == "asymptotic", Inf, object$dims$N - object$dims$p - length(attr(object$apVar, "Pars")))
+    else if (mode %in%  c("df.error", "asymptotic")) {
+        df = ifelse(mode == "asymptotic",
+                    Inf, 
+                    object$dims$N - object$dims$p - length(unlist(object$modelStruct)))
         dfargs = list(df = df)
         dffun = function(k, dfargs) dfargs$df
     }
