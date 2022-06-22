@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.7.4.1" />
+<meta name="author" content="emmeans package, Version 1.7.5" />
 
 
 <title>Confidence intervals and tests in emmeans</title>
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
 <h1 class="title toc-ignore">Confidence intervals and tests in
 emmeans</h1>
-<h4 class="author">emmeans package, Version 1.7.4.1</h4>
+<h4 class="author">emmeans package, Version 1.7.5</h4>
 
 
 
@@ -298,9 +298,10 @@ useful. For example,</p>
 ## Results are given on the log (not the response) scale. 
 ## Confidence level used: 0.95</code></pre>
 <p>If there is also an <code>adjust</code> in force when <code>by</code>
-variables are used, the adjustment is made <em>separately</em> on each
-<code>by</code> group; e.g., in the above, we would be adjusting for
-sets of 4 intervals, not all 12 together.</p>
+variables are used, by default, the adjustment is made
+<em>separately</em> on each <code>by</code> group; e.g., in the above,
+we would be adjusting for sets of 4 intervals, not all 12 together (but
+see “cross-adjustments” below.)</p>
 <p>There can be a <code>by</code> specification in
 <code>emmeans()</code> (or equivalently, a <code>|</code> in the
 formula); and if so, it is passed on to <code>summary()</code> and used
@@ -309,6 +310,75 @@ run:</p>
 <pre class="r"><code>emmeans(pigs.lm, ~ percent | source)     ### same results as above
 summary(.Last.value, by = percent)       ### grouped the other way</code></pre>
 <p>Specifying <code>by = NULL</code> will remove all grouping.</p>
+<div id="cross-adjust" class="section level3">
+<h3>Adjustments across <code>by</code> groups</h3>
+<!-- @index cross-group comparisons; `cross.adjust`; `adjust`!vs. `cross.adjust`
+     `by` groups!Adjusting across groups; Examples!`warpbreaks` -->
+<p>As was mentioned, each <code>by</code> group is regarded as a
+separate family with regards to the <code>adjust</code> procedure. For
+example, consider a model with interaction for the
+<code>warpbreaks</code> data, and construct pairwise comparisons of
+<code>tension</code> by <code>wool</code>:</p>
+<pre class="r"><code>warp.lm &lt;- lm(breaks ~ wool * tension, data = warpbreaks)
+warp.pw &lt;- pairs(emmeans(warp.lm, ~ tension | wool))
+warp.pw</code></pre>
+<pre class="ro"><code>## wool = A:
+##  contrast estimate   SE df t.ratio p.value
+##  L - M      20.556 5.16 48   3.986  0.0007
+##  L - H      20.000 5.16 48   3.878  0.0009
+##  M - H      -0.556 5.16 48  -0.108  0.9936
+## 
+## wool = B:
+##  contrast estimate   SE df t.ratio p.value
+##  L - M      -0.556 5.16 48  -0.108  0.9936
+##  L - H       9.444 5.16 48   1.831  0.1704
+##  M - H      10.000 5.16 48   1.939  0.1389
+## 
+## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre>
+<p>We have two sets of 3 comparisons, and the (default) Tukey adjustment
+is made <em>separately</em> in each group.</p>
+<p>However, sometimes we want the multiplicity adjustment to be broader.
+This broadening can be done in two ways. One is to remove the
+<code>by</code> variable, which then treats all results as one family.
+In our example:</p>
+<pre class="r"><code>test(warp.pw, by = NULL, adjust = &quot;bonferroni&quot;)</code></pre>
+<pre class="ro"><code>##  contrast wool estimate   SE df t.ratio p.value
+##  L - M    A      20.556 5.16 48   3.986  0.0014
+##  L - H    A      20.000 5.16 48   3.878  0.0019
+##  M - H    A      -0.556 5.16 48  -0.108  1.0000
+##  L - M    B      -0.556 5.16 48  -0.108  1.0000
+##  L - H    B       9.444 5.16 48   1.831  0.4396
+##  M - H    B      10.000 5.16 48   1.939  0.3504
+## 
+## P value adjustment: bonferroni method for 6 tests</code></pre>
+<p>This accomplishes the goal of putting all the comparisons in one
+family of 6 comparisons. Note that the Tukey adjustment may not be used
+here because we no longer have <em>one</em> set of pairwise
+comparisons.</p>
+<p>An alternative is to specify <code>cross.adjust</code>, which
+specifies an additional adjustment method to apply to corresponding sets
+of within-group adjusted <em>P</em> values:</p>
+<pre class="r"><code>test(warp.pw, adjust = &quot;tukey&quot;, cross.adjust = &quot;bonferroni&quot;)</code></pre>
+<pre class="ro"><code>## wool = A:
+##  contrast estimate   SE df t.ratio p.value
+##  L - M      20.556 5.16 48   3.986  0.0013
+##  L - H      20.000 5.16 48   3.878  0.0018
+##  M - H      -0.556 5.16 48  -0.108  1.0000
+## 
+## wool = B:
+##  contrast estimate   SE df t.ratio p.value
+##  L - M      -0.556 5.16 48  -0.108  1.0000
+##  L - H       9.444 5.16 48   1.831  0.3407
+##  M - H      10.000 5.16 48   1.939  0.2777
+## 
+## P value adjustment: tukey method for comparing a family of 3 estimates 
+## Cross-group P-value adjustment: bonferroni</code></pre>
+<p>These adjustments are less conservative than the previous result, but
+it is still a conservative adjustment to the set of 6 tests. Had we also
+specified <code>adjust = &quot;bonferroni&quot;</code>, we would have obtained the
+same adjusted <em>P</em> values as we obtained with
+<code>by = NULL</code>.</p>
+</div>
 <div id="simple" class="section level3">
 <h3>Simple comparisons</h3>
 <!-- @index Simple comparisons; `contrast()`!`simple`; `simple = "each"` -->
@@ -324,9 +394,9 @@ pigsint.rg &lt;- ref_grid(pigsint.lm)
 contrast(pigsint.rg, &quot;consec&quot;, simple = &quot;percent&quot;)</code></pre>
 <pre class="ro"><code>## source = fish:
 ##  contrast              estimate     SE df t.ratio p.value
-##  percent12 - percent9    0.1849 0.1061 17   1.742  0.2355
+##  percent12 - percent9    0.1849 0.1061 17   1.742  0.2356
 ##  percent15 - percent12   0.0045 0.1061 17   0.042  0.9999
-##  percent18 - percent15   0.0407 0.1061 17   0.383  0.9626
+##  percent18 - percent15   0.0407 0.1061 17   0.383  0.9625
 ## 
 ## source = soy:
 ##  contrast              estimate     SE df t.ratio p.value

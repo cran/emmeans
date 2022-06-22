@@ -10,8 +10,8 @@
 \alias{[.summary_emm}
 \title{Summaries, predictions, intervals, and tests for \code{emmGrid} objects}
 \usage{
-\method{summary}{emmGrid}(object, infer, level, adjust, by, type, df, calc,
-  null, delta, side, frequentist,
+\method{summary}{emmGrid}(object, infer, level, adjust, by,
+  cross.adjust = "none", type, df, calc, null, delta, side, frequentist,
   bias.adjust = get_emm_option("back.bias.adj"), sigma, ...)
 
 \method{confint}{emmGrid}(object, parm, level = 0.95, ...)
@@ -47,6 +47,10 @@ the P-value adjustments section below.}
 \item{by}{Character name(s) of variables to use for grouping into separate 
 tables. This affects the family of tests considered in adjusted \emph{P}
 values.}
+
+\item{cross.adjust}{Character: \eqn{p}-value adjustment method to 
+additionally apply \emph{across} 
+the \code{by} groups. See the section on P-value adjustments for details.}
 
 \item{type}{Character: type of prediction desired. This only has an effect if
 there is a known transformation or link function. \code{"response"} 
@@ -178,8 +182,8 @@ diverted to \code{\link{hpd.summary}}.
 }
 \details{
 \code{confint.emmGrid} is equivalent to \code{summary.emmGrid with 
-infer = c(TRUE, FALSE)}. When called with \code{joint = FALSE}, \code{test.emmGrid}
-is equivalent to \code{summary.emmGrid} with \code{infer = c(FALSE, TRUE)}. 
+infer = c(TRUE, FALSE)}. The function \code{test.emmGrid}, when called with 
+\code{joint = FALSE}, is equivalent to \code{summary.emmGrid} with \code{infer = c(FALSE, TRUE)}. 
 
 With \code{joint = TRUE}, \code{test.emmGrid} calculates the Wald test of the
 hypothesis \code{linfct \%*\% bhat = null}, where \code{linfct} and
@@ -188,7 +192,8 @@ hypothesis \code{linfct \%*\% bhat = null}, where \code{linfct} and
 non-estimable. It is permissible for the rows of \code{linfct} to be linearly
 dependent, as long as \code{null == 0}, in which case a reduced set of 
 contrasts is tested. Linear dependence and nonzero \code{null} cause an 
-error.
+error. The returned object has an aditional \code{"est.fcns"} attribute, which
+is a list of the linear functions associated with the joint test.
 }
 \note{
 In doing testing and a transformation and/or link is in force, any
@@ -319,6 +324,28 @@ The \code{as.data.frame} method is intended primarily to allow for
   \emph{Warning:} Non-estimable cases are \emph{included} in the family to which adjustments
   are applied. You may wish to subset the object using the \code{[]} operator
   to work around this problem.
+  
+  The \code{cross.adjust} argument is a way of specifying a multiplicity
+  adjustment across the \code{by} groups (otherwise by default, each group is
+  treated as a separate family in regards to multiplicity adjustments). It
+  applies only to \eqn{p} values. Valid options are one of the
+  \code{p.adjust.methods} or \code{"sidak"}. This argument is ignored unless
+  it is other than \code{"none"}, there is more than one \code{by} group, and
+  they are all the same size. Under those conditions, we first use
+  \code{adjust} to determine the within-group adjusted \eqn{p} values.
+  Imagine each group's adjusted \eqn{p} values arranged in side-by-side
+  columns, thus forming a matrix with the number of columns equal to the
+  number of \code{by} groups. Then we use the \code{cross.adjust} method to
+  further adjust the adjusted \eqn{p} values in each row of this matrix. Note
+  that an \emph{overall} Bonferroni (or Sidak) adjustment is obtainable by
+  specifying \emph{both} \code{adjust} and \code{cross.adjust} as
+  \code{"bonferroni"} (or \code{"sidak"}). However, less conservative (but
+  yet conservative) overall adjustments are available when it is possible to
+  use an \dQuote{exact} within-group method (e.g., \code{adjust = "tukey"}
+  for pairwise comparisons) and \code{cross.adjust} as a conservative
+  adjustment. [\code{cross.adjust} methods other than \code{"none"}, 
+  \code{"bonferroni"}, or \code{"sidak"} do not seem advisable, but other 
+  \code{p.adjust} methods are available if you can make sense of them.]
 }
 
 \section{Tests of significance, nonsuperiority, noninferiority, or equivalence}{
@@ -415,6 +442,15 @@ summary(con, infer = c(TRUE, TRUE), adjust = "scheffe", scheffe.rank = 5)
 
 # Show estimates to more digits
 print(test(con), digits = 7)
+
+# --------------------------------------------------------------
+# Cross-adjusting P values
+prs <- pairs(warp.emm)   # pairwise comparisons of tension, by wool
+test(prs, adjust = "tukey", cross.adjust = "bonferroni")
+
+# Same comparisons taken as one big family (more conservative)
+test(prs, adjust = "bonferroni", by = NULL)
+
 }
 \seealso{
 \code{\link{hpd.summary}}

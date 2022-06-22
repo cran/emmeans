@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.7.4.1" />
+<meta name="author" content="emmeans package, Version 1.7.5" />
 
 
 <title>Models supported by emmeans</title>
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
 
 <h1 class="title toc-ignore">Models supported by emmeans</h1>
-<h4 class="author">emmeans package, Version 1.7.4.1</h4>
+<h4 class="author">emmeans package, Version 1.7.5</h4>
 
 
 
@@ -242,7 +242,7 @@ matrix</td>
 <td align="left">glm.nb</td>
 <td align="left">MASS</td>
 <td align="center"><a href="#G">G</a></td>
-<td align="left">Requires <code>data</code> argument</td>
+<td align="left"></td>
 </tr>
 <tr class="even">
 <td align="left">glmerMod</td>
@@ -613,8 +613,8 @@ is interpreted as a <code>vcov.</code> specification as described for
 <p>Most models in this group receive only standard support as in <a href="#A">Group A</a>, but typically the tests and confidence intervals
 are asymptotic. Thus the <code>df</code> column for tabular results will
 be <code>Inf</code>.</p>
-<p>Some objects in this group <em>require</em> that the original or
-reference dataset be provided when calling <code>ref_grid()</code> or
+<p>Some objects in this group may require that the original or reference
+dataset be provided when calling <code>ref_grid()</code> or
 <code>emmeans()</code>.</p>
 <p>In the case of <code>mgcv::gam</code> objects, there are optional
 <code>freq</code> and <code>unconditional</code> arguments as is
