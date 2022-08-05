@@ -1,5 +1,5 @@
 ##############################################################################
-#    Copyright (c) 2012-2017 Russell V. Lenth                                #
+#    Copyright (c) 2012-2022 Russell V. Lenth                                #
 #                                                                            #
 #    This file is part of the emmeans package for R (*emmeans*)              #
 #                                                                            #
@@ -93,26 +93,26 @@ test.emmGrid = function(object, null = 0,
             if (!is.null(by)) 
                 by.rows = .find.by.rows(object@grid, by)
         }
-        # my own zapsmall fcn, sets a hard threshold
+        
+        # my own zapsmall fcn - sets a hard limit
         zapsm = function(x, tol = 1e-7) {
             x[abs(x) < tol] = 0
             x
         }
-        
+
         result = lapply(by.rows, function(rows) {
             LL = L[rows, , drop = FALSE]
 
             # discard any rows that have NAs
             narows = apply(LL, 1, function(x) any(is.na(x)) | all(x == 0))
-            L.all = LL = LL[!narows, , drop = FALSE]
+            LL = LL[!narows, , drop = FALSE]
             rrflag = 0 + 2 * any(narows)  ## flag for estimability issue
             
             if(est.flag)  { 
                 if (any(!estimability::is.estble(LL, nbasis, est.tol))) {
-                    L.all = estimability::estble.subspace(zapsm(L.all), nbasis)
+                    LL = estimability::estble.subspace(zapsm(LL), nbasis)
                     rrflag = bitwOr(rrflag, 2)
                 }
-                LL = L.all[, estble.idx, drop = FALSE]
             }
             # Check rank
             qrLt = qr(zapsm(t(LL))) # this will work even if LL has 0 rows
@@ -133,8 +133,12 @@ test.emmGrid = function(object, null = 0,
                 r = length(nz)
                 tR = tR[nz, nz, drop = FALSE]
             }
-            tQ = t(qr.Q(qrLt))[nz, , drop = FALSE]
             if(length(null) < r) null = rep(null, r)
+            tQ = tQ.all = t(qr.Q(qrLt))[nz, , drop = FALSE]
+            # tQ.all will have all the columns. tQ may get subsetted
+            # NOW get rid of the NA parts...
+            if (est.flag)
+                tQ = tQ[, estble.idx, drop = FALSE]
             z = try(tQ %*% bhat - solve(tR, null[nz]), silent = TRUE)
             zcov = tQ %*% object@V %*% t(tQ)
             F = try(sum(z * solve(zcov, z)) / r)
@@ -147,9 +151,8 @@ test.emmGrid = function(object, null = 0,
                 else
                     p.value = suppressWarnings(pf(F, r, df2, lower.tail = FALSE))
                 rtn = c(round(c(df1 = r, df2 = df2), 2), 
-                  F.ratio = round(F, 3), p.value = p.value, note = rrflag)
-                attr(L.all, "B") = NULL
-                attr(rtn, "L") = L.all
+                        F.ratio = round(F, 3), p.value = p.value, note = rrflag)
+                attr(rtn, "L") = tQ.all
                 rtn
             }
         })
@@ -194,55 +197,71 @@ test.emmGrid = function(object, null = 0,
 #' \code{by} variable(s), so that separate tables of tests are produced for
 #' each combination of them.
 #' 
-#' In models with only factors, no covariates, we believe these tests correspond
-#' to \dQuote{type III} tests a la \pkg{SAS}, as long as equal-weighted
-#' averaging is used and there are no estimability issues. When covariates are
-#' present and interact with factors, the results depend on how the covariate is
-#' handled in constructing the reference grid. See the example at the end of
-#' this documentation. The point that one must always remember is that
-#' \code{joint_tests} always tests contrasts among EMMs, in the context of the
-#' reference grid, whereas type III tests are tests of model coefficients --
-#' which may or may not have anything to do with EMMs or contrasts.
+#' In models with only factors, no covariates, these tests correspond to
+#' \dQuote{type III} tests a la \pkg{SAS}, as long as equal-weighted averaging
+#' is used and there are no estimability issues. When covariates are present and
+#' they interact with factors, the results depend on how the covariate is
+#' handled in constructing the reference grid. See the section on covariates
+#' below. The point that one must always remember is that \code{joint_tests}
+#' always tests contrasts among EMMs, in the context of the reference grid,
+#' whereas type III tests are tests of model coefficients -- which may or may
+#' not have anything to do with EMMs or contrasts.
 #' 
-#' @param object,cov.reduce \code{object} is a fitted model or an \code{emmGrid}. 
-#'    If a fitted model, it is
-#'    replaced by \code{ref_grid(object, cov.reduce = cov.reduce, ...)}
+#' @param object a fitted model or an \code{emmGrid} 
+#' @param cov.reduce a function.
+#'    If \code{object} is a fitted model, it is
+#'    replaced by \code{ref_grid(object, cov.reduce = cov.reduce, ...)}.
+#'    For this purpose, the functions \code{meanint} and \code{symmint} are
+#'    available for returning an interval around the mean or around zero,
+#'    respectively. Se the section below on covariates.
 #' @param by character names of \code{by} variables. Separate sets of tests are
 #'    run for each combination of these.
 #' @param show0df logical value; if \code{TRUE}, results with zero numerator
 #'    degrees of freedom are displayed, if \code{FALSE} they are skipped
-#' @param showconf logical value; if \code{true}, we look for additional effects 
-#'    that are not purely due to contrasts of a single term, and if found, are
-#'    labeled \code{(confounded)}. Such effects can occur, e.g., when there are empty
-#'    cells in the data. Setting this to \code{FALSE} can save some computation
-#'    time, especially when there are a lot of factors. The default is based on
-#'    the internal vector \code{facs}, which is the number of factors being
-#'    considered.
+#' @param showconf logical value.
+#'    When we have models with estimability issues (e.g., missing cells), then with
+#'    \code{showconf = TRUE}, we test any remaining effects that are not purely
+#'    due to contrasts of a single term. If found, they are labeled
+#'    \code{(confounded)}. See
+#'    \code{vignette("xplanations")} for more information.
 #' @param ... additional arguments passed to \code{ref_grid} and \code{emmeans}
 #'
 #' @return a \code{summary_emm} object (same as is produced by 
 #'   \code{\link{summary.emmGrid}}). All effects for which there are no
 #'   estimable contrasts are omitted from the results. 
 #'   There may be an additional row named \code{(confounded)} which accounts
-#'   for joint tests of effects that are estimable but are not 
-#'   determined by contrasts of any one term.
+#'   for additional degrees of freedom for effects not accounted for in the 
+#'   preceding rows.
+#'   
 #'   The returned object also includes an \code{"est.fcns"} attribute, which is a
 #'   named list containing the linear functions associated with each joint test. 
-#'   The order of this list may not be the same as the order of the summary.
+#'   No estimable functions are included for confounded effects.
 #'   
-#' @note
-#' When we have models with estimability issues (e.g., missing cells), the results
-#' can depend on what contrast method is used. The default is 
-#' \code{use.contr = c("consec", "eff")}, meaning that we use \code{"consec"} comparisons
-#' for constructing [interaction] contrasts for named terms, and \code{"eff"} contrasts
-#' for constructing contrasts for confounded effects (we construct the latter overall, then
-#' remove any linear dependence on the named contrasts). You may override these defaults
-#' via a hidden option: specify \code{use.contr = <character 2-vector>} among the arguments.
-#' Examining the \code{"est.fcns"} attribute may help understand what you are testing,
-#' but the more redundant the contrast method, the more redundant are the estimable
-#' functions.
-#'   
+#' @section Dealing with covariates:
+#' A covariate (or any other predictor) must have \emph{more than one value in 
+#' the reference grid} in order to test its effect and be included in the results.
+#' Therefore, when \code{object} is a model, we default to \code{cov.reduce = meanint}
+#' which sets each covariate at a symmetric interval about its mean. But
+#' when \code{object} is an existing reference grid, it often has only one value 
+#' for covariates, in which case they are excluded from the joint tests.
+#' 
+#' Covariates present further complications in that their values in the
+#' reference grid can affect the joint tests of \emph{other} effects. When
+#' covariates are centered around their means (the default), then the tests we
+#' obtain can be described as joint tests of covariate-adjusted means; and that
+#' is our intended use here. However, some software such as \pkg{SAS} and
+#' \code{car::Anova} adopt the convention of centering covariates around zero;
+#' and for that purpose, one can use \code{cov.reduce = symmint(0)} when calling
+#' with a model object (or in constructing a reference grid). However, adjusted
+#' means with covariates set at or around zero do not make much sense in the
+#' context of interpreting estimated marginal means, unless the covariate means
+#' really are zero.
+#' 
+#' See the examples below with the \code{toy} dataset.
+#' 
+#' 
 #' @seealso \code{\link{test}}
+#' @order 1
 #' @export
 #'
 #' @examples
@@ -257,7 +276,7 @@ test.emmGrid = function(object, null = 0,
 #' 
 #' joint_tests(pigs.lm, by = "source")      ## separate joint tests of 'percent'
 #' 
-#' ### Comparisons with type III tests
+#' ### Comparisons with type III tests in SAS
 #' toy = data.frame(
 #'     treat = rep(c("A", "B"), c(4, 6)),
 #'     female = c(1, 0, 0, 1,   0, 0, 0, 1, 1, 0 ),
@@ -281,21 +300,33 @@ test.emmGrid = function(object, null = 0,
 #' joint_tests(toy.fac)
 #' joint_tests(toy.cov)   # female is regarded as a 2-level factor by default
 #' 
-#' # results for toy.cov depend on value we use for 'female'
-#' joint_tests(toy.cov, at = list(female = 0.5))
-#' joint_tests(toy.cov, cov.keep = 0)   # i.e., female = mean(toy$female)
-#' joint_tests(toy.cov, at = list(female = 0))
+#' ## Treat 'female' as a numeric covariate (via cov.keep = 0)
+#' ## ... then tests depend on where we center things
+#' 
+#' # Center around the mean
+#' joint_tests(toy.cov, cov.keep = 0, cov.reduce = meanint)
+#' # Center around zero (like SAS's results for toy.cov)
+#' joint_tests(toy.cov, cov.keep = 0, cov.reduce = symmint(0))
+#' # Center around 0.5 (like SAS's results for toy.fac)
+#' joint_tests(toy.cov, cov.keep = 0, cov.reduce = range)
 #' 
 #' ### Example with empty cells and confounded effects
 #' low3 <- unlist(attr(ubds, "cells")[1:3]) 
 #' ubds.lm <- lm(y ~ A*B*C, data = ubds, subset = -low3)
-#' joint_tests(ubds.lm, by = "B")
 #' 
-joint_tests = function(object, by = NULL, show0df = FALSE, showconf = (length(facs) < 4),
-                       cov.reduce = range, ...) {
-    # hidden defaults for contrast methods:
-    use.contr = (function(use.contr = c("consec", "eff"), ...) use.contr)(...)
+#' # Show overall joint tests by C:
+#' ref_grid(ubds.lm, by = "C") |> contrast("consec") |> test(joint = TRUE)
+#' 
+#' # Break each of the above into smaller components:
+#' joint_tests(ubds.lm, by = "C")
+#' 
+joint_tests = function(object, by = NULL, show0df = FALSE, 
+                       showconf = TRUE,
+                       cov.reduce = meanint, ...) {
     
+    # hidden defaults for contrast methods and which basis to use for all contrasts
+    use.contr = (function(use.contr = c("consec", "consec"), ...) use.contr)(...)
+
     object = .chk.list(object,...)
     if (!inherits(object, "emmGrid")) {
         args = .zap.args(object = object, cov.reduce = cov.reduce, ..., omit = "submodel")
@@ -362,26 +393,40 @@ joint_tests = function(object, by = NULL, show0df = FALSE, showconf = (length(fa
     }
     result = suppressMessages(do.test(character(0), facs, NULL, ...))
     
-    ## look at leftover effects
+    ## look at as-yet-unexplained effects
     if (showconf) {
         tmp = contrast(object, use.contr[2], by = by, name = ".cnt.", ...)
-        # rbind all the est.fcns
+        br = .find.by.rows(tmp@grid, by)
         ef = est.fcns
-        if (!is.null(by))
-            ef = lapply(ef, function(x) do.call(rbind, x))
-        ef = do.call(rbind, ef)
-        tlf = qr.resid(qr(t(ef)), t(tmp@linfct))
-        if (any(abs(tlf) > 1e-6)) { # skip over if we just have fuzz
-            tmp@linfct = zapsmall(t(tlf))
-            jt = test(tmp, by = by, joint = TRUE, status = TRUE)
-            tst = cbind(ord = 999, `model term` = "(confounded)", jt)
-            result = rbind(result, tst)
-            ef = lapply(attr(jt, "est.fcns"), zapsmall)
-            if (length(ef) > 1)
-                ef = list(ef)
-            names(ef) = "(confounded)"
-            est.fcns = c(est.fcns, ef)
-            ef.ord = c(ef.ord, 999)
+        if (!is.null(ef)) {
+            lf = rows = NULL
+            for (i in seq_along(br)) {  # assemble est fcns for each by variable
+                r = br[[i]]
+                nm = names(br)[i]
+                efi = if (!is.null(nm)) lapply(ef, function(e) e[[nm]])
+                else ef
+                efi = do.call(rbind, efi)
+                if(!is.null(efi)) {
+                    lf = rbind(lf, efi)     # stack 'em up into lf
+                    rows = c(rows, r[seq_len(nrow(efi))])   # rows w/ same by combs
+                }
+                else {
+                    lf = rbind(lf, NA * tmp@linfct[r[1], ])
+                    rows = c(rows, r[1])
+                }
+            }
+            tmpe = tmp
+            tmpe@linfct = lf
+            tmpe@grid = tmp@grid[rows, , drop = FALSE]
+            
+            ref = conf = test(tmp, joint = TRUE, status = TRUE)
+            tst = test(tmpe, joint = TRUE)
+            conf$df1 = ref$df1 - tst$df1
+            conf$F.ratio = (ref$df1 * ref$F.ratio - tst$df1 * tst$F.ratio) / conf$df1
+            conf$p.value = pf(conf$F.ratio, conf$df1, conf$df2, lower.tail = FALSE)
+            conf$note = ""
+            conf = cbind(ord = 999, `model term` = "(confounded)", conf)
+            result = rbind(result, conf)
         }
     }
     
@@ -397,6 +442,13 @@ joint_tests = function(object, by = NULL, show0df = FALSE, showconf = (length(fa
     class(result) = c("summary_emm", "data.frame")
     attr(result, "estName") = "F.ratio"
     attr(result, "by.vars") = by
+    nms = colnames(object@linfct)
+    if(is.null(by)) 
+        est.fcns = lapply(est.fcns, function(x) {
+            if(!is.null(x)) colnames(x) = nms; x})
+    else 
+        est.fcns = lapply(est.fcns, function(L) lapply(L, function(x) {
+            if(!is.null(x)) colnames(x) = nms; x}))
     attr(result, "est.fcns") = est.fcns
     if (any(result$note != "")) {
         msg = character(0)
@@ -410,4 +462,44 @@ joint_tests = function(object, by = NULL, show0df = FALSE, showconf = (length(fa
         result$note = NULL
     result
 }
+
+# mean pm 1
+#' @rdname joint_tests
+#' @order 6
+#'
+#' @param x,ctr arguments for \code{meanint} and \code{symmint}
+#'
+#' @return \code{meanint} returns \code{mean(c) + c(-1, 1)}. 
+#'         \code{symmint(ctr)} returns a function that returns \code{ctr + c(-1, 1)}.
+#'         These functions are available primarily for use with \code{cov.reduce}.
+#' @export
+meanint = function(x) { mean(x) + c(-1, 1) }
+
+# # zero pm 1
+# #' @rdname joint_tests
+# #' @order 7
+# #' @export
+# zeroint = function(x) { c(-1, 1) }
+ 
+# const pm 1
+#' @rdname joint_tests
+#' @order 8
+#' @export
+symmint = function(ctr) {
+    return(function(x) ctr + c(-1, 1)) 
+}
+
+### Squash rows of L to best nrows of row space
+### If nrows not specified, determine via those with SVs > tol
+### ... but I guess this is no longer needed at all...
+# .squash = function(L, nbasis, tol = 1e-3, nrow) {
+#     if(!missing(nbasis))
+#         L = estimability::estble.subspace(L, nbasis)
+#     svd = try(svd(L, nu = 0), silent = TRUE)
+#     if(inherits(svd, "try-error")) return(L * 0)
+#     if (missing(nrow))
+#         nrow = sum(svd$d > tol)
+#     r = seq_len(nrow)
+#     diag(svd$d[r], nrow = nrow) %*% t(svd$v[, r, drop = FALSE])
+# }
 

@@ -25,7 +25,8 @@ test(object, null, ...)
   "prediction"), level = 0.95,
   bias.adjust = get_emm_option("back.bias.adj"), sigma, ...)
 
-\method{as.data.frame}{emmGrid}(x, row.names = NULL, optional, check.names = TRUE, ...)
+\method{as.data.frame}{emmGrid}(x, row.names = NULL, optional,
+  check.names = TRUE, destroy.annotations = FALSE, ...)
 
 \method{[}{summary_emm}(x, ..., as.df = TRUE)
 }
@@ -111,7 +112,7 @@ of the reference grid.}
 
 \item{...}{Optional arguments such as \code{scheffe.rank} 
 (see \dQuote{P-value adjustments}). 
-In \code{as.data.frame.emmGrid}, \code{confint.emmGrid}, 
+In \code{confint.emmGrid}, 
 \code{predict.emmGrid}, and 
 \code{test.emmGrid}, these arguments are passed to
 \code{summary.emmGrid}.}
@@ -151,6 +152,13 @@ such issues.}
 
 \item{check.names}{passed to \code{\link{data.frame}}}
 
+\item{destroy.annotations}{Logical value. If \code{FALSE}, an object of class
+\code{summary_emm} is returned (which inherits from \code{data.frame}),
+but if displayed, details like confidence levels, P-value adjustments, 
+transformations, etc. are also shown.
+If \code{TRUE} (not recommended), a \dQuote{plain vanilla} data frame is 
+returned, based on \code{row.names} and \code{check.names}.}
+
 \item{as.df}{Logical value. With \code{x[..., as.df = TRUE]}, the result is
 object is coerced to an ordinary \code{\link{data.frame}}; otherwise, it is left as a 
 \code{summary_emm} object.}
@@ -167,18 +175,18 @@ object is coerced to an ordinary \code{\link{data.frame}}; otherwise, it is left
 
 \code{predict} returns a vector of predictions for each row of \code{object@grid}.
 
-The \code{as.data.frame} method returns a plain data frame,
-  equivalent to \code{as.data.frame(summary(.))}.
+The \code{as.data.frame} method returns an object that inherits 
+  from \code{"data.frame"}.
 }
 \description{
-These are the primary methods for obtaining numerical or tabular results 
-from an \code{emmGrid} object. 
-\code{summary.emmGrid} is the general function for summarizing \code{emmGrid} objects. 
-It also serves as the print method for these objects; so for convenience,
-\code{summary()} arguments may be included in calls to functions such as 
-\code{\link{emmeans}} and \code{\link{contrast}} that construct \code{emmGrid} 
-objects. Note that by default, summaries for Bayesian models are
-diverted to \code{\link{hpd.summary}}.
+These are the primary methods for obtaining numerical or tabular results from
+an \code{emmGrid} object. \code{summary.emmGrid} is the general function for
+summarizing \code{emmGrid} objects. It also serves as the print method for
+these objects; so for convenience, \code{summary()} arguments may be included
+in calls to functions such as \code{\link{emmeans}} and
+\code{\link{contrast}} that construct \code{emmGrid} objects. Note that by
+default, summaries for Bayesian models are diverted to
+\code{\link{hpd.summary}}.
 }
 \details{
 \code{confint.emmGrid} is equivalent to \code{summary.emmGrid with 
@@ -216,16 +224,13 @@ The default \code{show} method for \code{emmGrid} objects (with the
   unnecessary to call \code{summary} unless there is a need to
   specify other than its default options.
 
-The \code{as.data.frame} method is intended primarily to allow for
-  \code{emmGrid} objects to be coerced to a data frame as needed internally.
-  However, we recommend \emph{against} users 
-  routinely using \code{as.data.frame}; instead, use \code{summary},
-  \code{confint}, or \code{test}, which already return a special
-  \code{data.frame} with added annotations. Those annotations display
-  important information such as adjustment methods and confidence levels.
-  If you need to see more digits, use \code{print(summary(object), digits = ...)};
-  and if you \emph{always} want to see more digits, use 
-  \code{emm_options(opt.digits = FALSE)}.
+If a data frame is needed, \code{summary}, \code{confint},
+  and \code{test} serve this need. \code{as.data.frame} routes to
+  \code{summary} by default; calling it with \code{destroy.annotations = TRUE}
+  is not recommended for exactly that reason.
+  If you want to see more digits in the output, use
+  \code{print(summary(object), digits = ...)}; and if you \emph{always} want
+  to see more digits, use \code{emm_options(opt.digits = FALSE)}.
 }
 \section{Defaults}{
 

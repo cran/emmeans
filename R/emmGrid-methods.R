@@ -92,6 +92,10 @@ str.emmGrid <- function(object, ...) {
         if (!is.null(tran2 <- object@misc$tran2))
             showtran(list(tran = tran2), "Additional response transformation:")
     }
+    if(!is.na(object@nbasis[1])) {
+        cat(paste0("Some things are non-estimable (null space dim = ",
+                  ncol(object@nbasis), ")\n"))
+    }
 }
 
 
@@ -980,6 +984,9 @@ regrid = function(object, transform = c("response", "mu", "unlink", "none", "pas
     object@V = vcov(object)[estble, estble, drop = FALSE]
     object@bhat = est[[1]]
     object@linfct = diag(1, length(estble))
+    pargs = object@grid[names(object@levels)]
+    lbls = do.call(paste, c(pargs, sep = "."))
+    colnames(object@linfct) = lbls
     if (!is.null(disp <- object@misc$display)) {  # fix up for the bookkeeping in nested models
         object@V = object@V[disp, disp, drop = FALSE]
         object@linfct = matrix(0, nrow = length(disp), ncol = length(estble))

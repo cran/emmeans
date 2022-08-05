@@ -26,14 +26,14 @@
 
 #' Summaries, predictions, intervals, and tests for \code{emmGrid} objects
 #' 
-#' These are the primary methods for obtaining numerical or tabular results 
-#' from an \code{emmGrid} object. 
-#' \code{summary.emmGrid} is the general function for summarizing \code{emmGrid} objects. 
-#' It also serves as the print method for these objects; so for convenience,
-#' \code{summary()} arguments may be included in calls to functions such as 
-#' \code{\link{emmeans}} and \code{\link{contrast}} that construct \code{emmGrid} 
-#' objects. Note that by default, summaries for Bayesian models are
-#' diverted to \code{\link{hpd.summary}}.
+#' These are the primary methods for obtaining numerical or tabular results from
+#' an \code{emmGrid} object. \code{summary.emmGrid} is the general function for
+#' summarizing \code{emmGrid} objects. It also serves as the print method for
+#' these objects; so for convenience, \code{summary()} arguments may be included
+#' in calls to functions such as \code{\link{emmeans}} and
+#' \code{\link{contrast}} that construct \code{emmGrid} objects. Note that by
+#' default, summaries for Bayesian models are diverted to
+#' \code{\link{hpd.summary}}. 
 #' 
 #' \code{confint.emmGrid} is equivalent to \code{summary.emmGrid with 
 #' infer = c(TRUE, FALSE)}. The function \code{test.emmGrid}, when called with 
@@ -115,7 +115,7 @@
 #'   of the reference grid.
 #' @param ... Optional arguments such as \code{scheffe.rank} 
 #'   (see \dQuote{P-value adjustments}). 
-#'   In \code{as.data.frame.emmGrid}, \code{confint.emmGrid}, 
+#'   In \code{confint.emmGrid}, 
 #'   \code{predict.emmGrid}, and 
 #'   \code{test.emmGrid}, these arguments are passed to
 #'   \code{summary.emmGrid}.
@@ -324,6 +324,13 @@
 #'   unnecessary to call \code{summary} unless there is a need to
 #'   specify other than its default options.
 #'   
+#' @note If a data frame is needed, \code{summary}, \code{confint},
+#'   and \code{test} serve this need. \code{as.data.frame} routes to
+#'   \code{summary} by default; calling it with \code{destroy.annotations = TRUE}
+#'   is not recommended for exactly that reason.
+#'   If you want to see more digits in the output, use
+#'   \code{print(summary(object), digits = ...)}; and if you \emph{always} want
+#'   to see more digits, use \code{emm_options(opt.digits = FALSE)}.
 #' @seealso \code{\link{hpd.summary}}
 #' 
 #' @method summary emmGrid  
@@ -759,29 +766,29 @@ predict.emmGrid <- function(object, type,
 }
 
 # as.data.frame method
-
 #' @rdname summary.emmGrid
 #' @order 5
 #' @param x object of the given class
+#' @param destroy.annotations Logical value. If \code{FALSE}, an object of class
+#'   \code{summary_emm} is returned (which inherits from \code{data.frame}),
+#'   but if displayed, details like confidence levels, P-value adjustments, 
+#'   transformations, etc. are also shown.
+#'   If \code{TRUE} (not recommended), a \dQuote{plain vanilla} data frame is 
+#'   returned, based on \code{row.names} and \code{check.names}.
 #' @param row.names passed to \code{\link{as.data.frame}}
 #' @param optional required argument, but ignored in \code{as.data.frame.emmGrid}
 #' @param check.names passed to \code{\link{data.frame}}
-#' @return The \code{as.data.frame} method returns a plain data frame,
-#'   equivalent to \code{as.data.frame(summary(.))}. 
-#' @note The \code{as.data.frame} method is intended primarily to allow for
-#'   \code{emmGrid} objects to be coerced to a data frame as needed internally.
-#'   However, we recommend \emph{against} users 
-#'   routinely using \code{as.data.frame}; instead, use \code{summary},
-#'   \code{confint}, or \code{test}, which already return a special
-#'   \code{data.frame} with added annotations. Those annotations display
-#'   important information such as adjustment methods and confidence levels.
-#'   If you need to see more digits, use \code{print(summary(object), digits = ...)};
-#'   and if you \emph{always} want to see more digits, use 
-#'   \code{emm_options(opt.digits = FALSE)}.
-#' @method as.data.frame emmGrid
+#' @return The \code{as.data.frame} method returns an object that inherits 
+#'   from \code{"data.frame"}.
 #' @export
-as.data.frame.emmGrid = function(x, row.names = NULL, optional, check.names = TRUE, ...) {
-    as.data.frame(summary(x, ...), row.names = row.names, check.names = check.names)
+#' @method as.data.frame emmGrid
+as.data.frame.emmGrid = function(x, 
+                                 row.names = NULL, optional, check.names = TRUE, 
+                                 destroy.annotations = FALSE, ...) {
+    rtn = summary(x, ...)
+    if(destroy.annotations)
+        rtn = as.data.frame(rtn, row.names = row.names, check.names = check.names)
+    rtn
 }
 
 
@@ -804,9 +811,14 @@ as.data.frame.emmGrid = function(x, row.names = NULL, optional, check.names = TR
 # Computes the quadratic form y'Xy after subsetting for the nonzero elements of y
 .qf.non0 = function(X, y) {
     ii = (zapsmall(y) != 0)
-    if (any(ii))
+    rtn = if (any(ii))
         sum(y[ii] * (X[ii, ii, drop = FALSE] %*% y[ii]))
     else 0
+    if (rtn < 0) {
+        warning("Negative variance estimate obtained!")
+        rtn = NaN
+    }
+    rtn
 }
 
 
@@ -1299,7 +1311,12 @@ print.summary_emm = function(x, ..., digits=NULL, quote=FALSE, right=TRUE, expor
         m = .just.labs(m[, setdiff(names(x), by.vars), drop = FALSE], just)
         if(export) 
             x.save$summary = list()
-        pargs = unname(as.list(x[,by.vars, drop=FALSE]))
+        pargs = unname(as.list(x[, by.vars, drop=FALSE]))
+        # We want labels to come out in order though...
+        ord = do.call(order, rev(pargs))
+        m = m[ord, , drop = FALSE]
+        xc = xc[ord, , drop = FALSE]
+        pargs = unname(as.list(x[ord, by.vars, drop=FALSE]))
         pargs$sep = ", "
         lbls = do.call(paste, pargs)
         for (lb in unique(lbls)) {
