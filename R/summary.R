@@ -393,8 +393,9 @@ summary.emmGrid <- function(object, infer, level, adjust, by,
     }
     
     if(!is.na(object@post.beta[1]) && (missing(frequentist) || !frequentist))
-        return (hpd.summary(object, prob = level, by = by, type = type, 
+        return (hpd.summary(object, prob = level, by = by, type = type, delta = delta,
                             bias.adjust = bias.adjust, sigma = sigma, ...))
+
     
     # Any "summary" options override built-in
     opt = get_emm_option("summary")
@@ -434,6 +435,7 @@ summary.emmGrid <- function(object, infer, level, adjust, by,
     # if there are two transformations and we want response, then we need to undo both
     if ((type == "response") && (!is.null(misc$tran2))) {
         tmp = match.call()
+        tmp$object = quote(object)
         tmp$type = "unlink"
         summ.unlink = eval(tmp) #this is summary with type = "unlink"
         object = regrid(object, transform = "mu")
@@ -796,16 +798,17 @@ as.data.frame.emmGrid = function(x,
 #' @order 6
 #' @method [ summary_emm
 #' @param as.df Logical value. With \code{x[..., as.df = TRUE]}, the result is
-#'   object is coerced to an ordinary \code{\link{data.frame}}; otherwise, it is left as a 
-#'   \code{summary_emm} object.
+#'   object is coerced to a \code{\link{data.frame}} before the subscripting 
+#'   is applied. With \code{as.df = FALSE}, the result is
+#'   returned as a \code{summary_emm} object when possible.
 #' @export
-"[.summary_emm" = function(x, ..., as.df = TRUE) {
-    if (as.df)
-        as.data.frame(x)[...]
-    else
-        base::`[.data.frame`(x, ...)
-}
-
+"[.summary_emm" = function(x, ..., as.df = FALSE) {
+    attr(x, "by.vars") = NULL
+    rtn = as.data.frame(x)[...]
+    if ((!as.df) && (!is.null(attr(rtn, "estName"))))
+        class(rtn) = c("summary_emm", "data.frame")
+    rtn
+}    
 
 
 # Computes the quadratic form y'Xy after subsetting for the nonzero elements of y
@@ -814,7 +817,7 @@ as.data.frame.emmGrid = function(x,
     rtn = if (any(ii))
         sum(y[ii] * (X[ii, ii, drop = FALSE] %*% y[ii]))
     else 0
-    if (rtn < 0) {
+    if (!is.na(rtn) && (rtn < 0)) {
         warning("Negative variance estimate obtained!")
         rtn = NaN
     }
@@ -1257,6 +1260,10 @@ as.data.frame.emmGrid = function(x,
 #' @method print summary_emm
 #' @export
 print.summary_emm = function(x, ..., digits=NULL, quote=FALSE, right=TRUE, export = FALSE) {
+    estn = attr(x, "estName")
+    if (is.null(estn)) # uh-oh, somebody messed it up - so Hail Mary
+        return(invisible(print(data.frame(x))))
+    
     test.stat.names = c("t.ratio", "z.ratio", "F.ratio", "T.square")  # format these w 3 dec places
     x.save = x
     if(export) x.save = list()
@@ -1274,8 +1281,7 @@ print.summary_emm = function(x, ..., digits=NULL, quote=FALSE, right=TRUE, expor
         fp = x$p.value = format(round(x$p.value, 4), nsmall = 4, sci = FALSE)
         x$p.value[fp=="0.0000"] = "<.0001"
     }
-    estn = attr(x, "estName")
-### moved up    just = sapply(x, function(col) if(is.numeric(col)) "R" else "L")
+
     est = x[[estn]]
     if (get_emm_option("opt.digits") && is.null(digits)) {
         if (!is.null(x[["SE"]]))

@@ -1,5 +1,5 @@
 ##############################################################################
-#    Copyright (c) 2012-2017 Russell V. Lenth                                #
+#    Copyright (c) 2012-2022 Russell V. Lenth                                #
 #                                                                            #
 #    This file is part of the emmeans package for R (*emmeans*)              #
 #                                                                            #
@@ -113,13 +113,23 @@ emm_basis.Gam = function(object, trms, xlev, grid, nboot = 800, ...) {
          dfargs = dfargs, misc = misc)
 }
 
+# Local utility for identifying random smooths
+.smooth.is.random = function(s) {
+    rcls = c("random.effect", "fs.interaction") ### what to look for
+    cls = c(class(s), unname(unlist(lapply(s$margin, class))))
+    any(cls %in% rcls)
+}
 
 ### for mgcv::gam objects
 ### Many thanks to Maarten Jung for help on sorting-out fixed and random effects
 recover_data.gam = function(object, ...) {
     if (length(object$smooth) > 0) { # get rid of random terms
-        fixnm = sapply(object$smooth, function(s) {ifelse(inherits(s, "random.effect"), NA, s$term)})
-        fixnm = union(.all.vars(delete.response(object$pterms)), fixnm[!is.na(fixnm)])
+        fixnm = unlist(lapply(object$smooth, function(s) {
+                              if(.smooth.is.random(s)) ""
+                              else c(s$term, s$by)
+            }))
+        fixnm = union(.all.vars(delete.response(object$pterms)), fixnm)
+        fixnm = setdiff(fixnm, c("1", "", "NA"))
         object$terms = terms(.reformulate(fixnm, env = environment(terms(object))))
     }
     recover_data.lm(object, ...)
@@ -133,7 +143,7 @@ emm_basis.gam = function(object, trms, xlev, grid,
                          what = c("location", "scale", "shape", "rate", "prob.gt.0"), 
                          ...) {
     if (length(object$smooth) > 0) { # get rid of random terms 
-        rand = sapply(object$smooth, function(s) {ifelse(inherits(s, "random.effect"), s$label, NA)})
+        rand = sapply(object$smooth, function(s) {ifelse(.smooth.is.random(s), s$label, NA)})
         rand = if (all(is.na(rand))) NULL else rand[!is.na(rand)]
     }
     else

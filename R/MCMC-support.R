@@ -99,15 +99,10 @@
 #' @method as.mcmc emmGrid
 #' @export as.mcmc.emmGrid
 #' @examples
-#' if(requireNamespace("coda")) {
-#'   ### A saved reference grid for a mixed logistic model (see lme4::cbpp)
-#'   cbpp.rg <- do.call(emmobj, 
-#'     readRDS(system.file("extdata", "cbpplist", package = "emmeans")))
-#'   # Predictive distribution for herds of size 20
-#'   # (perhaps a bias adjustment should be applied; see "sophisticated" vignette)
-#'   pred.incidence <- coda::as.mcmc(regrid(cbpp.rg), likelihood = "binomial", trials = 20)
-#'   summary(pred.incidence)
-#' }
+#' if(requireNamespace("coda")) 
+#'     emm_example("as.mcmc-coda")
+#'     # Use emm_example("as.mcmc-coda", list = TRUE) # to see just the code
+#'     
 as.mcmc.emmGrid = function(x, names = TRUE, sep.chains = TRUE, 
                            likelihood, NE.include = FALSE, ...) {
     if (is.na(x@post.beta[1])) {
@@ -221,6 +216,9 @@ as.mcmc.list.emm_list = function(x, which = I_bet(1), ...) {
 #' @param type prediction type as in \code{\link{summary.emmGrid}}
 #' @param point.est function to use to compute the point estimates from the 
 #'   posterior sample for each grid point
+#' @param delta Numeric equivalence threshold (on the linear predictor scale 
+#'   regardless of \code{type}).
+#'   See the section below on equivalence testing.
 #' @param bias.adjust Logical value for whether to adjust for bias in
 #'   back-transforming (\code{type = "response"}). This requires a value of 
 #'   \code{sigma} to exist in the object or be specified.
@@ -233,19 +231,42 @@ as.mcmc.list.emm_list = function(x, which = I_bet(1), ...) {
 #'
 #' @return an object of class \code{summary_emm}
 #' 
+#' @section Equivalence testing note:
+#'   If \code{delta} is positive, two columns labeled \code{p.equiv} and
+#'   \code{odds.eq} are appended to the summary. \code{p.equiv} is the fraction
+#'   of posterior estimates having absolute values less than \code{delta}. The
+#'   \code{odds.eq} column is just \code{p.equiv} converted to an odds ratio; so
+#'   it is the posterior odds of equivalence.
+#'   
+#'   A high value of \code{p.equiv} is evidence
+#'   in favor of equivalence. It can be used to obtain something equivalent
+#'   (in spirit) to the frequentist Schuirmann (TOST) procedure, whereby we would
+#'   conclude equivalence at significance level \eqn{\alpha} if the \eqn{(1 - 2\alpha)}
+#'   confidence interval falls entirely in the interval \eqn{[-\delta, \delta]}.
+#'   Similarly in the Bayesian context, an equally strong argument for
+#'   equivalence is obtained if \code{p.equiv} exceeds \eqn{1 - 2\alpha}.
+#'   
+#'   A closely related quantity is the ROPE (region of practical equivalence),
+#'   obtainable via \code{bayestestR::rope(object, range = c(-delta, delta))}.
+#'   Its value is approximately \code{100 * p.equiv / 0.95} if the default
+#'   \code{ci = 0.95} is used.
+#'   
+#'   Finally, a Bayes factor for equivalence is obtainable by dividing 
+#'   \code{odds.eq} by the prior odds of equivalence, assessed or elicited separately.
+#'   
+#' 
+#' 
 #' @seealso summary.emmGrid
 #' 
 #' @export
 #'
 #' @examples
-#' if(require("coda")) {
-#'   # Create an emmGrid object from a system file
-#'   cbpp.rg <- do.call(emmobj, 
-#'       readRDS(system.file("extdata", "cbpplist", package = "emmeans")))
-#'   hpd.summary(emmeans(cbpp.rg, "period"))
-#' }
+#' if(require("coda")) 
+#'     emm_example("hpd.summary-coda")
+#'     # Use emm_example("hpd.summary-coda", list = TRUE) # to see just the code
 #' 
 hpd.summary = function(object, prob, by, type, point.est = median, 
+                       delta,
                        bias.adjust = get_emm_option("back.bias.adj"), sigma, 
                        ...) {
     if(!is.null(object@misc$.predFlag))
@@ -308,6 +329,13 @@ hpd.summary = function(object, prob, by, type, point.est = median,
     mcmc = as.mcmc.emmGrid(object, names = FALSE, sep.chains = FALSE, 
                            NE.include = TRUE, ...)
     mcmc = mcmc[, use.elts, drop = FALSE]
+    p.equiv = odds.eq = NULL
+    if (!missing(delta) && (delta > 0)) {
+        p.equiv = apply(mcmc, 2, \(x) mean(abs(x) < delta))
+        mesg = c(mesg, paste0("'p.equiv' and 'odds.eq' based on posterior P(|lin. pred.| < ", 
+                              round(delta, digits = 4), ")"))
+        odds.eq = p.equiv / (1 - p.equiv)
+    }
     if (inv) {
         if (bias.adjust) {
             if (missing(sigma))
@@ -335,6 +363,10 @@ hpd.summary = function(object, prob, by, type, point.est = median,
     lblnms = setdiff(names(grid), 
                      c(object@roles$responses, ".offset.", ".wgt."))
     lbls = grid[lblnms]
+    if(!is.null(p.equiv)) {
+        summ$p.equiv = p.equiv
+        summ$odds.eq = odds.eq
+    }
     if (inv) {
         if (!is.null(misc$inv.lbl)) {
             names(pt.est) = misc$estName = misc$inv.lbl
@@ -632,7 +664,12 @@ emm_basis.stanreg = function(object, trms, xlev, grid, mode, rescale, ...) {
         coef = NA * X[1, ]
         coef[names(bhat)] = bhat
         bhat = coef
-        mmat = model.matrix(trms, object$data, contrasts.arg = contr)
+        data = object$data
+        if(!is.null(subset <- object$call$subset)) {
+            subset = eval(subset, envir = data, enclos = environment(terms(object)))
+            data = data[subset, , drop = FALSE]
+        }
+        mmat = model.matrix(trms, data, contrasts.arg = contr)
         nbasis = estimability::nonest.basis(mmat)
     }
     
