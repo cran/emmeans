@@ -110,17 +110,14 @@ recover_data.merMod = function(object, ...) {
 }
 
 #' @export
-emm_basis.merMod = function(object, trms, xlev, grid, vcov., 
+emm_basis.merMod = function(object, trms, xlev, grid, 
                             mode = get_emm_option("lmer.df"), lmer.df, 
                             disable.pbkrtest = get_emm_option("disable.pbkrtest"), 
                             pbkrtest.limit = get_emm_option("pbkrtest.limit"), 
                             disable.lmerTest = get_emm_option("disable.lmerTest"), 
                             lmerTest.limit = get_emm_option("lmerTest.limit"), 
                             options, ...) {
-    if (missing(vcov.))
-        V = as.matrix(vcov(object, correlation = FALSE))
-    else
-        V = as.matrix(.my.vcov(object, vcov.))
+    V = .my.vcov(object, ...)
     dfargs = misc = list()
     
     if (lme4::isLMM(object)) {
@@ -170,7 +167,7 @@ emm_basis.merMod = function(object, trms, xlev, grid, vcov.,
         # if my logic isn't flawed, we are guaranteed that mode is both desired and possible
         
         if (mode == "kenward-roger") {
-            if (missing(vcov.)) {
+            if ((\(vcov., ...) missing(vcov.))(...)) {   # if (vcov. not in ...)
                 dfargs = list(unadjV = V, 
                               adjV = pbkrtest::vcovAdj.lmerMod(object, 0))
                 V = as.matrix(dfargs$adjV)
@@ -331,7 +328,7 @@ emm_basis.lme = function(object, trms, xlev, grid,
 # model with a few random perturbations of y, then
 # regressing the changes in V against the changes in the 
 # covariance parameters
-gradV.kludge = function(object, Vname = "varFix", call = object$call$fixed, 
+gradV.kludge = function(object, Vname = "varFix", call = formula(object$terms), 
                         data = object$data, extra.iter = 0) {
     # check consistency of contrasts
     #### This code doesn't work with coerced factors. Hardly seems messing with, so I commented it out
@@ -350,6 +347,7 @@ gradV.kludge = function(object, Vname = "varFix", call = object$call$fixed,
     yname = all.vars(eval(call))[1]
     y = data[[yname]]
     n = length(y)
+    object$call[[2]] = call
     dat = t(replicate(2 + extra.iter + length(theta), {
         data[[yname]] = y + sig * rnorm(n)
         mod = update(object, data = data)
@@ -417,6 +415,9 @@ recover_data.gls = function(object, data, ...) {
         fcall$weights = NULL
     }
     trms = delete.response(terms(nlme::getCovariateFormula(object)))
+    attr(trms, "predvars") = attr(delete.response(terms(object)), "predvars")
+    # above copies scaling info for scale() and poly() terms
+    
     result = recover_data.call(fcall, trms, object$na.action, data = data, ...)
     if (!is.null(wts))
         result[["(weights)"]] = wts
@@ -791,7 +792,8 @@ recover_data.svyglm = function(object, data = NULL, ...) {
 .my.vcov = function(object, vcov. = .statsvcov, ...) {
     if (is.function(vcov.))
         vcov. = vcov.(object, ...)
-    else if (!is.matrix(vcov.))
+    vcov. = try(as.matrix(vcov.), silent = TRUE)
+    if (inherits(vcov., "try-error") || (nrow(vcov.) != ncol(vcov.)))
         stop("vcov. must be a function or a square matrix")
     vcov.
 }

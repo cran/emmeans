@@ -47,7 +47,10 @@ setMethod("show", "emmGrid", function(object) {
 str.emmGrid <- function(object, ...) {
     showlevs = function(x) { # internal convenience function
         if (is.null(x)) cat("(predicted by other variables)")
-        else cat(paste(format(x, digits = 5, justify = "none"), collapse=", "))
+        else {
+            if (length(x) > 9) x = c(x[1:9], "...", x[length(x)])
+            cat(paste(format(x, digits = 5, justify = "none"), collapse=", "))
+        }
     }
     showtran = function(misc, label) { # internal convenience fcn
         cat(paste(label, dQuote(.fmt.tran(misc)), "\n"))
@@ -967,10 +970,12 @@ regrid = function(object, transform = c("response", "mu", "unlink", "none", "pas
 
     if (transform == "pass")
         return(object)
-    
-        # if we have two transformations to undo, do the first one recursively
+
+    # if we have two transformations to undo, do the first one recursively
     if ((transform == "response") && (!is.null(object@misc$tran2)))
-        object = regrid(object, transform = "mu")
+             object = regrid(object, transform = "mu")
+
+    .collapse = (\(.collapse = NULL, ...) .collapse)(...) # check counterfactuals hook
     
     # Save post.beta stuff
     PB = object@post.beta
@@ -983,45 +988,50 @@ regrid = function(object, transform = c("response", "mu", "unlink", "none", "pas
     }
     
     est = .est.se.df(object, do.se = TRUE) ###FALSE)
-    estble = !(is.na(est[[1]]))
-    object@V = vcov(object)[estble, estble, drop = FALSE]
-    object@bhat = est[[1]]
-    object@linfct = diag(1, length(estble))
-    pargs = object@grid[names(object@levels)]
-    lbls = do.call(paste, c(pargs, sep = "."))
-    colnames(object@linfct) = lbls
-    if (!is.null(disp <- object@misc$display)) {  # fix up for the bookkeeping in nested models
-        object@V = object@V[disp, disp, drop = FALSE]
-        object@linfct = matrix(0, nrow = length(disp), ncol = length(estble))
-        object@linfct[disp, ] = diag(1, length(estble))
-    }
-    if(all(estble))
-        object@nbasis = estimability::all.estble
-    else
-        object@nbasis = object@linfct[, !estble, drop = FALSE]
     
-    # override the df function
-    df = est$df
-    edf = df[estble]
-    if (length(edf) == 0) edf = NA
-    # note both NA/NA and Inf/Inf test is.na() = TRUE
-    prev.df.msg = attr(object@dffun, "mesg")
-    if (any(is.na(edf/edf)) || (diff(range(edf)) < .01)) { # use common value
-        object@dfargs = list(df = mean(edf, na.rm = TRUE))
-        object@dffun = function(k, dfargs) dfargs$df
-    }
-    else { # use containment df
-        object@dfargs = list(df = df)
-        object@dffun = function(k, dfargs) {
-            idx = which(zapsmall(k) != 0)
-            ifelse(length(idx) == 0, NA, min(dfargs$df[idx], na.rm = TRUE))
+    if(is.null(.collapse)) {
+        estble = !(is.na(est[[1]]))
+        object@V = vcov(object)[estble, estble, drop = FALSE]
+        object@bhat = est[[1]]
+        object@linfct = diag(1, length(estble))
+        pargs = object@grid[names(object@levels)]
+        lbls = do.call(paste, c(pargs, sep = "."))
+        colnames(object@linfct) = lbls
+        if (!is.null(disp <- object@misc$display)) {  # fix up for the bookkeeping in nested models
+            object@V = object@V[disp, disp, drop = FALSE]
+            object@linfct = matrix(0, nrow = length(disp), ncol = length(estble))
+            object@linfct[disp, ] = diag(1, length(estble))
         }
-    }
-    if(!is.null(prev.df.msg)) 
-        attr(object@dffun, "mesg") = ifelse(
-            startsWith(prev.df.msg, "inherited"), prev.df.msg,
+        if(all(estble))
+            object@nbasis = estimability::all.estble
+        else
+            object@nbasis = object@linfct[, !estble, drop = FALSE]
+        
+        # override the df function
+        df = est$df
+        edf = df[estble]
+        if (length(edf) == 0) edf = NA
+        # note both NA/NA and Inf/Inf test is.na() = TRUE
+        prev.df.msg = attr(object@dffun, "mesg")
+        if (any(is.na(edf/edf)) || (diff(range(edf)) < .01)) { # use common value
+            object@dfargs = list(df = mean(edf, na.rm = TRUE))
+            object@dffun = function(k, dfargs) dfargs$df
+        }
+        else { # use containment df
+            object@dfargs = list(df = df)
+            object@dffun = function(k, dfargs) {
+                idx = which(zapsmall(k) != 0)
+                ifelse(length(idx) == 0, NA, min(dfargs$df[idx], na.rm = TRUE))
+            }
+        }
+        if(!is.null(prev.df.msg)) 
+            attr(object@dffun, "mesg") = ifelse(
+                startsWith(prev.df.msg, "inherited"), prev.df.msg,
                 paste("inherited from", prev.df.msg, "when re-gridding"))
-
+    }
+    
+    if(!is.null(.collapse) && is.null(object@misc$tran))  # need explicit link so we can collapse
+        object@misc$tran = attr(est, "link") = make.link("identity")
     
     if(transform %in% c("response", "mu", "unlink", links, "user") && !is.null(object@misc$tran)) {
         flink = link = attr(est, "link")
@@ -1034,11 +1044,37 @@ regrid = function(object, transform = c("response", "mu", "unlink", "none", "pas
             else
                 flink = link
         }
-        D = .diag(flink$mu.eta(object@bhat[estble]))
-        object@bhat = flink$linkinv(object@bhat)
-        object@V = D %*% tcrossprod(object@V, D)
         if (!is.na(PB[1]))
-            PB = matrix(link$linkinv(PB), ncol = ncol(PB))
+            PB = matrix(flink$linkinv(PB), ncol = ncol(PB))
+        if(is.null(.collapse)) {
+            D = flink$mu.eta(object@bhat[estble])
+            object@bhat = flink$linkinv(object@bhat)
+            # efficient repl for D'VD with D <- diag(D)
+            object@V = sweep(sweep(object@V, 1, D, "*"), 2, D, "*")
+        }
+        else {  # we'll average over the levels of .collapse (assume it varies slowest)
+            est = est[[1]]
+            nobs = length(object@levels[[.collapse]])
+            idx = sapply(seq_len(nobs), \(i) which(object@grid[[.collapse]] == i))
+            X = sweep(object@linfct, 1, flink$mu.eta(est), "*")
+            wt.counter = (\(wt.counter, ...) wt.counter)(...)
+            if (length(wt.counter) == 1) wt.counter = rep(1, nobs)
+            wmn = function(x) sum(wt.counter*x) / sum(wt.counter)
+            est = flink$linkinv(est)
+            object@bhat = sapply(seq_len(nrow(idx)), \(i) wmn(est[idx[i,]]))
+            L = matrix(0, nrow = nrow(idx), ncol = ncol(X))
+            for (i in seq_len(nrow(idx)))
+                L[i, ] = apply(X[idx[i,], , drop = FALSE], 2, wmn)
+            object@V = L %*% tcrossprod(object@V, L)
+            object@linfct = diag(1, nrow(L))
+            if(!is.na(PB[1])) {
+                pb = matrix(0, ncol = nrow(L), nrow = nrow(PB))
+                for (i in seq_len(nrow(idx)))
+                    pb[, i] = apply(PB[, idx[i,], drop = FALSE], 1, wmn)
+                PB = pb
+            }
+        }
+        
         inm = object@misc$inv.lbl
         if (!is.null(inm)) {
             object@misc$estName = inm
@@ -1096,6 +1132,13 @@ regrid = function(object, transform = c("response", "mu", "unlink", "none", "pas
     object@model.info$model.matrix = "Submodels are not available with regridded objects"
     if(!missing(predict.type))
         object = update(object, predict.type = predict.type)
+    if(!is.null(.collapse)) {
+        object@grid = object@grid[idx[,1], , drop = TRUE]
+        object@grid[[.collapse]] = object@levels[[.collapse]] = NULL
+        object@roles$predictors = setdiff(object@roles$predictors, .collapse)
+        object@misc$famSize = nrow(object@linfct)
+    }
+    
     object
 }
 
