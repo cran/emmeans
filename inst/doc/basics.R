@@ -6,7 +6,7 @@ knitr::opts_chunk$set(fig.width = 4.5, class.output = "ro")
 par(mar = .1 + c(4, 4, 1, 1))   # reduce head space
 
 
-## -----------------------------------------------------------------------------
+## ----fig.alt = "Standard-graphics interaction plot showing cell means. Trends are non-parallel"----
 with(pigs, interaction.plot(percent, source, conc))
 
 ## -----------------------------------------------------------------------------
@@ -98,11 +98,11 @@ emmeans(mtcars.2, "Cyl", at = list(dispsq = 230.72^2))
 ## ---- eval = FALSE------------------------------------------------------------
 #  emmeans(mod, ~ treat | x, at = list(x = 1:3), params = "deg")
 
-## -----------------------------------------------------------------------------
+## ----fig.alt = c("emmip plot of pigs.lm1, showing parallel piecewise-linear trends","emmip plot of pigs.lm2, showing parallel linear trends")----
 emmip(pigs.lm1, source ~ percent)
 emmip(ref_grid(pigs.lm2, cov.reduce = FALSE), source ~ percent)
 
-## -----------------------------------------------------------------------------
+## ----fig.alt = "Plot of side-by-side confidence intervals for cyl means, in 3 panels for disp = 100, 200, 300"----
 plot(mtcars.rg, by = "disp")
 
 ## -----------------------------------------------------------------------------
@@ -110,10 +110,10 @@ mtcars.rg_d.c <- ref_grid(mtcars.lm, at = list(cyl = c(4,6,8)),
                           cov.reduce = disp ~ cyl)
 mtcars.rg_d.c @ grid
 
-## ----fig.height = 1.5---------------------------------------------------------
+## ----fig.height = 1.5, fig.alt = "Side-by-side CIs for cyl marginal means"----
 plot(mtcars.rg_d.c)
 
-## -----------------------------------------------------------------------------
+## ----fig.alt = "Enhanced interaction plot with CIs and observed data added; we have separate panels for the 3 diets, and the 4 percent conentrations in each panel"----
 require("ggplot2")
 emmip(pigs.lm1, ~ percent | source, CIs = TRUE) +
     geom_point(aes(x = percent, y = log(conc)), data = pigs, pch = 2, color = "blue")

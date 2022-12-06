@@ -1,6 +1,26 @@
 ---
 title: "NEWS for the emmeans package"
 ---
+
+## emmeans 1.8.3
+  * Fix to logic error in `regrid()` (#287, revisited)
+  * Fix to `nbasis` calculation in ordinal models (#387)
+  * Bias-adjustment example added when we have random slopes
+  * New `addl.vars` argument allows including variables (say, for
+    random slopes) in the reference grid.
+  * Removed dependence on **xtable** package. The `xtable` methods are now
+    dynamically registered. This reduces the number of package dependencies
+    from 8 to 7 (as of this version).
+  * Added alt text to all pictures in vignettes (#389). This makes
+    the materials more accessible per guidelines from the 
+    [A11Y project](https://www.a11yproject.com/).
+  * Added `"atanh"` to the options in `make.tran()` and to the
+    "named" response transformations that are auto-detected
+  * `make.tran()` replaces `param` argument with `alpha` and `beta`
+    (`param` is still supported for backward compatibility)
+    and documentation has been revised in hopes of making everything clearer
+    
+
 ## emmeans 1.8.2
   * Extended `cld()` so it can show findings rather than non-findings,
     in two different ways: Using `delta`, groupings are based on actual

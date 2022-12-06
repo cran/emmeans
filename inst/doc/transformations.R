@@ -39,22 +39,22 @@ neuralgia.emm
 ## -------------------------------------------------------------------------------------------------
 pairs(neuralgia.emm, reverse = TRUE)
 
-## -------------------------------------------------------------------------------------------------
+## ----fig.alt = "Interaction-plot display of the results of emmeans(neuralgia.glm, ~ Treatment | Sex)"----
 emmip(neuralgia.glm, Sex ~ Treatment)
 
-## ---- fig.height = 1.5----------------------------------------------------------------------------
+## ---- fig.height = 1.5, fig.alt = c("Plot A: Display of the results of confint(neur.Trt.emm)", 'Plot B: Display of the results of confint(neur.Trt.emm, type = "response"). These intervals are markedly skewed right|left for low|high estimated probabilities')----
 neur.Trt.emm <- suppressMessages(emmeans(neuralgia.glm, "Treatment"))
 plot(neur.Trt.emm)   # Link scale by default
 plot(neur.Trt.emm, type = "response")
 
-## ---- fig.height = 1.5----------------------------------------------------------------------------
+## ---- fig.height = 1.5, fig.alt = "Plot C: On the inside, this plot looks exactly like Plot A above, but the scale is transformed to show the values in Plot B. However, there are not enough tick marks."----
 plot(neur.Trt.emm, type = "scale")
 
-## ---- fig.height = 1.5----------------------------------------------------------------------------
+## ---- fig.height = 1.5, fig.alt = "Plot D: Same as Plot C except there are more tick marks so we can discern the values better"----
 plot(neur.Trt.emm, type = "scale", breaks = seq(0.10, 0.90, by = 0.10),
      minor_breaks = seq(0.05, 0.95, by = 0.05))
 
-## ---- fig.height = 1.5----------------------------------------------------------------------------
+## ---- fig.height = 1.5, fig.alt = "Plot E: An alternative to Plot D using an arcsin scaling. This scale is less nonlinear than in plot D so the intervals are somewhat skewed, but less so than plot B"----
 plot(neur.Trt.emm, type = "response") +
   ggplot2::scale_x_continuous(trans = scales::asn_trans(),
                               breaks = seq(0.10, 0.90, by = 0.10))
