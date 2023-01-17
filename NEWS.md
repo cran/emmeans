@@ -2,6 +2,67 @@
 title: "NEWS for the emmeans package"
 ---
 
+## emmeans 1.8.4
+  * Fix to `scale()` response transformation when either `center` or `scale` 
+    is `FALSE`. I also added support for `center()` and `standardize()` from
+    the **datawizard** package as response transformations, though these are
+    mapped to `scale()`.
+  * Citation correction (#391)
+  * Removed a message about contrasting transformed objects that even confuses me!
+    (I added a topic in the FAQs vignette instead)
+  * Added new exported function `inverse` available as a response transformation
+  * I have quietly deprecated the previous `I_bet()` function, because it
+    produced a message that was confusing to inexperienced users. Instead, we
+    have tweaked some functions/methods so they seem to work the same way
+    with an `emm_list` object (using its first element) as an `emmGrid` object.
+  * We have removed the functions `convert_workspace()` and `convert_scripts()`
+    that were intended to clean up existing code and objects for the ancient
+    version of **lsmeans**. We also completely removed several old functions
+    from the codebase. Previously, we just ignored them.
+  * More reliable dispatching of `recover_data()` and `emm_basis()` methods (#392)
+  * New `permute_levels()` function to change the order of levels of a factor (#393)
+  * **This may alter results of existing code for models involving offsets:**
+    A user discovered an issue whereby offsets specified in an `offset()` model
+    term are accounted for, but those specified in an `offset = ...` argument
+    are ignored. We have revised the `recover_data()` and `ref_grid()` code so
+    that offsets specified either way (or even both) are treated the same way
+    (which is to *include* them in predictions unless overridden by
+    an `offset` argument in `emmeans()` or `ref_grid()`). 
+    
+    This change creates a subtle difference in cases where you want offsets to
+    depend on other predictors: In a model with formula `y ~ trt + offset(off)`,
+    if you used to specify `cov.reduce = off ~ trt`, now you need `cov.reduce =
+    .offset. ~ trt`. The latter will work the same with the model `y ~ trt,
+    offset = off`.
+  * Recoded some portions of the support functions for `zeroinfl` and `hurdle`
+    objects. We now use numerical differentiation to do the delta method,
+    and this comes out a lot cleaner. 
+  * Per the improved count-model support, we are now exporting and have documented 
+    two new functions `hurdle.support()` and `zi.support()` that may be useful in
+    providing comparable support in other packages that offer zero-inflated
+    models.
+  * Efficiency improvements: Several places in the code where we multiply
+    a matrix by a diagonal matrix, we replace this by equivalent code using
+    the `sweep()` function.
+  * Over time, too many users have latched on to the idea that 
+    `emmeans(model, pairwise ~ treatment(s))` as *the* recipe for using `emmeans()`.
+    It works okay when you have just one factor, but
+    when you have three factors, say, `pairwise ~ fac1*fac2*fac3` gives you
+    every possible comparison among cell means; often, this creates an
+    intractable amount of output (e.g., 378 comparisons in a 3x3x3 case) -- most 
+    of which are diagonal comparisons.
+    
+    So now, if a user is in interactive mode, specifies contrasts in a *direct*
+    `emmeans()` call (i.e., `sys.parent() == 0`), there is more than one
+    *primary* factor (not including `by` factors), and there are more than 21
+    contrasts as a result (e.g. more than 7 levels compared pairwise), we issue
+    an advisory warning message: "You may have generated more contrasts than you
+    really wanted...". Because of the restrictions on when this warning is
+    issued, it should not affect reverse-dependent package checks at all.
+    
+
+
+
 ## emmeans 1.8.3
   * Fix to logic error in `regrid()` (#287, revisited)
   * Fix to `nbasis` calculation in ordinal models (#387)

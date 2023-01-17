@@ -88,6 +88,7 @@
 #' @seealso \href{../doc/xtending.html}{Vignette on extending emmeans}
 #' 
 #' @export
+#' @order 1
 recover_data = function(object, ...) {
     # look for outside methods first
     for (cl in .chk.cls(object)) {
@@ -95,7 +96,14 @@ recover_data = function(object, ...) {
         if(!is.null(rd))
             return(rd(object, ...))
     }
-    UseMethod("recover_data")
+    ## look for an inside method
+    for (cl in class(object)) {
+        mth = utils::getAnywhere(paste("recover_data", cl, sep = "."))
+        if (length(mth$objs) > 0)
+            return((mth$objs[[1]])(object, ...))
+    }
+    UseMethod("recover_data")  ## This call has to be here to establish recover_data as a generic
+    
 }
 
 # get classes that are OK for external code to modify
@@ -103,7 +111,7 @@ recover_data = function(object, ...) {
 # nor ones in 3rd place or later in inheritance
 .chk.cls = function(object) {
     sacred = c("call", "lm", "glm", "mlm", "aovlist", "lme", "qdrg")
-    setdiff(class(object)[1:2], sacred)
+    setdiff(head(class(object), 2), sacred)
 }
 
 ### My internal method dispatch -- we prefer outside methods
@@ -165,14 +173,19 @@ recover_data = function(object, ...) {
 #' 
 #' @method recover_data call
 #' @export
+#' @order 2
 recover_data.call = function(object, trms, na.action, data = NULL, 
                              params = "pi", frame, addl.vars, ...) {
     fcall = object # because I'm easily confused
     vars = setdiff(.all.vars(trms), params)
     if(!missing(addl.vars))
         vars = union(vars, addl.vars)
-    if (!missing(frame) && is.null(data) && !.has.fcns(trms))
-        data = frame
+    .offset. = NULL
+    if (!missing(frame)) {
+        .offset. = model.offset(frame)
+        if(is.null(data) && !.has.fcns(trms))
+            data = frame
+    }
     tbl = data
     if (length(vars) == 0 || vars[1] == "1") {
         tbl = data.frame(c(1,1))
@@ -235,6 +248,12 @@ recover_data.call = function(object, trms, na.action, data = NULL,
         tbl = tbl[complete.cases(tbl), , drop=FALSE]
     }
     
+    if(!is.null(.offset.) && !all(.offset. == 0)) {
+        tbl[[".offset."]] = .offset.
+        addl.vars = if(!missing(addl.vars)) c(addl.vars, ".offset.")
+                    else                    ".offset."
+    }
+    
     attr(tbl, "call") = object # the original call
     attr(tbl, "terms") = trms
     attr(tbl, "predictors") = setdiff(.all.vars(delete.response(trms)), params)
@@ -292,6 +311,7 @@ recover_data.call = function(object, trms, na.action, data = NULL,
 #--------------------------------------------------------------
 
 #' @rdname extending-emmeans
+#' @order 11
 #' @param xlev Named list of factor levels (\emph{excluding} ones coerced to 
 #'   factors in the model formula)
 #' @param grid A \code{data.frame} (provided by \code{ref_grid}) containing 
@@ -347,17 +367,24 @@ emm_basis = function(object, trms, xlev, grid, ...) {
         if(!is.null(emb))
             return(emb(object, trms, xlev, grid, ...))
     }
-    UseMethod("emm_basis") # lands here only if no outside method found
+    for (cl in class(object)) {
+        mth = utils::getAnywhere(paste("emm_basis", cl, sep = "."))
+        if (length(mth$objs) > 0)
+            return((mth$objs[[1]])(object, trms, xlev, grid, ...))
+    }
+    UseMethod("emm_basis")  ## This call has to be here to establish emm_basis as a generic
 }
 
 # Hidden courtesy function that provides access to all recover_data methods
 #' @rdname extending-emmeans
+#' @order 21
 #' @export
 .recover_data = function(object, ...)
     recover_data(object, ...)
 
 # Hidden courtesy function that provides access to all emm_basis methods
 #' @rdname extending-emmeans
+#' @order 22
 #' @return \code{.recover_data} and \code{.emm_basis} are hidden exported versions of 
 #'   \code{recover_data} and \code{emm_basis}, respectively. They run in \pkg{emmeans}'s
 #'   namespace, thus providing access to all existing methods.

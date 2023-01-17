@@ -92,7 +92,9 @@ emmeans.list = function(object, specs, ...) {
 #' @param specs A \code{character} vector specifying the names of the predictors
 #'   over which EMMs are desired. \code{specs} may also be a \code{formula}
 #'   or a \code{list} (optionally named) of valid \code{spec}s. Use of formulas
-#'   is described in the Overview section below.
+#'   is described in the Overview section below. 
+#'   \bold{Note:} We recommend \emph{against} using two-sided formulas; see the
+#'   note below for \code{contr}.
 #' @param by A character vector specifying the names of predictors to condition on.
 #' @param fac.reduce A function that combines the rows of a matrix into a single
 #'   vector. This implements the ``marginal averaging'' aspect of EMMs. 
@@ -102,8 +104,11 @@ emmeans.list = function(object, specs, ...) {
 #'   interpretable. NOTE: If the \code{weights} argument is non-missing,
 #'   \code{fac.reduce} is ignored.
 #' @param contr A character value or \code{list} specifying contrasts to be
-#'   added. See \code{\link{contrast}}. NOTE: \code{contr} is ignored when
-#'   \code{specs} is a formula.
+#'   added. See \code{\link{contrast}}. \bold{Note:} \code{contr} is ignored when
+#'   \code{specs} is a formula. \bold{Note 2:}: We recommend \emph{against} using this
+#'   argument; obtaining means and obtaining contrasts are two different things,
+#'   and it is best to do them in separate steps, using the \code{\link{contrast}}
+#'   function for the contrasts.
 #' @param options If non-\code{NULL}, a named \code{list} of arguments to pass
 #'   to \code{\link{update.emmGrid}}, just after the object is constructed.
 #'   (Options may also be included in \code{...}; see the \sQuote{options}
@@ -161,8 +166,8 @@ emmeans.list = function(object, specs, ...) {
 #' \code{~ specs | by}, \code{contr ~ specs}, or \code{contr ~ specs | by}. The
 #' formula is parsed and the variables therein are used as the arguments
 #' \code{specs}, \code{by}, and \code{contr} as indicated. The left-hand side is
-#' optional, but if specified it should be the name of a contrast family (e.g.,
-#' \code{pairwise}). Operators like
+#' optional (and we don't recommend it), but if specified it should be the 
+#' name of a contrast family (e.g., \code{pairwise}). Operators like
 #' \code{*} or \code{:} are needed in the formula to delineate names, but
 #' otherwise are ignored.
 #' 
@@ -296,10 +301,6 @@ emmeans = function(object, specs, by = NULL,
         options $tran = tran
     }
     
-    # This was added in 1.47, but causes problems
-    # if((length(specs) == 1) && (specs == "1"))
-    #     specs = character(0)
-    
     if(is.null(nesting <- object@model.info$nesting)) 
         {
         RG = object
@@ -370,20 +371,19 @@ emmeans = function(object, specs, by = NULL,
             if (is.matrix(weights)) {
                 wtrow = 0
                 fac.reduce = function(coefs) {
-                    wtmat = .diag(weights[wtrow+1, ]) / sum(weights[wtrow+1, ])
-                    ans = apply(wtmat %*% coefs, 2, sum)
+                    wtvec = weights[wtrow+1, ] / sum(weights[wtrow+1, ])
+                    ans = apply(sweep(coefs, 1, wtvec, "*"), 2, sum)
                     wtrow <<- (1 + wtrow) %% nrow(weights)
                     ans
                 }
             }
             else if (is.numeric(weights)) {
-                wtmat = .diag(weights)
                 wtsum = sum(weights)
                 if (wtsum <= 1e-8) wtsum = NA
                 fac.reduce = function(coefs) {
-                    if (nrow(coefs) != nrow(wtmat))
+                    if (nrow(coefs) != length(weights))
                         stop("Nonconforming number of weights -- need ", nrow(coefs))
-                    apply(wtmat %*% coefs, 2, sum) / wtsum
+                    apply(sweep(coefs, 1, weights, "*"), 2, sum) / wtsum
                 }
             }
         }
@@ -401,7 +401,7 @@ emmeans = function(object, specs, by = NULL,
                 fq = RG@grid[[".wgt."]][idx]
                 if (weights == "fl")
                     fq = 0 + (fq > 0)  # fq = 1 if > 0, else 0
-                apply(.diag(fq) %*% RG@linfct[idx, , drop=FALSE], 2, sum) / sum(fq)
+                apply(sweep(RG@linfct[idx, , drop=FALSE], 1, fq, "*"), 2, sum) / sum(fq)
             })
         else
             K = apply(row.idx, use.mars, function(idx) {
@@ -470,6 +470,8 @@ emmeans = function(object, specs, by = NULL,
     
 
     if(!missing(contr)) { # return a list with emmeans and contrasts
+        warn.contr = interactive() && (sys.parent() == 0) && is.character(contr) && 
+            (length(result@misc$pri.vars) > 1)
         # NULL-out a bunch of arguments to not pass. 
         dontpass = c("data", "avgd.over", "by.vars", "df", "initMesg", "estName", "estType",
                      "famSize", "inv.lbl", "methDesc", "nesting", "pri.vars", 
@@ -479,8 +481,15 @@ emmeans = function(object, specs, by = NULL,
         result = .cls.list("emm_list", emmeans = result, contrasts = ctrs)
         if(!is.null(lbl <- object@misc$methDesc))
             names(result)[1] = lbl
+        
+        if (warn.contr && (nrow(result$contr@grid) > 21))
+            warning("You may have generated more contrasts than you really wanted. In the future,\n",
+                    "we suggest you avoid things like 'pairwise ~ fac1*fac2' when you have\n",
+                    "more than one factor. Instead, call emmeans() with just '~ fac1*fac2' and do the\n",
+                    "contrasts you need in a later step. See vignette(\"QuickStart\", \"emmeans\").\n",
+                     call. = FALSE)
     }
-    
+
     result
 }
 

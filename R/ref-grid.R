@@ -703,14 +703,17 @@ ref_grid <- function(object, at, cov.reduce = mean, cov.keep = get_emm_option("c
         lhs = frm[-3]
         tran = setdiff(.all.vars(lhs, functions = TRUE), c(.all.vars(lhs), "~", "cbind", "+", "-", "*", "/", "^", "%%", "%/%"))
         if(length(tran) > 0) {
-            if (tran[1] == "scale") { # we'll try to set it up based on terms component
+            # we are now supporting scale() as well as some functions from datawizard
+            if (tran[1] %in% c("scale", "center", "centre", "standardize", "standardise")) { # we'll try to set it up based on terms component
                 pv = try(attr(terms(object), "predvars"), silent = TRUE)
-                if (!inherits(pv, "try-error")) {
-                    pv = c(lapply(pv, as.character), "foo") # make sure it isn't empty
-                    scal = which(sapply(pv, function(x) x[1] == "scale"))
+                if (!inherits(pv, "try-error") && !is.null(pv)) {
+                    scal = which(sapply(c(sapply(pv, as.character), "foo"), 
+                                        function(x) x[1]) == tran[1])
                     if(length(scal) > 0) {
-                        par = as.numeric(pv[[scal[1]]][3:4]) 
-                        tran = make.tran("scale", y = 0, center = par[1], scale = par[2])
+                        pv = pv[[scal[1]]]
+                        ctr = ifelse(is.null(pv$center), 0, ifelse(pv$center, pv$center, 0))
+                        scl = ifelse(is.null(pv$scale), 1, ifelse(pv$scale, pv$scale, 1))
+                        tran = make.tran("scale", y = 0, center = ctr, scale = scl)
                     }
                 }
                 if (is.character(tran)) { # didn't manage to find params
@@ -718,6 +721,7 @@ ref_grid <- function(object, at, cov.reduce = mean, cov.keep = get_emm_option("c
                     message("NOTE: Unable to recover scale() parameters. See '? make.tran'")
                 }
             }
+ 
             else if (tran[1] == "linkfun")
                 tran = as.list(environment(trms))[c("linkfun","linkinv","mu.eta","valideta","name")]
             else {
@@ -815,14 +819,14 @@ ref_grid <- function(object, at, cov.reduce = mean, cov.keep = get_emm_option("c
     }
 
     # Any offsets??? (misc$offset.mult might specify removing or reversing the offset)
+    om = ifelse(is.null(misc$offset.mult), 1, misc$offset.mult)
     if (!missing(offset)) {  # For safety, we always treat it as scalar
         if (offset[1] != 0)
             grid[[".offset."]] = offset[1]
     }
+    else if(".offset." %in% names(grid))
+        grid[[".offset."]] = om * grid[[".offset."]]
     else if(!is.null(attr(trms,"offset"))) {
-        om = 1
-        if (!is.null(misc$offset.mult))
-            om = misc$offset.mult
         if (any(om != 0))
             grid[[".offset."]] = om * .get.offset(trms, grid)
     }

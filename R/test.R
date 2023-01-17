@@ -207,7 +207,8 @@ test.emmGrid = function(object, null = 0,
 #' whereas type III tests are tests of model coefficients -- which may or may
 #' not have anything to do with EMMs or contrasts.
 #' 
-#' @param object a fitted model or an \code{emmGrid} 
+#' @param object a fitted model, \code{emmGrid}, or \code{emm_list}. If the
+#'   latter, its first element is used.
 #' @param cov.reduce a function.
 #'    If \code{object} is a fitted model, it is
 #'    replaced by \code{ref_grid(object, cov.reduce = cov.reduce, ...)}.
@@ -488,18 +489,4 @@ meanint = function(x) { mean(x) + c(-1, 1) }
 symmint = function(ctr) {
     return(function(x) ctr + c(-1, 1)) 
 }
-
-### Squash rows of L to best nrows of row space
-### If nrows not specified, determine via those with SVs > tol
-### ... but I guess this is no longer needed at all...
-# .squash = function(L, nbasis, tol = 1e-3, nrow) {
-#     if(!missing(nbasis))
-#         L = estimability::estble.subspace(L, nbasis)
-#     svd = try(svd(L, nu = 0), silent = TRUE)
-#     if(inherits(svd, "try-error")) return(L * 0)
-#     if (missing(nrow))
-#         nrow = sum(svd$d > tol)
-#     r = seq_len(nrow)
-#     diag(svd$d[r], nrow = nrow) %*% t(svd$v[, r, drop = FALSE])
-# }
 

@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.8.3" />
+<meta name="author" content="emmeans package, Version 1.8.4.1" />
 
 
 <title>Index of vignette topics</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Index of vignette topics</h1>
-<h4 class="author">emmeans package, Version 1.8.3</h4>
+<h4 class="author">emmeans package, Version 1.8.4.1</h4>
 
 
 
@@ -202,6 +202,8 @@ values</a></li>
 <li><a href="xplanations.html#arrows">How arrows are determined</a></li>
 </ul></li>
 <li><a href="comparisons.html#logs">with logs</a></li>
+<li><a href="FAQs.html#ratios">Obtaining differences rather than
+ratios</a></li>
 <li><a href="FAQs.html#CIerror">with overlapping CIs</a></li>
 </ul></li>
 <li><a href="FAQs.html#nopairs">Comparisons result in
@@ -307,11 +309,14 @@ functions</a></li>
 <li><strong>emmeans</strong> package
 <ul>
 <li><a href="xtending.html#exporting">Exporting extensions to</a></li>
+<li><a href="AQuickStart.html">Quick-start guide</a></li>
 </ul></li>
 <li><a href="basics.html#emmeans"><code>emmeans()</code></a>
 <ul>
 <li><a href="FAQs.html#nowelch">And the underlying model</a></li>
 <li><a href="utilities.html#defaults">Changing defaults</a></li>
+<li><a href="FAQs.html#fastest">Fastest way to get wrong
+answers</a></li>
 <li><a href="FAQs.html#transformations">Surprising results from</a></li>
 <li><code>weights</code>
 <ul>
@@ -684,8 +689,12 @@ output</a></li>
 <h3>O</h3>
 <ul>
 <li><a href="messy-data.html#issues">Observational data</a></li>
-<li><a href="transformations.html#oddsrats">Odds ratios</a></li>
+<li><a href="transformations.html#oddsrats">Odds ratios</a>
+<ul>
+<li><a href="FAQs.html#ratios">but I wanted differences</a></li>
+</ul></li>
 <li><a href="sophisticated.html#offsets">Offsets</a></li>
+<li><a href="AQuickStart.html#covar">Only one mean</a></li>
 <li><a href="utilities.html#digits"><code>opt.digits</code>
 option</a></li>
 <li><a href="utilities.html#options">Options</a>
@@ -715,6 +724,11 @@ ordinal</em></a></li>
 <li><a href="basics.html#pvalues">Interpreting</a></li>
 </ul></li>
 <li><a href="comparisons.html#pairwise"><code>pairs()</code></a></li>
+<li><code>pairwise ~ factors</code>
+<ul>
+<li><a href="AQuickStart.html#pairwise">Why you should avoid
+this</a></li>
+</ul></li>
 <li><a href="comparisons.html#pairwise">Pairwise comparisons</a>
 <ul>
 <li><a href="comparisons.html#pwpm">Matrix displays</a></li>
@@ -783,7 +797,7 @@ distribution</a></li>
 <ul>
 <li><a href="FAQs.html#qdrg"><code>qdrg()</code></a></li>
 <li><a href="basics.html#depcovs">Quadratic terms</a></li>
-<li><a href="FAQs.html#fastest">Quick start</a></li>
+<li><a href="AQuickStart.html">Quick-start guide</a></li>
 </ul>
 <p><a href="#topnav">Back to top</a></p>
 </div>
@@ -799,6 +813,10 @@ distribution</a></li>
 <li><a href="sophisticated.html#random-slopes">Bias adjustment</a></li>
 </ul></li>
 <li><a href="xplanations.html#joint_tests">Rank deficiency</a></li>
+<li>Ratios
+<ul>
+<li><a href="FAQs.html#ratios">but I wanted differences</a></li>
+</ul></li>
 <li><a href="utilities.html#rbind"><code>rbind()</code></a></li>
 <li><a href="utilities.html#relevel">Re-labeling</a></li>
 <li><a href="basics.html#recs1">Recommended practices</a></li>
@@ -825,7 +843,7 @@ distribution</a></li>
 <li><a href="basics.html#multiv"><code>mult.name</code></a></li>
 <li><a href="messy-data.html#nest-trap"><code>nesting</code></a></li>
 <li><a href="sophisticated.html#offsets"><code>offset</code></a></li>
-<li><a href="transformations.html#regrid"><code>regrid</code>
+<li><a href="transformations.html#regrid2"><code>regrid</code>
 argument</a></li>
 </ul></li>
 <li><a href="basics.html#ref_grid">Reference grids</a>
@@ -841,7 +859,7 @@ equivalence</a></li>
 argument</a></li>
 <li><a href="transformations.html#regrid"><code>regrid()</code></a>
 <ul>
-<li><a href="transformations.html#regrid"><code>regrid</code>
+<li><a href="transformations.html#regrid2"><code>regrid</code>
 vs. <code>type</code></a></li>
 <li><a href="transformations.html#logs"><code>transform = &quot;log&quot;</code></a></li>
 </ul></li>
@@ -964,6 +982,7 @@ tests</a></li>
 <li><a href="confidence-intervals.html#summary">One- and
 two-sided</a></li>
 </ul></li>
+<li><a href="AQuickStart.html#covar">Too few means</a></li>
 <li>Transformations
 <ul>
 <li><a href="transformations.html#after">Adding after the fact</a></li>
