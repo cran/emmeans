@@ -6,27 +6,27 @@ knitr::opts_chunk$set(fig.width = 4.5, class.output = "ro")
 pigs.lm <- lm(log(conc) ~ source + factor(percent), data = pigs)
 
 ## -------------------------------------------------------------------------------------------------
-pigs.emm.s <- emmeans(pigs.lm, "source")
-str(pigs.emm.s)
+emm.src <- emmeans(pigs.lm, "source")
+str(emm.src)
 
 ## -------------------------------------------------------------------------------------------------
-summary(pigs.emm.s, infer = TRUE, null = log(35))
+summary(emm.src, infer = TRUE, null = log(35))
 
 ## -------------------------------------------------------------------------------------------------
-summary(pigs.emm.s, infer = TRUE, null = log(35), type = "response")
+summary(emm.src, infer = TRUE, null = log(35), type = "response")
 
 ## -------------------------------------------------------------------------------------------------
-str(regrid(pigs.emm.s))
+str(regrid(emm.src))
 
-summary(regrid(pigs.emm.s), infer = TRUE, null = 35)
+summary(regrid(emm.src), infer = TRUE, null = 35)
 
 ## -------------------------------------------------------------------------------------------------
 pigs.rg <- ref_grid(pigs.lm)
-pigs.remm.s <- emmeans(regrid(pigs.rg), "source")
-summary(pigs.remm.s, infer = TRUE, null = 35)
+remm.src <- emmeans(regrid(pigs.rg), "source")
+summary(remm.src, infer = TRUE, null = 35)
 
 ## ----eval = FALSE---------------------------------------------------------------------------------
-#  pigs.remm.s <- emmeans(pigs.lm, "source", regrid = "response")
+#  remm.src <- emmeans(pigs.lm, "source", regrid = "response")
 
 ## ----eval = FALSE---------------------------------------------------------------------------------
 #  emmeans(pigs.lm, "source", type = "response")
@@ -86,9 +86,9 @@ emmeans(warp.glm, ~ tension | wool, type = "unlink")
 
 ## -------------------------------------------------------------------------------------------------
 pigroot.lm <- lm(sqrt(conc) ~ source + factor(percent), data = pigs)
-piglog.emm.s <- regrid(emmeans(pigroot.lm, "source"), transform = "log")
-confint(piglog.emm.s, type = "response")
-pairs(piglog.emm.s, type = "response")
+logemm.src <- regrid(emmeans(pigroot.lm, "source"), transform = "log")
+confint(logemm.src, type = "response")
+pairs(logemm.src, type = "response")
 
 ## ---- eval = FALSE--------------------------------------------------------------------------------
 #  regrid(emm, transform = "probit")
@@ -101,7 +101,7 @@ pct.diff.tran <- list(
     name = "log(pct.diff)"
 )
 
-update(pairs(piglog.emm.s, type = "response"), 
+update(pairs(logemm.src, type = "response"), 
        tran = pct.diff.tran, inv.lbl = "pct.diff")
 
 ## ---- message = FALSE-----------------------------------------------------------------------------
@@ -146,12 +146,14 @@ emmeans(fib.lm, "machine", regrid = tran)
 sigma(pigs.lm)
 
 ## -------------------------------------------------------------------------------------------------
-summary(pigs.emm.s, type = "response", bias.adj = TRUE)
+summary(emm.src, type = "response", bias.adj = TRUE)
 
 ## -------------------------------------------------------------------------------------------------
 ismod <- glm(count ~ spray, data = InsectSprays, family = poisson())
-emmeans(ismod, "spray", type = "response", bias.adj = FALSE)
-emmeans(ismod, "spray", type = "response", bias.adj = TRUE)
+emmeans(ismod, "spray", type = "response")
+
+## ----eval = FALSE---------------------------------------------------------------------------------
+#  emmeans(ismod, "spray", type = "response", bias.adj = TRUE)
 
 ## -------------------------------------------------------------------------------------------------
 with(InsectSprays, tapply(count, spray, mean))

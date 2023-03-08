@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.8.4.1" />
+<meta name="author" content="emmeans package, Version 1.8.5" />
 
 
 <title>Transformations and link functions in emmeans</title>
@@ -58,7 +58,7 @@ ul.task-list{list-style: none;}
 
 <h1 class="title toc-ignore">Transformations and link functions in
 emmeans</h1>
-<h4 class="author">emmeans package, Version 1.8.4.1</h4>
+<h4 class="author">emmeans package, Version 1.8.5</h4>
 
 
 
@@ -90,20 +90,21 @@ link</a></li>
 <div id="overview" class="section level2">
 <h2>Overview</h2>
 <!-- @index Transformations!Overview; Examples!`pigs` -->
-<p>Consider the same example with the <code>pigs</code> dataset that is
-used in many of these vignettes:</p>
+<p>Consider an example with the <code>pigs</code> dataset that is used
+in many of these vignettes; but this time, we use a <code>log</code>
+transformation of the response:</p>
 <pre class="r"><code>pigs.lm &lt;- lm(log(conc) ~ source + factor(percent), data = pigs)</code></pre>
 <p>This model has two factors, <code>source</code> and
 <code>percent</code> (coerced to a factor), as predictors; and
 log-transformed <code>conc</code> as the response. Here we obtain the
 EMMs for <code>source</code>, examine its structure, and finally produce
 a summary, including a test against a null value of log(35):</p>
-<pre class="r"><code>pigs.emm.s &lt;- emmeans(pigs.lm, &quot;source&quot;)
-str(pigs.emm.s)</code></pre>
+<pre class="r"><code>emm.src &lt;- emmeans(pigs.lm, &quot;source&quot;)
+str(emm.src)</code></pre>
 <pre class="ro"><code>## &#39;emmGrid&#39; object with variables:
 ##     source = fish, soy, skim
 ## Transformation: &quot;log&quot;</code></pre>
-<pre class="r"><code>summary(pigs.emm.s, infer = TRUE, null = log(35))</code></pre>
+<pre class="r"><code>summary(emm.src, infer = TRUE, null = log(35))</code></pre>
 <pre class="ro"><code>##  source emmean     SE df lower.CL upper.CL null t.ratio p.value
 ##  fish     3.39 0.0367 23     3.32     3.47 3.56  -4.385  0.0002
 ##  soy      3.67 0.0374 23     3.59     3.74 3.56   2.988  0.0066
@@ -115,7 +116,7 @@ str(pigs.emm.s)</code></pre>
 <p>Now suppose that we want the EMMs expressed on the same scale as
 <code>conc</code>. This can be done by adding
 <code>type = &quot;response&quot;</code> to the <code>summary()</code> call:</p>
-<pre class="r"><code>summary(pigs.emm.s, infer = TRUE, null = log(35), type = &quot;response&quot;)</code></pre>
+<pre class="r"><code>summary(emm.src, infer = TRUE, null = log(35), type = &quot;response&quot;)</code></pre>
 <pre class="ro"><code>##  source response   SE df lower.CL upper.CL null t.ratio p.value
 ##  fish       29.8 1.09 23     27.6     32.1   35  -4.385  0.0002
 ##  soy        39.1 1.47 23     36.2     42.3   35   2.988  0.0066
@@ -177,10 +178,10 @@ of things. The tool for changing when back-transformation is performed
 is the <code>regrid()</code> function – which, with default settings of
 its arguments, back-transforms an <code>emmGrid</code> object and
 adjusts everything in it appropriately. For example:</p>
-<pre class="r"><code>str(regrid(pigs.emm.s))</code></pre>
+<pre class="r"><code>str(regrid(emm.src))</code></pre>
 <pre class="ro"><code>## &#39;emmGrid&#39; object with variables:
 ##     source = fish, soy, skim</code></pre>
-<pre class="r"><code>summary(regrid(pigs.emm.s), infer = TRUE, null = 35)</code></pre>
+<pre class="r"><code>summary(regrid(emm.src), infer = TRUE, null = 35)</code></pre>
 <pre class="ro"><code>##  source response   SE df lower.CL upper.CL null t.ratio p.value
 ##  fish       29.8 1.09 23     27.5     32.1   35  -4.758  0.0001
 ##  soy        39.1 1.47 23     36.1     42.2   35   2.827  0.0096
@@ -202,14 +203,14 @@ the table are the ones actually used to construct the tests and
 intervals.</li>
 </ul>
 <p>Understood, right? But think carefully about how these EMMs were
-obtained. They are back-transformed from <code>pigs.emm.s</code>, in
-which <em>the marginal averaging was done on the log scale</em>. If we
-want to back-transform <em>before</em> doing the averaging, we need to
-call <code>regrid()</code> after the reference grid is constructed but
-before the averaging takes place:</p>
+obtained. They are back-transformed from <code>emm.src</code>, in which
+<em>the marginal averaging was done on the log scale</em>. If we want to
+back-transform <em>before</em> doing the averaging, we need to call
+<code>regrid()</code> after the reference grid is constructed but before
+the averaging takes place:</p>
 <pre class="r"><code>pigs.rg &lt;- ref_grid(pigs.lm)
-pigs.remm.s &lt;- emmeans(regrid(pigs.rg), &quot;source&quot;)
-summary(pigs.remm.s, infer = TRUE, null = 35)</code></pre>
+remm.src &lt;- emmeans(regrid(pigs.rg), &quot;source&quot;)
+summary(remm.src, infer = TRUE, null = 35)</code></pre>
 <pre class="ro"><code>##  source response   SE df lower.CL upper.CL null t.ratio p.value
 ##  fish       30.0 1.10 23     27.7     32.2   35  -4.585  0.0001
 ##  soy        39.4 1.49 23     36.3     42.5   35   2.927  0.0076
@@ -227,14 +228,14 @@ rather than the <code>log(conc)</code> scale.</p>
 averaging, the <code>regrid</code> argument in <code>ref_grid()</code>
 simplifies this. The first two steps above could have been done more
 easily as follows:</p>
-<pre class="r"><code>pigs.remm.s &lt;- emmeans(pigs.lm, &quot;source&quot;, regrid = &quot;response&quot;)</code></pre>
+<pre class="r"><code>remm.src &lt;- emmeans(pigs.lm, &quot;source&quot;, regrid = &quot;response&quot;)</code></pre>
 <p>But don’t get <code>regrid</code> and <code>type</code> confused. The
 <code>regrid</code> argument is passed to <code>regrid()</code> (as the
 <code>transform</code> argument) after the reference grid is
 constructed, whereas the <code>type</code> argument is simply remembered
 and used by <code>summary()</code>. So a similar-looking call:</p>
 <pre class="r"><code>emmeans(pigs.lm, &quot;source&quot;, type = &quot;response&quot;)</code></pre>
-<p>will compute the results we have seen for <code>pigs.emm.s</code> –
+<p>will compute the results we have seen for <code>emm.src</code> –
 back-transformed <em>after</em> averaging on the log scale.</p>
 <p>Remember again: When it comes to transformations, timing is
 everything.</p>
@@ -503,8 +504,8 @@ you can make comparisons using ratios instead of differences.</p>
 <p>Consider the <code>pigs</code> example once again, but suppose we had
 fitted a model with a square-root transformation instead of a log:</p>
 <pre class="r"><code>pigroot.lm &lt;- lm(sqrt(conc) ~ source + factor(percent), data = pigs)
-piglog.emm.s &lt;- regrid(emmeans(pigroot.lm, &quot;source&quot;), transform = &quot;log&quot;)
-confint(piglog.emm.s, type = &quot;response&quot;)</code></pre>
+logemm.src &lt;- regrid(emmeans(pigroot.lm, &quot;source&quot;), transform = &quot;log&quot;)
+confint(logemm.src, type = &quot;response&quot;)</code></pre>
 <pre class="ro"><code>##  source response   SE df lower.CL upper.CL
 ##  fish       29.8 1.32 23     27.2     32.7
 ##  soy        39.2 1.54 23     36.2     42.6
@@ -513,7 +514,7 @@ confint(piglog.emm.s, type = &quot;response&quot;)</code></pre>
 ## Results are averaged over the levels of: percent 
 ## Confidence level used: 0.95 
 ## Intervals are back-transformed from the log scale</code></pre>
-<pre class="r"><code>pairs(piglog.emm.s, type = &quot;response&quot;)</code></pre>
+<pre class="r"><code>pairs(logemm.src, type = &quot;response&quot;)</code></pre>
 <pre class="ro"><code>##  contrast    ratio     SE df null t.ratio p.value
 ##  fish / soy  0.760 0.0454 23    1  -4.591  0.0004
 ##  fish / skim 0.663 0.0391 23    1  -6.965  &lt;.0001
@@ -531,7 +532,7 @@ response.</p>
 <h3>Faking other transformations</h3>
 <!-- @index Transformations!faking -->
 <p>It is possible to fake transformations other than the log. Just use
-the same method, e.g.</p>
+the same method, e.g. (results not displayed)</p>
 <pre class="r"><code>regrid(emm, transform = &quot;probit&quot;)</code></pre>
 <p>would re-grid the existing <code>emm</code> to the probit scale. Note
 that any estimates in <code>emm</code> outside of the interval <span class="math inline">\((0,1)\)</span> will be flagged as
@@ -546,8 +547,8 @@ this way.</p>
 <p>It is possible to create a report on an alternative scale by updating
 the <code>tran</code> component. For example, suppose we want percent
 differences instead of ratios in the preceding example with the
-<code>pigs</code> dataset. This is possible by modifying the inverse
-transformation: since the uusual inverse transformation is a ratio of
+<code>pigs</code> dataset. This is possible by modifying the reverse
+transformation: since the uusual reverse transformation is a ratio of
 the form <span class="math inline">\(r = a/b\)</span>, we have that the
 percentage difference between <span class="math inline">\(a\)</span> and
 <span class="math inline">\(b\)</span> is <span class="math inline">\(100(a-b)/b = 100(r-1)\)</span>. Thus,</p>
@@ -558,7 +559,7 @@ percentage difference between <span class="math inline">\(a\)</span> and
     name = &quot;log(pct.diff)&quot;
 )
 
-update(pairs(piglog.emm.s, type = &quot;response&quot;), 
+update(pairs(logemm.src, type = &quot;response&quot;), 
        tran = pct.diff.tran, inv.lbl = &quot;pct.diff&quot;)</code></pre>
 <pre class="ro"><code>##  contrast    pct.diff   SE df t.ratio p.value
 ##  fish / soy     -24.0 4.54 23  -4.591  0.0004
@@ -742,7 +743,7 @@ residual SD is available via the <code>sigma()</code> function:</p>
 <pre class="ro"><code>## [1] 0.115128</code></pre>
 <p>This estimate is used by default. The bias-adjusted EMMs for the
 sources are:</p>
-<pre class="r"><code>summary(pigs.emm.s, type = &quot;response&quot;, bias.adj = TRUE)</code></pre>
+<pre class="r"><code>summary(emm.src, type = &quot;response&quot;, bias.adj = TRUE)</code></pre>
 <pre class="ro"><code>##  source response   SE df lower.CL upper.CL
 ##  fish       30.0 1.10 23     27.8     32.4
 ##  soy        39.4 1.48 23     36.5     42.6
@@ -780,7 +781,7 @@ and there is one treatment, the spray that is used. Let us model the
 count as a Poisson variable with (by default) a log link; and obtain the
 EMMs, with and without a bias adjustment</p>
 <pre class="r"><code>ismod &lt;- glm(count ~ spray, data = InsectSprays, family = poisson())
-emmeans(ismod, &quot;spray&quot;, type = &quot;response&quot;, bias.adj = FALSE)</code></pre>
+emmeans(ismod, &quot;spray&quot;, type = &quot;response&quot;)</code></pre>
 <pre class="ro"><code>##  spray  rate    SE  df asymp.LCL asymp.UCL
 ##  A     14.50 1.099 Inf     12.50     16.82
 ##  B     15.33 1.130 Inf     13.27     17.72
@@ -791,29 +792,25 @@ emmeans(ismod, &quot;spray&quot;, type = &quot;response&quot;, bias.adj = FALSE)
 ## 
 ## Confidence level used: 0.95 
 ## Intervals are back-transformed from the log scale</code></pre>
+<p>The above results were computed with no bias adjustment, the default.
+If you try</p>
 <pre class="r"><code>emmeans(ismod, &quot;spray&quot;, type = &quot;response&quot;, bias.adj = TRUE)</code></pre>
-<pre class="ro"><code>##  spray  rate    SE  df asymp.LCL asymp.UCL
-##  A     25.30 1.918 Inf     21.81     29.35
-##  B     26.76 1.972 Inf     23.16     30.91
-##  C      3.64 0.727 Inf      2.46      5.38
-##  D      8.58 1.117 Inf      6.65     11.07
-##  E      6.11 0.942 Inf      4.51      8.26
-##  F     29.08 2.056 Inf     25.32     33.41
-## 
-## Confidence level used: 0.95 
-## Intervals are back-transformed from the log scale 
-## Bias adjustment applied based on sigma = 1.2206</code></pre>
-<p>These are substantially different! Which is right? Well, due to the
-simple structure of this dataset, the estimates should be well in line
-with the simple observed mean counts:</p>
+<p>you will get exactly the same results, plus a warning message that
+says bias adjustment was disabled. Why? Because in an ordinary GLM like
+this, we are <em>already</em> modeling the mean counts, and the link
+function is not a response transformation as such, just a part of the
+relationship we are specifying between the linear predictor and the
+mean. Given the simple structure of this dataset, we can verify this by
+noting that the estimates we have correspond examply to the simple
+observed mean counts:</p>
 <pre class="r"><code>with(InsectSprays, tapply(count, spray, mean))</code></pre>
 <pre class="ro"><code>##         A         B         C         D         E         F 
 ## 14.500000 15.333333  2.083333  4.916667  3.500000 16.666667</code></pre>
-<p>This illustrates that it is the <em>non</em>-bias-adjusted results
-that are appropriate. Again, the point here is that a GLM does not have
-an additive error term, that the model is already formulated in terms of
-the mean, not some generalized mean. Users must be very careful with
-this! There is no way to automatically do the right thing.</p>
+<p>The point here is that a GLM does not have an additive error term,
+that the model is already formulated in terms of the mean, not some
+generalized mean. (You can enable the bias-adjustment computations by
+specifying a valid <code>sigma</code> value; but you should not do
+so.)</p>
 <p>Note that, in a generalized linear <em>mixed</em> model, including
 generalized estimating equations and such, there <em>are</em> additive
 random components involved, and then bias adjustment becomes

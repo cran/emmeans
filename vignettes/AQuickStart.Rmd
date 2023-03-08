@@ -3,7 +3,7 @@ title: "Quick start guide for **emmeans**"
 author: "emmeans package, Version `r packageVersion('emmeans')`"
 output: emmeans::.emm_vignette
 vignette: >
-  %\VignetteIndexEntry{Quick-start guide for emmeans}
+  %\VignetteIndexEntry{A quick-start guide for emmeans}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -173,7 +173,7 @@ also be accessed via `vignette("`*name*`", "emmeans")`
   * Models that are supported in **emmeans** (there are lots of them)
     ["models"](models.html)
   * Basic ideas that underlie estimated marginal means (EMMs):
-    ["Basics"](basics.html). These concepts
+    ["basics"](basics.html). These concepts
     emphasize *experimental* data, as distinct from *observational* studies.
   * Confidence intervals and tests: 
     ["confidence-intervals"](confidence-intervals.html)

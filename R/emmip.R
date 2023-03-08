@@ -53,8 +53,10 @@ emmip = function(object, formula, ...) {
 #'   for Bayesian models) are added to the plot 
 #'   (works only with \code{engine = "ggplot"}).
 #' @param PIs Logical value. If \code{TRUE}, prediction intervals are added to the plot 
-#'   (works only with \code{engine = "ggplot"}). If both \code{CIs} and
-#'   \code{CIs} are \code{TRUE}, the prediction intervals will be somewhat
+#'   (works only with \code{engine = "ggplot"}). This is allowed only if the
+#'   underlying model family is \code{"gaussian"}.
+#'   If both \code{CIs} and
+#'   \code{PIs} are \code{TRUE}, the prediction intervals will be somewhat
 #'   longer, lighter, and thinner than the confidence intervals. Additional
 #'   parameters to \code{\link{predict.emmGrid}} (e.g., \code{sigma}) may be passed via
 #'   \code{...}. For Bayesian models, PIs require \code{frequentist = TRUE} and 
@@ -202,9 +204,11 @@ emmip.default = function(object, formula, type, CIs = FALSE, PIs = FALSE,
     emms = summary(emmo, type = type, infer = c(CIs, FALSE), 
                    point.est = point.est, frequentist = frequentist)
     if(PIs) {
-        prd = predict(emmo, interval = "pred", ...)
-        emms$LPL = prd$lower.PL
-        emms$UPL = prd$upper.PL
+        prd = predict(emmo, interval = "pred", type = type, ...)
+        if(!is.null(prd)) {
+            emms$LPL = prd$lower.PL
+            emms$UPL = prd$upper.PL
+        }
     }
     # Ensure the estimate is named "yvar" and the conf limits are "LCL" and "UCL"
     nm = names(emms)
@@ -274,7 +278,9 @@ emmip.default = function(object, formula, type, CIs = FALSE, PIs = FALSE,
     emms$.single. = NULL   # in case we have that trick column
     attr(emms, "labs") = list(xlab = xlab, ylab = ylab, tlab = tlab)
     attr(emms, "vars") = list(byvars = byvars, tvars = setdiff(tvars, ".single."))
-
+    if (!plotit && nonlin.scale)
+        attr(emms, "scale") = .make.scale(emmo@misc)
+    
     if (!plotit || engine == "none")
         return (emms)
     
@@ -362,6 +368,9 @@ emmip_ggplot = function(emms, style = "factor", dodge = .1,
     
     if(!missing(col)) ### brute-force color setting
         dotarg$color = linearg$color = CIarg$color = PIarg$color = col
+    
+    if(missing(scale) && !is.null(attr(emms, "scale")))
+        scale = attr(emms, "scale")
 
     dotarg$position = pos
     linearg$mapping = ggplot2::aes_(group = ~tvar)
