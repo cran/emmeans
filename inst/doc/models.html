@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.8.5" />
+<meta name="author" content="emmeans package, Version 1.8.6" />
 
 
 <title>Models supported by emmeans</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Models supported by emmeans</h1>
-<h4 class="author">emmeans package, Version 1.8.5</h4>
+<h4 class="author">emmeans package, Version 1.8.6</h4>
 
 
 
@@ -266,8 +266,7 @@ matrix</td>
 <td align="left">glmmTMB</td>
 <td align="left">glmmTMB</td>
 <td align="center"><a href="#P">P</a></td>
-<td align="left">Supported in <strong>glmmTMB</strong> package (dev.
-version only?)</td>
+<td align="left">Supported in <strong>glmmTMB</strong> package</td>
 </tr>
 <tr class="even">
 <td align="left">gls</td>
@@ -339,37 +338,49 @@ supported</td>
 <td align="left"><code>emm_options(lmer.df =, pbkrtest.limit =, disable.pbkrtest =)</code></td>
 </tr>
 <tr class="odd">
+<td align="left">logistf</td>
+<td align="left">glmmTMB</td>
+<td align="center"><a href="#P">P</a></td>
+<td align="left">Supported in <strong>logistf</strong> package</td>
+</tr>
+<tr class="even">
 <td align="left">lqm,lqmm</td>
 <td align="left">lqmm</td>
 <td align="center"><a href="#Q">Q</a></td>
 <td align="left"><code>tau = &quot;0.5&quot;</code> (must match an entry in
 <code>object$tau</code>)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"></td>
 <td align="left"></td>
 <td align="center"></td>
 <td align="left">Optional: <code>method</code>, <code>R</code>,
 <code>seed</code>, <code>startQR</code> (must be fully spelled-out)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">manova</td>
 <td align="left">stats</td>
 <td align="center"><a href="#M">M</a></td>
 <td align="left"><code>mult.name</code>, <code>mult.levs</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">maov</td>
 <td align="left">stats</td>
 <td align="center"><a href="#M">M</a></td>
 <td align="left"><code>mult.name</code>, <code>mult.levs</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">mblogit</td>
 <td align="left">mclogit</td>
-<td align="center"><a href="#P">P</a></td>
-<td align="left">Supported in <strong>mclogit</strong> (overrides
-previous minimal support here)</td>
+<td align="center"><a href="#N">N</a></td>
+<td align="left"><code>mode = c(&quot;prob&quot;, &quot;latent&quot;)</code></td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left"></td>
+<td align="center"></td>
+<td align="left">Always include response in specs for
+<code>emmeans()</code></td>
 </tr>
 <tr class="even">
 <td align="left">mcmc</td>
