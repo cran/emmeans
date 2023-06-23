@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.8.6" />
+<meta name="author" content="emmeans package, Version 1.8.7" />
 
 
 <title>Utilities and options for emmeans</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Utilities and options for emmeans</h1>
-<h4 class="author">emmeans package, Version 1.8.6</h4>
+<h4 class="author">emmeans package, Version 1.8.7</h4>
 
 
 
@@ -444,7 +444,7 @@ library(nlme)
 warp.gls &lt;- gls(breaks ~ treat, weights = varIdent(form = ~ 1|treat), data = warp)
 ( warp.emm &lt;- emmeans(warp.gls, &quot;treat&quot;) )</code></pre>
 <pre class="ro"><code>##  treat emmean   SE   df lower.CL upper.CL
-##  A.L     44.6 6.03 8.01     30.6     58.5
+##  A.L     44.6 6.03 8.02     30.7     58.5
 ##  B.L     28.2 3.29 8.00     20.6     35.8
 ##  A.M     24.0 2.89 8.00     17.3     30.7
 ##  B.M     28.8 3.14 8.00     21.5     36.0

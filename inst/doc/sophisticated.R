@@ -60,10 +60,13 @@ ins.glm <- glm(claims ~ size + age + offset(log(n)),
 ref_grid(ins.glm)
 
 ## -------------------------------------------------------------------------------------------------
-emmeans(ins.glm, "size", type = "response")
+(EMM <- emmeans(ins.glm, "size", type = "response"))
 
 ## -------------------------------------------------------------------------------------------------
-emmeans(ins.glm, "size", type = "response", offset = 0)
+EMM@grid
+
+## -------------------------------------------------------------------------------------------------
+emmeans(ins.glm, "size", type = "response", offset = log(1))
 
 ## ----eval = FALSE---------------------------------------------------------------------------------
 #  emmeans(ins.glm, "size", type = "response", at = list(n = 1))

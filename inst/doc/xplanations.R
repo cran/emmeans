@@ -1,5 +1,6 @@
 ## ---- echo = FALSE, results = "hide", message = FALSE---------------------------------------------
 require("emmeans")
+require("MASS")
 knitr::opts_chunk$set(fig.width = 4.5, fig.height = 2.0, class.output = "ro",
                       class.message = "re", class.error = "re", class.warning = "re")
 ###knitr::opts_chunk$set(fig.width = 4.5, fig.height = 2.0)
@@ -62,4 +63,31 @@ tmp@grid <- tmp@grid[1:2, ]           # replace the @linfct and @grid slots
 ## -------------------------------------------------------------------------------------------------
 (test.all$df1 * test.all$F.ratio  -  test.ef$df1 * test.ef$F.ratio) /
     (test.all$df1 - test.ef$df1)
+
+## -------------------------------------------------------------------------------------------------
+require(MASS)
+mod1 <- glm(Claims ~ District + Group + Age + offset(log(Holders)),
+            data = Insurance,
+            family = poisson)
+mod2 <- glm(Claims ~ District + Group + Age,
+            offset = log(Holders),
+            data = Insurance, 
+            family = poisson)
+
+## -------------------------------------------------------------------------------------------------
+(rg1 <- ref_grid(mod1))
+(rg2 <- ref_grid(mod2))
+
+## -------------------------------------------------------------------------------------------------
+emmeans(rg1, "Age")
+emmeans(rg2, "Age")
+
+## -------------------------------------------------------------------------------------------------
+emmeans(rg1, "Age", offset = 0, type = "response")
+
+## -------------------------------------------------------------------------------------------------
+emmeans(mod1, "Age", cov.reduce = Holders ~ Age)
+
+## -------------------------------------------------------------------------------------------------
+emmeans(mod2, "Age", cov.reduce = .static.offset. ~ Age)
 

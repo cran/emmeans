@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.8.6" />
+<meta name="author" content="emmeans package, Version 1.8.7" />
 
 
 <title>Transformations and link functions in emmeans</title>
@@ -58,7 +58,7 @@ ul.task-list{list-style: none;}
 
 <h1 class="title toc-ignore">Transformations and link functions in
 emmeans</h1>
-<h4 class="author">emmeans package, Version 1.8.6</h4>
+<h4 class="author">emmeans package, Version 1.8.7</h4>
 
 
 
@@ -560,15 +560,32 @@ percentage difference between <span class="math inline">\(a\)</span> and
 )
 
 update(pairs(logemm.src, type = &quot;response&quot;), 
-       tran = pct.diff.tran, inv.lbl = &quot;pct.diff&quot;)</code></pre>
-<pre class="ro"><code>##  contrast    pct.diff   SE df t.ratio p.value
-##  fish / soy     -24.0 4.54 23  -4.591  0.0004
-##  fish / skim    -33.7 3.91 23  -6.965  &lt;.0001
-##  soy / skim     -12.8 4.69 23  -2.548  0.0457
+       tran = pct.diff.tran, inv.lbl = &quot;pct.diff&quot;, adjust = &quot;none&quot;,
+       infer = c(TRUE, TRUE))</code></pre>
+<pre class="ro"><code>##  contrast    pct.diff   SE df lower.CL upper.CL t.ratio p.value
+##  fish / soy     -24.0 4.54 23    -32.8   -13.97  -4.591  0.0001
+##  fish / skim    -33.7 3.91 23    -41.3   -25.08  -6.965  &lt;.0001
+##  soy / skim     -12.8 4.69 23    -22.0    -2.54  -2.548  0.0180
 ## 
 ## Results are averaged over the levels of: percent 
-## P value adjustment: tukey method for comparing a family of 3 estimates 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the log(pct.diff) scale 
 ## Tests are performed on the log(pct.diff) scale</code></pre>
+<p>Another way to obtain the same estimates is to directly transform the
+estimated ratios to <span class="math inline">\(100r - 100\)</span>:</p>
+<pre class="r"><code>contrast(regrid(pairs(logemm.src)), &quot;identity&quot;, scale = 100, offset = -100,
+         infer = c(TRUE, TRUE))</code></pre>
+<pre class="ro"><code>##  contrast    estimate   SE df lower.CL upper.CL t.ratio p.value
+##  (fish/soy)     -24.0 4.54 23    -33.3    -14.6  -5.281  &lt;.0001
+##  (fish/skim)    -33.7 3.91 23    -41.8    -25.6  -8.613  &lt;.0001
+##  (soy/skim)     -12.8 4.69 23    -22.5     -3.1  -2.730  0.0119
+## 
+## Results are averaged over the levels of: percent 
+## Confidence level used: 0.95</code></pre>
+<p>While the estimates are the same, the tests and confidence intervals
+are different because they are computed on the re-gridded scale using
+the standard errors shown, rather than on the link scale as in the first
+results.</p>
 </div>
 </div>
 <div id="stdize" class="section level2">

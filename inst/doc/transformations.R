@@ -102,7 +102,12 @@ pct.diff.tran <- list(
 )
 
 update(pairs(logemm.src, type = "response"), 
-       tran = pct.diff.tran, inv.lbl = "pct.diff")
+       tran = pct.diff.tran, inv.lbl = "pct.diff", adjust = "none",
+       infer = c(TRUE, TRUE))
+
+## -------------------------------------------------------------------------------------------------
+contrast(regrid(pairs(logemm.src)), "identity", scale = 100, offset = -100,
+         infer = c(TRUE, TRUE))
 
 ## ---- message = FALSE-----------------------------------------------------------------------------
 fiber.lm <- lm(scale(strength) ~ machine * scale(diameter), data = fiber)
