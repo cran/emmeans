@@ -94,6 +94,18 @@ pairs(logemm.src, type = "response")
 #  regrid(emm, transform = "probit")
 
 ## -------------------------------------------------------------------------------------------------
+log.emm <- regrid(neuralgia.emm, "log")
+
+## -------------------------------------------------------------------------------------------------
+pairs(log.emm, reverse = TRUE, type = "response")
+
+## -------------------------------------------------------------------------------------------------
+neuralgia.prb <- glm(Pain ~ Treatment * Sex + Age, family = binomial(link = "probit"), 
+                     data = neuralgia)
+prb.emm <- suppressMessages(emmeans(neuralgia.prb, "Treatment"))
+pairs(regrid(prb.emm, "logit"), type = "response", reverse = TRUE)
+
+## -------------------------------------------------------------------------------------------------
 pct.diff.tran <- list(
     linkfun = function(mu) log(mu/100 + 1),
     linkinv = function(eta) 100 * (exp(eta) - 1),

@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.8.7" />
+<meta name="author" content="emmeans package, Version 1.8.8" />
 
 
 <title>Sophisticated models in emmeans</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Sophisticated models in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.8.7</h4>
+<h4 class="author">emmeans package, Version 1.8.8</h4>
 
 
 
@@ -397,6 +397,14 @@ example, if you want estimates of claims per 100 cars, simply use
 <p>For more details on how offsets are handled, and how and why an
 <code>offset()</code> <em>model term</em> is treated differently than an
 <code>offset</code> <em>argument</em> in model fitting, see <a href="xplanations.html#offsets">the “xplanations” vignette</a>.</p>
+<p>An additional complication may come up in models zero-inflated or
+hurdle models. In those cases, it is somewhat ambiguous what one might
+mean by a “rate”, but one interpretation would be to just go with the
+above techniques with estimates for just the Poisson component of the
+model. Another approach would be to estimate the response mean with the
+zero-inflation included, and divide by the appropriate offset. This can
+be done, but it is messy. An example is given on the <a href="https://stats.stackexchange.com/questions/620842/help-interpreting-zeroinfl-results-from-emmeans/621108?noredirect=1#comment1155903_621108">Cross-Validated
+site</a>.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="ordinal" class="section level2">
