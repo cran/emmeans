@@ -2,14 +2,20 @@
 % Please edit documentation in R/test.R
 \name{joint_tests}
 \alias{joint_tests}
+\alias{make.meanint}
 \alias{meanint}
+\alias{make.symmint}
 \alias{symmint}
 \title{Compute joint tests of the terms in a model}
 \usage{
 joint_tests(object, by = NULL, show0df = FALSE, showconf = TRUE,
-  cov.reduce = meanint, ...)
+  cov.reduce = make.meanint(1), ...)
+
+make.meanint(delta)
 
 meanint(x)
+
+make.symmint(ctr, delta)
 
 symmint(ctr)
 }
@@ -39,7 +45,9 @@ respectively. Se the section below on covariates.}
 
 \item{...}{additional arguments passed to \code{ref_grid} and \code{emmeans}}
 
-\item{x, ctr}{arguments for \code{meanint} and \code{symmint}}
+\item{delta, ctr}{arguments for \code{make.meanint} and \code{make.symmint}}
+
+\item{x}{argument for \code{meanint} and \code{symmint}}
 }
 \value{
 a \code{summary_emm} object (same as is produced by 
@@ -53,8 +61,14 @@ a \code{summary_emm} object (same as is produced by
   named list containing the linear functions associated with each joint test. 
   No estimable functions are included for confounded effects.
 
-\code{meanint} returns \code{mean(c) + c(-1, 1)}. 
-        \code{symmint(ctr)} returns a function that returns \code{ctr + c(-1, 1)}.
+\code{make.meanint} returns the function 
+\code{function(x) mean(x) + delta * c(-1, 1)},
+  and \code{make.symmint(ctr, delta)} returns the function
+\code{function(x) ctr + delta * c(-1, 1)}
+        (which does not depend on \code{x}).
+        The cases with \code{delta = 1}, \code{meanint = make.meanint(1)} 
+        and \code{symmint(ctr) = make.symmint(ctr, 1)}
+        are retained for back-compatibility reasons.
         These functions are available primarily for use with \code{cov.reduce}.
 }
 \description{
@@ -142,9 +156,9 @@ joint_tests(toy.cov)   # female is regarded as a 2-level factor by default
 ## ... then tests depend on where we center things
 
 # Center around the mean
-joint_tests(toy.cov, cov.keep = 0, cov.reduce = meanint)
+joint_tests(toy.cov, cov.keep = 0, cov.reduce = make.meanint(delta = 1))
 # Center around zero (like SAS's results for toy.cov)
-joint_tests(toy.cov, cov.keep = 0, cov.reduce = symmint(0))
+joint_tests(toy.cov, cov.keep = 0, cov.reduce = make.symmint(ctr = 0, delta = 1))
 # Center around 0.5 (like SAS's results for toy.fac)
 joint_tests(toy.cov, cov.keep = 0, cov.reduce = range)
 

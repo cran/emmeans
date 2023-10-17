@@ -2,6 +2,20 @@
 title: "NEWS for the emmeans package"
 ---
 
+## emmeans 1.8.9
+  * Added functions `make.meanint()` and `make.symmint()` that return functions
+    that compute symmetric intervals. The old `meanint()` and `symmint()` functions
+    that return symmetric intervals of width `2` are retained for back-compatibility
+  * Small repairs to `multinom` support so it works with a model where the
+    response is a matrix of counts (#439)
+  * Enhancements/fixes for `MuMIn` support (#442)
+  * `qdrg()` has replaced its `ordinal.dim` argument with `ordinal`, a list with
+    elements `dim` and `mode` -- which now fully supports all the modes available
+    for ordinal models (#444). (`ordinal.dim` still works for backward compatibility.)
+  * Fix to bookkeeping bug in `emtrends` (#448)
+  * Fix to `averaging` support with certain predictor function calls (#449)
+  
+
 ## emmeans 1.8.8
   * Bug correction in `contrast` when `tran` is a `list` (#428)
   * Bug correction to suppress a nuisance warning when the number of

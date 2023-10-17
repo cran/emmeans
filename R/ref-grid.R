@@ -697,7 +697,8 @@ ref_grid <- function(object, at, cov.reduce = mean, cov.keep = get_emm_option("c
     # and it is silently ignored
     frm = try(formula(eval(attr(data, "call")[[2]])), silent = TRUE)
     if (inherits(frm, "formula")) { # response may be transformed
-        lhs = frm[-3]
+        lhs = if(length(frm) == 2) NULL
+              else frm[-3]
         tran = setdiff(.all.vars(lhs, functions = TRUE), c(.all.vars(lhs), "~", "cbind", "+", "-", "*", "/", "^", "%%", "%/%"))
         if(length(tran) > 0) {
             # we are now supporting scale() as well as some functions from datawizard
@@ -1121,9 +1122,9 @@ ref_grid <- function(object, at, cov.reduce = mean, cov.keep = get_emm_option("c
     basis$misc$avgd.over = paste(length(nuis), "nuisance factors")
     RA = rep(ra, k)
     basis$X = X[RA == ".main.grid.", , drop = FALSE]
+    basis$grid = grid[RA == ".main.grid.", , drop = FALSE]
     non.nuis = setdiff(names(ref.levels), info$nuis)
     basis$ref.levels = ref.levels[non.nuis]
-    basis$grid = grid[1:n, non.nuis, drop = FALSE]
     basis
 }
 

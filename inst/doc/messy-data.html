@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.8.8" />
+<meta name="author" content="emmeans package, Version 1.8.9" />
 
 
 <title>Working with messy data</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Working with messy data</h1>
-<h4 class="author">emmeans package, Version 1.8.8</h4>
+<h4 class="author">emmeans package, Version 1.8.9</h4>
 
 
 
@@ -375,13 +375,23 @@ rg.usual</code></pre>
 ##     carb = 1, 2, 3, 4, 6, 8</code></pre>
 <pre class="r"><code>nrow(rg.usual@linfct)</code></pre>
 <pre class="ro"><code>## [1] 216</code></pre>
-<pre class="r"><code>rg.nuis = ref_grid(mtcars.lm, non.nuisance = &quot;cyl&quot;)
-rg.nuis</code></pre>
+<pre class="r"><code>rg.nuis = ref_grid(mtcars.lm, non.nuisance = &quot;cyl&quot;)</code></pre>
+<pre><code>## NOTE: A nesting structure was detected in the fitted model:
+##     cyl %in% am</code></pre>
+<pre class="r"><code>rg.nuis</code></pre>
 <pre class="ro"><code>## &#39;emmGrid&#39; object with variables:
 ##     cyl = 4, 6, 8
 ##     am = 0, 1
+##     disp = (predicted by other variables)
+##     hp = (predicted by other variables)
+##     drat = (predicted by other variables)
+##     wt = (predicted by other variables)
+##     vs = (predicted by other variables)
+##     gear = (predicted by other variables)
+##     carb = (predicted by other variables)
 ## Nuisance factors that have been collapsed by averaging:
-##     disp(1), hp(1), drat(1), wt(1), vs(2), gear(3), carb(6)</code></pre>
+##     disp(1), hp(1), drat(1), wt(1), vs(2), gear(3), carb(6)
+## Nesting structure:  cyl %in% am</code></pre>
 <pre class="r"><code>nrow(rg.nuis@linfct)</code></pre>
 <pre class="ro"><code>## [1] 6</code></pre>
 <p>Notice that we left <code>am</code> out of <code>non.nuisance</code>
@@ -403,12 +413,8 @@ EMMs either way, with slightly different annotations:</p>
 ## Confidence level used: 0.95</code></pre>
 <pre class="r"><code>emmeans(rg.nuis, ~ cyl * am)</code></pre>
 <pre class="ro"><code>##  cyl am emmean   SE df lower.CL upper.CL
-##    4  0   19.0 4.29 14    9.823     28.2
-##    6  0   19.7 3.32 14   12.556     26.8
-##    8  0   29.0 5.98 14   16.130     41.8
-##    4  1   15.4 4.29 14    6.206     24.6
-##    6  1   27.3 4.90 14   16.741     37.8
-##    8  1   11.2 5.56 14   -0.718     23.1
+##    4  0   19.0 4.29 14     9.82     28.2
+##    6  0   19.7 3.32 14    12.56     26.8
 ## 
 ## Results are averaged over the levels of: 7 nuisance factors 
 ## Confidence level used: 0.95</code></pre>
@@ -420,7 +426,9 @@ are averaged separately. Let’s try it to see how the estimates
 differ:</p>
 <pre class="r"><code>predict(emmeans(mtcars.lm, ~ cyl * am, non.nuis = c(&quot;cyl&quot;, &quot;am&quot;), 
                 wt.nuis = &quot;prop&quot;))</code></pre>
-<pre class="ro"><code>## [1] 16.51254 17.17869 26.45709 12.90600 24.75053  8.70546</code></pre>
+<pre><code>## NOTE: A nesting structure was detected in the fitted model:
+##     cyl %in% am</code></pre>
+<pre class="ro"><code>## [1] 16.51254 17.17869</code></pre>
 <pre class="r"><code>predict(emmeans(mtcars.lm, ~ cyl * am, weights = &quot;outer&quot;))</code></pre>
 <pre class="ro"><code>## [1] 16.51254 17.17869 26.45709 12.90600 24.75053  8.70546</code></pre>
 <p>These are the same as each other, but different from the
@@ -435,17 +443,15 @@ possible reference grid: Pass the <code>specs</code> argument to
 quote it to delay evaluation, and also use <code>all.vars()</code> if
 (and only if) <code>specs</code> is a formula:</p>
 <pre class="r"><code>emmeans(mtcars.lm, ~ gear | am, non.nuis = quote(all.vars(specs)))</code></pre>
-<pre class="ro"><code>## am = 0:
-##  gear emmean   SE df lower.CL upper.CL
-##     3   15.2 2.65 14     9.56     20.9
-##     4   22.4 3.36 14    15.20     29.6
-##     5   30.0 4.54 14    20.28     39.7
+<pre><code>## NOTE: A nesting structure was detected in the fitted model:
+##     am %in% gear</code></pre>
+<pre class="ro"><code>## gear = 3, am = 0:
+##  emmean   SE df lower.CL upper.CL
+##    15.2 2.65 14     9.56     20.9
 ## 
-## am = 1:
-##  gear emmean   SE df lower.CL upper.CL
-##     3   10.6 4.49 14     1.02     20.3
-##     4   17.8 2.62 14    12.19     23.4
-##     5   25.4 4.05 14    16.72     34.1
+## gear = 4, am = 1:
+##  emmean   SE df lower.CL upper.CL
+##    17.8 2.62 14    12.19     23.4
 ## 
 ## Results are averaged over the levels of: 6 nuisance factors, cyl 
 ## Confidence level used: 0.95</code></pre>
