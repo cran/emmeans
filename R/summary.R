@@ -439,6 +439,8 @@ summary.emmGrid <- function(object, infer, level, adjust, by,
         level = misc$level
     if(missing(adjust))
         adjust = misc$adjust
+    if(missing(cross.adjust) && !is.null(misc$cross.adjust))
+        cross.adjust = misc$cross.adjust
     if(missing(by))
         by = misc$by.vars
     
@@ -683,13 +685,14 @@ summary.emmGrid <- function(object, infer, level, adjust, by,
             val = c("sidak", p.adjust.methods)
             w = pmatch(tolower(cross.adjust), tolower(val))
             if (!is.na(w)) {
+                bridx = unlist(by.rows)
                 cross.adjust = val[w]
-                mat = matrix(result$p.value, nrow = len)
+                mat = matrix(result$p.value[bridx], nrow = len)
                 apv = apply(mat, 1, function(p) {
                     if (w > 1)   p.adjust(p, cross.adjust)
                     else         1 - (1 - p)^ncol(mat)
                 })
-                result$p.value = as.numeric(t(apv))
+                result$p.value[bridx] = as.numeric(t(apv))
                 mesg = c(mesg, paste("Cross-group P-value adjustment:", cross.adjust))
             }
             else
@@ -1312,7 +1315,7 @@ as.data.frame.emmGrid = function(x,
     nm = dimnames(m)[[2]]
     for (j in seq_len(length(nm))) {
         if(just[nm[j]] == "L") 
-            nm[j] = format(nm[j], width = nchar(m[1,j]), just="left")
+            nm[j] = format(nm[j], width = nchar(m[1,j]), justify = "left")
     }
     dimnames(m) = list(rep("", nrow(m)), nm)
     m

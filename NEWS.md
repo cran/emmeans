@@ -2,6 +2,18 @@
 title: "NEWS for the emmeans package"
 ---
 
+## emmeans 1.10.0
+  * Restored `tau` argument (now optional) for rq models (#458)
+  * Fixed issue where a multivariate factor having numeric levels may
+    mismatch a level in `at` even when apparently valid (#458)
+  * Added `cross.adjust` to legal arguments that can be passed via `misc` slot
+  * Robustified code for `cross.adjust`
+  * Fixed masking of `vcov.` in `glmgee` support (#460)
+  * Fixed an error in `xtable()` method for `summary_emm` objects
+  * Added `inner` argument to `make.tran()` to allow for compound transform;
+    e.g., `make.tran("inverse", inner = "sqrt")` is reciprocal sqrt (#462)
+  
+
 ## emmeans 1.9.0
   * Warning message about prior weights was sometimes unnecessary.
     We now suppress it when all the prior weights are equal.
