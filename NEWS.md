@@ -2,6 +2,27 @@
 title: "NEWS for the emmeans package"
 ---
 
+## emmeans 1.10.1
+  * With `gls` or `lme` models, `mode = "satterthwaite"`
+    and `mode =  "appx-satterthwaite"` failed when model was fitted with no
+    explicit `data` argument (#465)
+  * We decided to export the `.emmc` functions, just to make it easier to
+    see and use them
+  * Added a new contrast function `wtcon.emmc(levs, wts, cmtype, ...)` which
+    generates contrasts via `multcomp::contrMat(wts, type = cmtype, ...)`
+  * `contrast()` gains a new argument `wts` which can be passed to some
+    `.emmc` functions including `eff.emmc`, `del.eff.emmc`, and `wtcon.emmc`.
+    If `wts` is left missing, we pass equal weights of `. If we specify
+    `wts = NA`, we retrieve weights from the object (potentially different in
+    each `by` group). Otherwise, the same fixed `wts` are used in each group.
+  * Added a `weights()` method for `emmGrid` objects
+  * Modification to `pwpp()` to play along if `contrast()` changes the
+    `by` variable via `options` (#472)
+  * After some wiggling around, we now allow `strata()` factors to be included in
+    the reference grid for **survival** models. It is up to the user to decide
+    what is sensible. (#429, #473)
+
+
 ## emmeans 1.10.0
   * Restored `tau` argument (now optional) for rq models (#458)
   * Fixed issue where a multivariate factor having numeric levels may

@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.10.0" />
+<meta name="author" content="emmeans package, Version 1.10.1" />
 
 
 <title>Comparisons and contrasts in emmeans</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Comparisons and contrasts in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.10.0</h4>
+<h4 class="author">emmeans package, Version 1.10.1</h4>
 
 
 
@@ -359,9 +359,9 @@ org.emml</code></pre>
 ## $contrasts
 ##  contrast    estimate   SE df t.ratio p.value
 ##  day2 - day1   -0.772 3.78 25  -0.204  0.9997
-##  day3 - day2    6.658 3.78 25   1.763  0.3245
-##  day4 - day3   -5.716 3.78 25  -1.513  0.4684
-##  day5 - day4    4.882 3.78 25   1.293  0.6126
+##  day3 - day2    6.658 3.78 25   1.763  0.3244
+##  day4 - day3   -5.716 3.78 25  -1.513  0.4683
+##  day5 - day4    4.882 3.78 25   1.293  0.6127
 ##  day6 - day5   -1.321 3.78 25  -0.350  0.9965
 ## 
 ## P value adjustment: mvt method for 5 tests</code></pre>
@@ -390,10 +390,12 @@ is to avoid such dilemmas.)</p>
 name with <code>&quot;.emmc&quot;</code> appended, that generates the needed
 coefficients as a list or data frame. The function should take a vector
 of levels as its first argument, and any optional parameters as
-additional arguments. For example, suppose we want to compare every
-third level of a treatment. The following function provides for
-this:</p>
-<pre class="r"><code>skip_comp.emmc &lt;- function(levels, skip = 1, reverse = FALSE) {
+additional arguments. It should also always have a <code>...</code>
+argument to allow for unspecified arguments that may occur in the
+call.</p>
+<p>As an example, suppose we want to compare every third level of a
+treatment. The following function provides for this:</p>
+<pre class="r"><code>skip_comp.emmc &lt;- function(levels, skip = 1, reverse = FALSE, ...) {
     if((k &lt;- length(levels)) &lt; skip + 1)
         stop(&quot;Need at least &quot;, skip + 1, &quot; levels&quot;)
     coef &lt;- data.frame()

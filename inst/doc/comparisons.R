@@ -55,7 +55,7 @@ org.emml <- emmeans(org.aov, consec ~ day)
 org.emml
 
 ## -----------------------------------------------------------------------------
-skip_comp.emmc <- function(levels, skip = 1, reverse = FALSE) {
+skip_comp.emmc <- function(levels, skip = 1, reverse = FALSE, ...) {
     if((k <- length(levels)) < skip + 1)
         stop("Need at least ", skip + 1, " levels")
     coef <- data.frame()

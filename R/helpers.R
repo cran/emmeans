@@ -340,6 +340,12 @@ gradV.kludge = function(object, Vname = "varFix", call = formula(object$terms),
     #     stop()
     # }
     
+    if(is.null(data)) {
+        vars = all.vars(eval(object$call[[2]]))
+        lst = lapply(vars, get)
+        names(lst) = vars
+        data = data.frame(lst)
+    }
     A = object$apVar
     theta = attr(A, "Pars")
     V = object[[Vname]]
@@ -349,10 +355,24 @@ gradV.kludge = function(object, Vname = "varFix", call = formula(object$terms),
     y = data[[yname]]
     n = length(y)
     object$call[[2]] = call
-    dat = t(replicate(2 + extra.iter + length(theta), {
-        data[[yname]] = y + sig * rnorm(n)
-        mod = update(object, data = data)
-        c(attr(mod$apVar, "Pars") - theta, as.numeric(mod[[Vname]] - V))
+    # we're gonna carefully check simulation results to make sure we didn't
+    # lose (or gain?) any params so that everything conforms
+    niter = 0
+    nsim = 2 + extra.iter + length(theta)
+    dat = t(replicate(nsim, {
+        simt = simv = numeric(0)
+        niter = niter + 1
+        while((niter < 3 * nsim) && 
+              ((length(simv) != length(V)) || (length(simt) != length(theta)))) {
+            data[[yname]] = y + sig * rnorm(n)
+            mod = update(object, data = data)
+            simt = attr(mod$apVar, "Pars")
+            simv = mod[[Vname]]
+        }
+        niter = niter + 1
+        if (niter > 3 * nsim) 
+            stop("Too many simulations due to inconsistency")
+        c(simt - theta, as.numeric(simv - V))
     }))
     dimnames(dat) = c(NULL, NULL)
     xcols = seq_along(theta)
@@ -390,11 +410,13 @@ gradV.kludge = function(object, Vname = "varFix", call = formula(object$terms),
 
 ### new way to get jacobians for gls models
 gls_grad = function(object, call, data, V) {
+    if (is.null(data)) 
+        data = environment(eval(call$model))
     obj = object$modelStruct
     conLin = object
     class(conLin) = class(obj)
     X = model.matrix(eval(call$model), data = data)
-    y = data[[all.vars(call)[1]]]
+    y = eval(call$model[[2]], envir = data)
     conLin$Xy = cbind(X, y)
     conLin$fixedSigma = FALSE
     func = function(x) {
@@ -559,9 +581,9 @@ emm_basis.polr = function(object, trms, xlev, grid,
 recover_data.survreg = function(object, ...) {
     fcall = object$call
     trms = delete.response(terms(object))
-    # I'm gonna delete any terms involving cluster(), frailty(), or strata()
+    # I'm gonna delete any terms involving cluster(), frailty(); keep strata()
     mod.elts = dimnames(attr(trms, "factor"))[[2]]
-    tmp = grep("cluster\\(|frailty\\(|strata\\(", mod.elts)
+    tmp = grep("cluster\\(|frailty", mod.elts)
     if (length(tmp))
         trms = trms[-tmp]
     recover_data(fcall, trms, object$na.action, pwts = weights(object), ...)
@@ -585,7 +607,8 @@ emm_basis.survreg = function(object, trms, xlev, grid, ...) {
     X = model.matrix(trms, m, contrasts.arg = object$contrasts)
     usecols = intersect(colnames(X), names(bhat))
     bhat = bhat[usecols]  # in case ref_grid code excluded some levels...
-    nbasis = estimability::nonest.basis(model.matrix(object))
+    X = X[, usecols, drop=FALSE]
+    nbasis = estimability::nonest.basis(model.matrix(object)[, usecols, drop = FALSE])
     dfargs = list(df = object$df.residual)
     dffun = function(k, dfargs) dfargs$df
     if (object$dist %in% c("exponential","weibull","loglogistic","loggaussian","lognormal")) 
@@ -613,7 +636,8 @@ emm_basis.coxph = function (object, trms, xlev, grid, ...)
     nms = colnames(result$X)
     # delete columns for intercept and main effects of strata
     zaps = which(nms %in% setdiff(nms, names(result$bhat)))
-    result$X = result$X[, -zaps, drop = FALSE]
+    if(length(zaps) > 0)
+        result$X = result$X[, -zaps, drop = FALSE]
     ### result$X = result$X - rep(object$means, each = nrow(result$X))
     result$misc$tran = "log"
     result$misc$inv.lbl = "hazard"
