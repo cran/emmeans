@@ -1,8 +1,10 @@
-R package **emmeans**: Estimated marginal means
+R package **emmeans**: Estimated marginal means <img src="man/figures/logo.png" align="right" />
 ====
+## Website
+https://rvlenth.github.io/emmeans/
 
 ## Features
-Estimated marginal means (EMMs, previously known as least-squares means in the
+Estimated marginal means (EMMs, also known as least-squares means in the
 context of traditional regression models) are derived by using a model to make
 predictions over a regular grid of predictor combinations (called a *reference
 grid*). These predictions may possibly be averaged (typically with equal
@@ -70,7 +72,7 @@ easily produce these results, as well as various graphs of them
     may be viewed.
 
   * **GitHub** To install the latest development version from GitHub, 
-    install the newest version (definitely 2.0 or higher) of the **devtools** 
+    install the newest version of the **devtools** 
     package; then run
     
 ```r
@@ -86,8 +88,21 @@ remotes::install_github("rvlenth/emmeans")
 For the latest release notes on this development version, see the 
 [NEWS file](https://github.com/rvlenth/emmeans/blob/master/NEWS.md)
 
-## Interview with an erstwhile expert
-In February, 2024, I interviewed ChatGPT (version 3.5) about the **emmeans** package. Some things it did better than others. [Here's the conversation](https://chat.openai.com/share/fc943cdd-8a42-408e-85c0-f3e47e1b2760).
+## "Tidiness" can be dangerous
+I see more and more users who are in a terrible hurry to get results. They develop
+a "workflow" where they plan-out several steps at once and pipe them
+together. That's useful when you don't have to think about what happens in
+those steps; but *when you're doing statistics, you should be thinking!*
+Most functions in the **emmeans** package yield results that are accompanied by 
+annotations such as transformations involved, P-value adjustments
+made, the families for those adjustments, etc. If you just pipe the results
+into some more code, *you never see those annotations*. 
+
+**Please slow down!** Look at the actual results from each **emmeans** package 
+function without any post-processing -- None. That way, you'll see the annotated 
+summaries.
+Statistics is pretty hard stuff. Don't make it harder by blindfolding yourself.
+
 
 ## Supersession plan
 The developer of **emmeans** continues to maintain and occasionally add new

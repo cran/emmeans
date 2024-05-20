@@ -1,8 +1,8 @@
 Package: emmeans
 Type: Package
 Title: Estimated Marginal Means, aka Least-Squares Means
-Version: 1.10.1
-Date: 2024-04-05
+Version: 1.10.2
+Date: 2024-05-19
 Authors@R: c(person("Russell V.", "Lenth", role = c("aut", "cre", "cph"), 
     email = "russell-lenth@uiowa.edu"),
     person("Ben", "Bolker", role = "ctb"),
@@ -12,6 +12,7 @@ Authors@R: c(person("Russell V.", "Lenth", role = c("aut", "cre", "cph"),
     person("Maarten", "Jung", role = "ctb"),
     person("Jonathon", "Love", role = "ctb"),
     person("Fernando", "Miguez", role = "ctb"),
+    person("Julia", "Piaskowski", role = "ctb"),
     person("Hannes", "Riebl", role = "ctb"),
     person("Henrik", "Singmann", role = "ctb"))
 Depends: R (>= 4.1.0)
@@ -21,11 +22,12 @@ Suggests: bayesplot, bayestestR, biglm, brms, car, coda (>= 0.17),
         ggplot2, lattice, logspline, mediation, mgcv, multcomp,
         multcompView, nlme, ordinal (>= 2014.11-12), pbkrtest (>=
         0.4-1), lme4, lmerTest (>= 2.0.32), MASS, MuMIn, rsm, knitr,
-        rmarkdown, sandwich, scales, splines, testthat, xtable (>=
-        1.8-2)
+        rmarkdown, sandwich, scales, splines, testthat, tibble, xtable
+        (>= 1.8-2)
 Enhances: CARBayes, coxme, gee, geepack, MCMCglmm, MCMCpack, mice,
         nnet, pscl, rstanarm, sommer, survival
-URL: https://github.com/rvlenth/emmeans
+URL:
+        https://rvlenth.github.io/emmeans/,https://rvlenth.github.io/emmeans/
 BugReports: https://github.com/rvlenth/emmeans/issues
 LazyData: yes
 ByteCompile: yes
@@ -38,10 +40,10 @@ Description: Obtain estimated marginal means (EMMs) for many linear, generalized
   Statistician 34(4), 216-221 <doi:10.1080/00031305.1980.10483031>.
 License: GPL-2 | GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2024-04-05 19:21:17 UTC; rlenth
+Packaged: 2024-05-20 02:51:17 UTC; rlenth
 Author: Russell V. Lenth [aut, cre, cph],
   Ben Bolker [ctb],
   Paul Buerkner [ctb],
@@ -50,8 +52,9 @@ Author: Russell V. Lenth [aut, cre, cph],
   Maarten Jung [ctb],
   Jonathon Love [ctb],
   Fernando Miguez [ctb],
+  Julia Piaskowski [ctb],
   Hannes Riebl [ctb],
   Henrik Singmann [ctb]
 Maintainer: Russell V. Lenth <russell-lenth@uiowa.edu>
 Repository: CRAN
-Date/Publication: 2024-04-06 10:23:09 UTC
+Date/Publication: 2024-05-20 03:50:02 UTC
