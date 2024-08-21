@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.10.3" />
+<meta name="author" content="emmeans package, Version 1.10.4" />
 
 
 <title>Models supported by emmeans</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Models supported by emmeans</h1>
-<h4 class="author">emmeans package, Version 1.10.3</h4>
+<h4 class="author">emmeans package, Version 1.10.4</h4>
 
 
 
@@ -666,6 +666,14 @@ be <code>Inf</code>.</p>
 <p>Some objects in this group may require that the original or reference
 dataset be provided when calling <code>ref_grid()</code> or
 <code>emmeans()</code>.</p>
+<p>For <code>coxph</code> objects, the estimates we obtain are
+comparable to running <code>predict.coxph()</code> with
+<code>reference = &quot;zero&quot;</code>; that is, no covariate centering is
+done. The user may use <code>at</code> to specify adjusted covariate
+values. For example, the default reference grid sets each covariate to
+its mean, so estimates comparable to
+<code>predict.coxph(..., reference = &quot;sample&quot;)</code> would be obtained
+by specifying <code>at = list(x = 0)</code>.</p>
 <p>In the case of <code>mgcv::gam</code> objects, there are optional
 <code>freq</code> and <code>unconditional</code> arguments as is
 detailed in the documentation for <code>mgcv::vcov.gam()</code>. Both

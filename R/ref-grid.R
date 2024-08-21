@@ -125,7 +125,10 @@
 #'   \code{nuisance} must not interact with other factors, not even other
 #'   nuisance factors. Specifying nuisance factors can save considerable
 #'   storage and computation time, and help avoid exceeding the maximum
-#'   reference-grid size (\code{get_emm_option("rg.limit")}).
+#'   reference-grid size (\code{get_emm_option("rg.limit")}). 
+#'   (\emph{Note:} For certain models where the \code{emm_basis} method returns a
+#'   re-gridded parameterization, nuisance factors cannot be used, and an error
+#'   is thrown.)
 #' @param rg.limit Integer limit on the number of reference-grid rows to allow
 #'   (checked before any multivariate responses are included).
 #' @param ... Optional arguments passed to \code{\link{summary.emmGrid}},
@@ -548,8 +551,8 @@ ref_grid <- function(object, at, cov.reduce = mean, cov.keep = get_emm_option("c
         
         # Save the original levels of factors, no matter what
         if (is.factor(x) && !(nm %in% coerced$covariates))
-            xlev[[nm]] = levels(factor(x))
-            # (applying factor drops any unused levels)
+            xlev[[nm]] = levels(.chk.fac(x))
+            # (drops any used levels unless allow.na.levs option is TRUE)
         else if (is.character(x)) # just like a factor
             xlev[[nm]] = sort(unique(x))
     
@@ -559,7 +562,7 @@ ref_grid <- function(object, at, cov.reduce = mean, cov.keep = get_emm_option("c
             ref.levels[[nm]] = at[[nm]]
         # factors not in 'at'
         else if (is.factor(x) && !(nm %in% coerced$covariates))
-            ref.levels[[nm]] = levels(factor(x))
+            ref.levels[[nm]] = levels(.chk.fac(x))
         else if (is.character(x) || is.logical(x))
             ref.levels[[nm]] = chrlev[[nm]] = sort.unique(x)
         # matrices
@@ -695,7 +698,7 @@ ref_grid <- function(object, at, cov.reduce = mean, cov.keep = get_emm_option("c
     # next stmt assumes that model formula is 1st argument (2nd element) in call.
     # if not, we probably get an error or something that isn't a formula
     # and it is silently ignored
-    frm = try(formula(eval(attr(data, "call")[[2]])), silent = TRUE)
+    frm = try(formula(eval(attr(data, "call")[[2]], environment(trms))), silent = TRUE)
     if (inherits(frm, "formula")) { # response may be transformed
         lhs = if(length(frm) == 2) NULL
               else frm[-3]
@@ -821,20 +824,22 @@ ref_grid <- function(object, at, cov.reduce = mean, cov.keep = get_emm_option("c
     if (!missing(offset)) {  # For safety, we always treat it as scalar
         if (offset[1] != 0)
             oval = offset[1]
+        if(".static.offset." %in% names(grid))
+            grid$.static.offset. = ref.levels$.static.offset. = oval
     }
     else {
         if(".static.offset." %in% names(grid)) { # static offset is available
             oval = om * grid[[".static.offset."]]
-            # grid$.static.offset. = NULL
         }
-        #else 
+        #else implied
         if(!is.null(attr(trms,"offset"))) {
             if (any(om != 0))
                 oval = om * (oval + .get.offset(trms, grid))
         }
-        if(any(oval != 0))
-            grid[[".offset."]] = oval
     }
+    if(any(oval != 0))
+        grid[[".offset."]] = oval
+    
     
     ### --- Determine weights for each grid point
     if (!hasName(data, "(weights)"))
@@ -1047,13 +1052,20 @@ ref_grid <- function(object, at, cov.reduce = mean, cov.keep = get_emm_option("c
 # data.frames rbinded together:
 #   * the expanded grid for all factors *not* in nuis, with the nuis factors set 
 #     at their first levels
-#   * for each factor in f nuis, a set of rows for (levs$f), with the other 
+#   * for each factor f in nuis, a set of rows for (levs$f), with the other 
 #     factors at their first levels (this is arbitrary)
 # In addition, we return a character vector 'row.assign' corresponding to the rows 
 # in the grid, telling which is what: ".main.grid." for the first part of the grid,
 # otherwise factor names from nuis.
 # We also return 'nuis' itself - which may be reduced since illegal 
 # entries are silently removed
+###
+# Update July 2024...
+# All this trickery assumes that columns of X are associated with model terms!
+# So this does not work for anything that's been re-gridded.
+# Those (almost?) always have X = I. Unfortunately we won't see X until
+# later, but we can still stop it before we inflict damage...
+# Note: we also provide a simpler check: misc$regrid.flag is non-NULL
 .setup.nuis = function(nuis, levs, trms, rg.limit) {
     firsts =  args = lapply(levs, function(x) x[1])
     nuis = intersect(nuis, names(levs))
@@ -1091,9 +1103,12 @@ ref_grid <- function(object, at, cov.reduce = mean, cov.keep = get_emm_option("c
 # bottom part, and substitute those averages in the required columns in the top part 
 # of the model matrix.
 .basis.nuis = function(basis, info, wt, levs, data, grid, ref.levels) {
-    ra = info$row.assign
+  X = basis$X
+  if(!is.null(basis$misc$regrid.flag) || all(apply(X, 1, \(x) sum(x != 0)) == 1))   # each row has 1 nonzero element
+      stop("Sorry, 'nuisance' specs are not allowed for this situation.",
+           " Revise the call accordingly.", call. = FALSE)
+  ra = info$row.assign
     r. = rep(".", length(ra))  # fillers
-    X = basis$X
     n = sum(ra == ".main.grid.")
     k = nrow(X) / length(ra)   # multivariate dimension
     nuis = info$nuis
@@ -1124,7 +1139,7 @@ ref_grid <- function(object, at, cov.reduce = mean, cov.keep = get_emm_option("c
     basis$misc$avgd.over = paste(length(nuis), "nuisance factors")
     RA = rep(ra, k)
     basis$X = X[RA == ".main.grid.", , drop = FALSE]
-    basis$grid = grid[RA == ".main.grid.", , drop = FALSE]
+    basis$grid = grid[ra == ".main.grid.", , drop = FALSE]
     non.nuis = setdiff(names(ref.levels), info$nuis)
     basis$ref.levels = ref.levels[non.nuis]
     basis

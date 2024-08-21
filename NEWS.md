@@ -2,6 +2,21 @@
 title: "NEWS for the emmeans package"
 ---
 
+## emmeans 1.10.4
+  * Refinements in tracking static offsets
+  * Made d.f. consistent for `geeglm` and `glmgee` (#496)
+  * Fixed suggestion for installing from GitHub (#497)
+  * Change that allows factors to have `NA` levels (#500). This
+    was previously not allowed, and we added an `"allow.na.levs"` option
+    (defaults to `TRUE`) just in case we broke anything that used to work.
+  * Better default contrasts in `qdrg()` (#501)
+  * Bug fix for nuisance factors when we have a multivariate response (#503)
+  * Improved auto-detection of response transformation (#504)
+  * Bug fix for detecting cases where we can't use `nuisance` (#503)
+  * New `mvregrid()` function for multivariate response transformations
+    such as a compositional response.
+
+
 ## emmeans 1.10.3
   * Updated `mice::mira` support to use Barnard-Rubin adjusted d.f. (#494)
   * Fix to MuMIn support so a response transformation is auto-detected
