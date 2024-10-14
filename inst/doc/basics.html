@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.10.4" />
+<meta name="author" content="emmeans package, Version 1.10.5" />
 
 
 <title>Basics of estimated marginal means</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Basics of estimated marginal means</h1>
-<h4 class="author">emmeans package, Version 1.10.4</h4>
+<h4 class="author">emmeans package, Version 1.10.5</h4>
 
 
 
@@ -224,10 +224,10 @@ later.</p>
 ## Confidence level used: 0.95</code></pre>
 <pre class="r"><code>(EMM.percent &lt;- emmeans(mod4, &quot;percent&quot;))</code></pre>
 <pre class="ro"><code>##  percent emmean       SE df lower.CL upper.CL
-##        9 0.0322 0.001032 23   0.0301   0.0344
+##        9 0.0322 0.001030 23   0.0301   0.0344
 ##       12 0.0270 0.000969 23   0.0250   0.0290
-##       15 0.0263 0.001104 23   0.0240   0.0286
-##       18 0.0241 0.001337 23   0.0213   0.0268
+##       15 0.0263 0.001100 23   0.0240   0.0286
+##       18 0.0241 0.001340 23   0.0213   0.0268
 ## 
 ## Results are averaged over the levels of: source 
 ## Results are given on the inverse (not the response) scale. 
@@ -431,8 +431,8 @@ it makes sense. For instance,</p>
 <pre class="r"><code>emmeans(RG4, &quot;source&quot;, type = &quot;response&quot;)</code></pre>
 <pre class="ro"><code>##  source response    SE df lower.CL upper.CL
 ##  fish       29.7 0.816 23     28.1     31.5
-##  soy        39.0 1.436 23     36.2     42.2
-##  skim       43.8 1.903 23     40.1     48.1
+##  soy        39.0 1.440 23     36.2     42.2
+##  skim       43.8 1.900 23     40.1     48.1
 ## 
 ## Results are averaged over the levels of: percent 
 ## Confidence level used: 0.95 
@@ -645,7 +645,7 @@ cat(&quot;&lt;/font&gt;\n&quot;)</code></pre>
 <td align="right">219.0</td>
 <td align="right">6</td>
 <td align="right">17.6</td>
-<td align="right">1.066</td>
+<td align="right">1.070</td>
 <td align="right">28</td>
 <td align="right">14.8</td>
 <td align="right">20.4</td>
@@ -680,9 +680,9 @@ information is retained in the reference grid). This produces results
 comparable to ordinary marginal means:</p>
 <pre class="r"><code>emmeans(mod4, &quot;percent&quot;, weights = &quot;cells&quot;)</code></pre>
 <pre class="ro"><code>##  percent emmean       SE df lower.CL upper.CL
-##        9 0.0315 0.001028 23   0.0293   0.0336
+##        9 0.0315 0.001030 23   0.0293   0.0336
 ##       12 0.0270 0.000969 23   0.0250   0.0290
-##       15 0.0260 0.001099 23   0.0238   0.0283
+##       15 0.0260 0.001100 23   0.0238   0.0283
 ##       18 0.0266 0.001300 23   0.0239   0.0293
 ## 
 ## Results are averaged over the levels of: source 
@@ -788,10 +788,10 @@ example:</p>
 <pre class="r"><code># equivalent to summary(emmeans(mod4, &quot;percent&quot;), level = 0.90, infer = TRUE))
 emmeans(mod4, &quot;percent&quot;, level = 0.90, infer = TRUE)</code></pre>
 <pre class="ro"><code>##  percent emmean       SE df lower.CL upper.CL t.ratio p.value
-##        9 0.0322 0.001032 23   0.0305   0.0340  31.240  &lt;.0001
+##        9 0.0322 0.001030 23   0.0305   0.0340  31.240  &lt;.0001
 ##       12 0.0270 0.000969 23   0.0253   0.0287  27.872  &lt;.0001
-##       15 0.0263 0.001104 23   0.0244   0.0282  23.802  &lt;.0001
-##       18 0.0241 0.001337 23   0.0218   0.0264  18.009  &lt;.0001
+##       15 0.0263 0.001100 23   0.0244   0.0282  23.802  &lt;.0001
+##       18 0.0241 0.001340 23   0.0218   0.0264  18.009  &lt;.0001
 ## 
 ## Results are averaged over the levels of: source 
 ## Results are given on the inverse (not the response) scale. 

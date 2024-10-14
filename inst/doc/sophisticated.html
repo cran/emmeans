@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.10.4" />
+<meta name="author" content="emmeans package, Version 1.10.5" />
 
 
 <title>Sophisticated models in emmeans</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Sophisticated models in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.10.4</h4>
+<h4 class="author">emmeans package, Version 1.10.5</h4>
 
 
 
@@ -161,9 +161,9 @@ models. As <code>nitro</code> has quantitative levels, we might want to
 test polynomial contrasts:</p>
 <pre class="r"><code>contrast(Oats.emm.n, &quot;poly&quot;)</code></pre>
 <pre class="ro"><code>##  contrast  estimate    SE   df t.ratio p.value
-##  linear      152.69 15.58 43.2   9.802  &lt;.0001
+##  linear      152.69 15.60 43.2   9.802  &lt;.0001
 ##  quadratic    -8.27  6.95 44.2  -1.190  0.2402
-##  cubic        -6.32 15.21 42.8  -0.415  0.6800
+##  cubic        -6.32 15.20 42.8  -0.415  0.6800
 ## 
 ## Results are averaged over the levels of: Variety 
 ## Degrees-of-freedom method: kenward-roger</code></pre>
@@ -274,28 +274,28 @@ values follow the same ordering as <code>cw.emm@grid</code>.</p>
 ##     5     63.2  1.49 45.5     60.2     66.2
 ##    10     91.1  4.11 45.8     83.0     99.5
 ##    15    124.5  7.81 46.1    109.3    140.8
-##    20    163.6 12.45 46.2    139.6    189.7
+##    20    163.6 12.40 46.2    139.6    189.7
 ## 
 ## Diet = 2:
 ##  Time response    SE   df lower.CL upper.CL
 ##     5     69.3  2.15 45.0     65.1     73.7
 ##    10    106.6  6.14 44.9     94.6    119.3
-##    15    152.3 11.97 44.9    129.1    177.4
+##    15    152.3 12.00 44.9    129.1    177.4
 ##    20    206.5 19.40 44.9    169.3    247.5
 ## 
 ## Diet = 3:
 ##  Time response    SE   df lower.CL upper.CL
 ##     5     72.8  2.20 45.0     68.4     77.3
 ##    10    121.3  6.56 44.9    108.5    134.9
-##    15    182.7 13.13 44.9    157.2    210.1
-##    20    256.9 21.69 44.9    215.1    302.4
+##    15    182.7 13.10 44.9    157.2    210.1
+##    20    256.9 21.70 44.9    215.1    302.4
 ## 
 ## Diet = 4:
 ##  Time response    SE   df lower.CL upper.CL
 ##     5     76.4  2.26 45.0     71.9     81.0
 ##    10    119.4  6.50 45.0    106.6    132.8
-##    15    172.4 12.75 45.0    147.7    199.1
-##    20    235.5 20.76 45.0    195.5    279.2
+##    15    172.4 12.80 45.0    147.7    199.1
+##    20    235.5 20.80 45.0    195.5    279.2
 ## 
 ## Degrees-of-freedom method: kenward-roger 
 ## Confidence level used: 0.95 

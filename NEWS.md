@@ -2,6 +2,15 @@
 title: "NEWS for the emmeans package"
 ---
 
+## emmeans 1.10.4.90xxxx
+  * Fix for long-standing `weights` bug in `lme()` (#356)
+  * Fix for inconsistent contrasts in case of missing levels (#508, #509)
+  * Fix for using nuisance variables with proportional weights (#510)
+  * New function `with_emm_options()` to run code with options temporarily set
+  * Tweak to optimal-digits output that shows `SE` to 3 significant digits
+  
+  
+
 ## emmeans 1.10.4
   * Refinements in tracking static offsets
   * Made d.f. consistent for `geeglm` and `glmgee` (#496)

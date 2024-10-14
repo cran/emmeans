@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.10.4" />
+<meta name="author" content="emmeans package, Version 1.10.5" />
 
 
 <title>Working with messy data</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Working with messy data</h1>
-<h4 class="author">emmeans package, Version 1.10.4</h4>
+<h4 class="author">emmeans package, Version 1.10.5</h4>
 
 
 
@@ -375,23 +375,13 @@ rg.usual</code></pre>
 ##     carb = 1, 2, 3, 4, 6, 8</code></pre>
 <pre class="r"><code>nrow(rg.usual@linfct)</code></pre>
 <pre class="ro"><code>## [1] 216</code></pre>
-<pre class="r"><code>rg.nuis = ref_grid(mtcars.lm, non.nuisance = &quot;cyl&quot;)</code></pre>
-<pre><code>## NOTE: A nesting structure was detected in the fitted model:
-##     cyl %in% am</code></pre>
-<pre class="r"><code>rg.nuis</code></pre>
+<pre class="r"><code>rg.nuis = ref_grid(mtcars.lm, non.nuisance = &quot;cyl&quot;)
+rg.nuis</code></pre>
 <pre class="ro"><code>## &#39;emmGrid&#39; object with variables:
 ##     cyl = 4, 6, 8
 ##     am = 0, 1
-##     disp = (predicted by other variables)
-##     hp = (predicted by other variables)
-##     drat = (predicted by other variables)
-##     wt = (predicted by other variables)
-##     vs = (predicted by other variables)
-##     gear = (predicted by other variables)
-##     carb = (predicted by other variables)
 ## Nuisance factors that have been collapsed by averaging:
-##     disp(1), hp(1), drat(1), wt(1), vs(2), gear(3), carb(6)
-## Nesting structure:  cyl %in% am</code></pre>
+##     disp(1), hp(1), drat(1), wt(1), vs(2), gear(3), carb(6)</code></pre>
 <pre class="r"><code>nrow(rg.nuis@linfct)</code></pre>
 <pre class="ro"><code>## [1] 6</code></pre>
 <p>Notice that we left <code>am</code> out of <code>non.nuisance</code>
@@ -413,8 +403,12 @@ EMMs either way, with slightly different annotations:</p>
 ## Confidence level used: 0.95</code></pre>
 <pre class="r"><code>emmeans(rg.nuis, ~ cyl * am)</code></pre>
 <pre class="ro"><code>##  cyl am emmean   SE df lower.CL upper.CL
-##    4  0   19.0 4.29 14     9.82     28.2
-##    6  0   19.7 3.32 14    12.56     26.8
+##    4  0   19.0 4.29 14    9.823     28.2
+##    6  0   19.7 3.32 14   12.556     26.8
+##    8  0   29.0 5.98 14   16.130     41.8
+##    4  1   15.4 4.29 14    6.206     24.6
+##    6  1   27.3 4.90 14   16.741     37.8
+##    8  1   11.2 5.56 14   -0.718     23.1
 ## 
 ## Results are averaged over the levels of: 7 nuisance factors 
 ## Confidence level used: 0.95</code></pre>
@@ -426,9 +420,7 @@ are averaged separately. Let’s try it to see how the estimates
 differ:</p>
 <pre class="r"><code>predict(emmeans(mtcars.lm, ~ cyl * am, non.nuis = c(&quot;cyl&quot;, &quot;am&quot;), 
                 wt.nuis = &quot;prop&quot;))</code></pre>
-<pre><code>## NOTE: A nesting structure was detected in the fitted model:
-##     cyl %in% am</code></pre>
-<pre class="ro"><code>## [1] 16.51254 17.17869</code></pre>
+<pre class="ro"><code>## [1] 16.51254 17.17869 26.45709 12.90600 24.75053  8.70546</code></pre>
 <pre class="r"><code>predict(emmeans(mtcars.lm, ~ cyl * am, weights = &quot;outer&quot;))</code></pre>
 <pre class="ro"><code>## [1] 16.51254 17.17869 26.45709 12.90600 24.75053  8.70546</code></pre>
 <p>These are the same as each other, but different from the
@@ -443,15 +435,17 @@ possible reference grid: Pass the <code>specs</code> argument to
 quote it to delay evaluation, and also use <code>all.vars()</code> if
 (and only if) <code>specs</code> is a formula:</p>
 <pre class="r"><code>emmeans(mtcars.lm, ~ gear | am, non.nuis = quote(all.vars(specs)))</code></pre>
-<pre><code>## NOTE: A nesting structure was detected in the fitted model:
-##     am %in% gear</code></pre>
-<pre class="ro"><code>## gear = 3, am = 0:
-##  emmean   SE df lower.CL upper.CL
-##    15.2 2.65 14     9.56     20.9
+<pre class="ro"><code>## am = 0:
+##  gear emmean   SE df lower.CL upper.CL
+##     3   15.2 2.65 14     9.56     20.9
+##     4   22.4 3.36 14    15.20     29.6
+##     5   30.0 4.54 14    20.28     39.7
 ## 
-## gear = 4, am = 1:
-##  emmean   SE df lower.CL upper.CL
-##    17.8 2.62 14    12.19     23.4
+## am = 1:
+##  gear emmean   SE df lower.CL upper.CL
+##     3   10.6 4.49 14     1.02     20.3
+##     4   17.8 2.62 14    12.19     23.4
+##     5   25.4 4.05 14    16.72     34.1
 ## 
 ## Results are averaged over the levels of: 6 nuisance factors, cyl 
 ## Confidence level used: 0.95</code></pre>
@@ -540,7 +534,7 @@ emmeans(neuralgia.glm, &quot;Treatment&quot;, counterfactuals = &quot;Treatment&
 <pre class="ro"><code>##  Treatment  prob     SE  df asymp.LCL asymp.UCL
 ##  A         0.283 0.0792 Inf    0.1280     0.439
 ##  B         0.221 0.0669 Inf    0.0894     0.352
-##  P         0.754 0.1041 Inf    0.5500     0.958
+##  P         0.754 0.1040 Inf    0.5500     0.958
 ## 
 ## Results are averaged over the levels of: .obs.no. 
 ## Confidence level used: 0.95</code></pre>
@@ -549,7 +543,7 @@ scale, which is the default. Let’s compare this with what we get without
 using counterfactuals (i.e., predicting at each covariate average):</p>
 <pre class="r"><code>emmeans(neuralgia.glm, &quot;Treatment&quot;, weights = &quot;prop&quot;, type = &quot;response&quot;)</code></pre>
 <pre class="ro"><code>##  Treatment  prob     SE  df asymp.LCL asymp.UCL
-##  A         0.196 0.1055 Inf    0.0617     0.475
+##  A         0.196 0.1050 Inf    0.0617     0.475
 ##  B         0.126 0.0822 Inf    0.0323     0.384
 ##  P         0.855 0.0852 Inf    0.6053     0.958
 ## 
@@ -581,12 +575,12 @@ after removing interactions involving <code>age</code>:</p>
 ## because &quot;tukey&quot; is only appropriate for one set of pairwise comparisons</code></pre>
 <pre class="ro"><code>## $emmeans
 ##  group      race     emmean    SE df lower.CL upper.CL
-##  FoodStamps Black      4.91 2.061 92    0.817    9.003
-##  NoAid      Black     -3.01 1.581 92   -6.148    0.133
-##  FoodStamps Hispanic  -1.18 5.413 92  -11.935    9.567
-##  NoAid      Hispanic   1.32 3.876 92   -6.382    9.014
+##  FoodStamps Black      4.91 2.060 92    0.817    9.003
+##  NoAid      Black     -3.01 1.580 92   -6.148    0.133
+##  FoodStamps Hispanic  -1.18 5.410 92  -11.935    9.567
+##  NoAid      Hispanic   1.32 3.880 92   -6.382    9.014
 ##  FoodStamps White      4.10 0.901 92    2.308    5.886
-##  NoAid      White     -1.44 1.114 92   -3.654    0.771
+##  NoAid      White     -1.44 1.110 92   -3.654    0.771
 ## 
 ## Results are averaged over the levels of: age 
 ## submodel: ~ age + group + race + group:race 
@@ -619,9 +613,9 @@ submodel with only the active factors:</p>
 <pre class="r"><code>emmeans(nutr.lm, ~ group * race, submodel = &quot;minimal&quot;)</code></pre>
 <pre class="ro"><code>##  group      race     emmean    SE df lower.CL upper.CL
 ##  FoodStamps Black     5.000 2.020 92    0.988    9.012
-##  NoAid      Black    -1.929 1.428 92   -4.765    0.908
-##  FoodStamps Hispanic  0.000 5.344 92  -10.614   10.614
-##  NoAid      Hispanic  2.500 3.779 92   -5.005   10.005
+##  NoAid      Black    -1.929 1.430 92   -4.765    0.908
+##  FoodStamps Hispanic  0.000 5.340 92  -10.614   10.614
+##  NoAid      Hispanic  2.500 3.780 92   -5.005   10.005
 ##  FoodStamps White     4.769 0.741 92    3.297    6.241
 ##  NoAid      White    -0.516 0.960 92   -2.422    1.390
 ## 
@@ -716,13 +710,13 @@ drug.emm</code></pre>
 <pre class="r"><code>pairs(drug.emm, by = &quot;route&quot;, reverse = TRUE)</code></pre>
 <pre class="ro"><code>## route = injection:
 ##  contrast                    estimate    SE df t.ratio p.value
-##  Charloisazepam - Bovineumab     9.17 1.182  9   7.757  &lt;.0001
+##  Charloisazepam - Bovineumab     9.17 1.180  9   7.757  &lt;.0001
 ## 
 ## route = oral:
 ##  contrast                    estimate    SE df t.ratio p.value
-##  Herefordmycin - Angustatin     -8.75 1.121  9  -7.805  0.0001
+##  Herefordmycin - Angustatin     -8.75 1.120  9  -7.805  0.0001
 ##  Mollycoddle - Angustatin       -9.92 0.989  9 -10.030  &lt;.0001
-##  Mollycoddle - Herefordmycin    -1.17 1.182  9  -0.987  0.6026
+##  Mollycoddle - Herefordmycin    -1.17 1.180  9  -0.987  0.6026
 ## 
 ## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre>
 <p>In the latter result, the contrast itself becomes a nested factor in
