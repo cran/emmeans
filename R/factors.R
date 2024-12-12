@@ -306,6 +306,33 @@ add_grouping = function(object, newname, refname, newlevs, ...) {
     object
 }
 
+#' @rdname manip-factors
+#' @export
+#' 
+#' @section The \code{add_submodels} function:
+#' This function updates \code{object} with a named list of submodels specified in 
+#' \code{...}. These are \code{rbind}ed together and the corresponding rows
+#' for each submodel are assigned a factor named \code{newname} with levels 
+#' equal to the names in \code{...}. This facilitates comparing estimates obtained
+#' from different submodels. For this to work, the underlying model object must be of
+#' a class supported by the \code{submodel} argument of \code{\link{update.emmGrid}}.
+#' 
+#' @examples
+#' ## Using 'add_submodels' to compare adjusted and unadjusted means
+#' fibint.lm <- lm(strength ~ machine * diameter, data = fiber)
+#' fibsub <- add_submodels(emmeans(fibint.lm, "machine"), 
+#'     full = ~ ., additive = ~ . - machine:diameter, unadj = ~ machine)
+#' emmeans(fibsub, pairwise ~ model | machine, adjust = "none")
+#' 
+add_submodels = function(object, ..., newname = "model") {
+    all = lapply(list(...), \(s) update(object, submodel = s))
+    class(all) = c("emm_list", "list")
+    comb = rbind(all)
+    levels(comb)[[newname]] = names(all)
+    comb
+}
+
+
 
 #' @rdname manip-factors
 #' @param pos Integer vector consisting of some permutation of the sequence
@@ -329,6 +356,7 @@ add_grouping = function(object, newname, refname, newlevs, ...) {
 #' you must add the arguments \code{style = "factor"} and \code{nesting.order = TRUE}.
 #' 
 #' @examples
+#' # Permuting factor levels...
 #' str(v.c.g)
 #' str(permute_levels(v.c.g, "cyl", c(2,3,1)))
 #' 
