@@ -22,7 +22,7 @@ eff_size(pigs.emm.s, sigma = sigma(pigs.lm), edf = 23)
 eff_size(pigs.emm.s, sigma = sigma(pigs.lm), edf = Inf)
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  eff_size(pairs(pigs.emm.s), sigma = sigma(pigs.lm), edf = 23, method = "identity")
+# eff_size(pairs(pigs.emm.s), sigma = sigma(pigs.lm), edf = 23, method = "identity")
 
 ## ----fig.height = 1.5, fig.alt = "side-by-side CIs with comparison arrows added"----
 plot(pigs.emm.s, comparisons = TRUE)

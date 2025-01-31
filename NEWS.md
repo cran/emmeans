@@ -2,6 +2,26 @@
 title: "NEWS for the emmeans package"
 ---
 
+## emmeans 1.10-7
+  * Spelling changes in several vignettes
+  * We have completely revamped the design of reference grids involving
+    counterfactuals. Now, if we specify counterfactuals `A` and `B`, the
+    reference grid comprises combinations of `A`, `B`, `actual_A`, and `actual_B`
+    the latter two used to track the original settings of `A` and `B` in the dataset.
+    We always average over combinations of these factors. The previous code was
+    a memory hog, and we have made it much more efficient for large datasets.
+  * `emmeans()` has also been revised to do special handling of counterfactual
+    reference grids. Whenever we average over a counterfactual `B`, we only
+    use the cases where `B == actual_B`, thus obtaining the same results as 
+    would be obtained when `B` is not regarded as a counterfactual.
+  * Tweaks to `regrid()` to create `@post.beta` slot correctly when there are 
+    non-estimable cases.
+  * Bug fix for scoping in `subset.emmGrid()` (#518)
+  * Changed `print.emmGrid()` so that it calls `show()` unless `export = TRUE`.
+    This change was made because I noticed that **pkgdown** uses `print()` rather 
+    than `show()` to display example results.
+  
+
 ## emmeans 1.10.6
   * Added new `add_submodels()` function that allows for comparison od estimates
     from different submodels (when supported)
