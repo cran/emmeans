@@ -52,10 +52,10 @@ mtcars.lm <- lm(mpg ~ factor(cyl)*am + disp + hp + drat + log(wt) + vs +
 ## -----------------------------------------------------------------------------
 rg.usual <- ref_grid(mtcars.lm)
 rg.usual
-nrow(rg.usual@linfct)
+nrow(linfct(rg.usual))
 rg.nuis = ref_grid(mtcars.lm, non.nuisance = "cyl")
 rg.nuis
-nrow(rg.nuis@linfct)
+nrow(linfct(rg.nuis))
 
 ## -----------------------------------------------------------------------------
 emmeans(rg.usual, ~ cyl * am)

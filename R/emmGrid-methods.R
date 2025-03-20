@@ -108,21 +108,22 @@ str.emmGrid <- function(object, ...) {
 
 
 #' @rdname emmGrid-methods
-#' @param export Logical value. If \code{FALSE}, the object is printed. 
+#' @param export Logical value. If \code{FALSE}, the object is printed.
 #'   If \code{TRUE}, a list is invisibly returned, which contains character
-#'   elements named \code{summary} and \code{annotations} that may be saved 
-#'   or displayed as the user sees fit. \code{summary} is a character matrix 
+#'   elements named \code{summary} and \code{annotations} that may be saved
+#'   or displayed as the user sees fit. \code{summary} is a character matrix
 #'   (or list of such matrices, if a \code{by} variable is in effect).
-#'   \code{annotations} is a character vector of the annotations that would 
+#'   \code{annotations} is a character vector of the annotations that would
 #'   have been printed below the summary or summaries.
 #' @method print emmGrid
 #' @param x An \code{emmGrid} object
 #' @export
 print.emmGrid = function(x, ..., export = FALSE) {
-    if(export) 
-        print(summary.emmGrid(x, ...), export = export)
-    else
-        show(x)
+    print(summary.emmGrid(x, ...), export = export)
+    # if(export)
+    #     print(summary.emmGrid(x, ...), export = export)
+    # else
+    #     show(x)
 }
 
 ### Former print method which I changed to work around a bug in pkgdown
@@ -172,6 +173,18 @@ vcov.emmGrid = function(object, ..., sep = get_emm_option("sep")) {
 }
 
 
+#' @rdname emmGrid-methods
+#'
+#' @returns The \code{linfct} function and method returns the \code{linfct} slot of \code{object}.
+#' @export
+linfct = function(object, ...)
+    UseMethod("linfct")
+
+#' @rdname emmGrid-methods
+#' @export
+linfct.default = function(object, ...) {
+    attr(object, "linfct")
+}
 
 
 # Method to alter contents of misc slot

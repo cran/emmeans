@@ -4,6 +4,8 @@
 \alias{str.emmGrid}
 \alias{print.emmGrid}
 \alias{vcov.emmGrid}
+\alias{linfct}
+\alias{linfct.default}
 \title{Miscellaneous methods for \code{emmGrid} objects}
 \usage{
 \method{str}{emmGrid}(object, ...)
@@ -11,6 +13,10 @@
 \method{print}{emmGrid}(x, ..., export = FALSE)
 
 \method{vcov}{emmGrid}(object, ..., sep = get_emm_option("sep"))
+
+linfct(object, ...)
+
+\method{linfct}{default}(object, ...)
 }
 \arguments{
 \item{object}{An \code{emmGrid} object}
@@ -19,12 +25,12 @@
 
 \item{x}{An \code{emmGrid} object}
 
-\item{export}{Logical value. If \code{FALSE}, the object is printed. 
+\item{export}{Logical value. If \code{FALSE}, the object is printed.
 If \code{TRUE}, a list is invisibly returned, which contains character
-elements named \code{summary} and \code{annotations} that may be saved 
-or displayed as the user sees fit. \code{summary} is a character matrix 
+elements named \code{summary} and \code{annotations} that may be saved
+or displayed as the user sees fit. \code{summary} is a character matrix
 (or list of such matrices, if a \code{by} variable is in effect).
-\code{annotations} is a character vector of the annotations that would 
+\code{annotations} is a character vector of the annotations that would
 have been printed below the summary or summaries.}
 
 \item{sep}{separator for pasting levels in creating row and column
@@ -33,6 +39,8 @@ names for \code{vcov()} results}
 \value{
 The \code{vcov} method returns a symmetric matrix of variances and
   covariances for \code{predict.emmGrid(object, type = "lp")}
+
+The \code{linfct} function and method returns the \code{linfct} slot of \code{object}.
 }
 \description{
 Miscellaneous methods for \code{emmGrid} objects

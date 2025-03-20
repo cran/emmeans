@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.10.7" />
+<meta name="author" content="emmeans package, Version 1.11.0" />
 
 
 <title>Working with messy data</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Working with messy data</h1>
-<h4 class="author">emmeans package, Version 1.10.7</h4>
+<h4 class="author">emmeans package, Version 1.11.0</h4>
 
 
 
@@ -373,7 +373,7 @@ rg.usual</code></pre>
 ##     vs = 0, 1
 ##     gear = 3, 4, 5
 ##     carb = 1, 2, 3, 4, 6, 8</code></pre>
-<pre class="r"><code>nrow(rg.usual@linfct)</code></pre>
+<pre class="r"><code>nrow(linfct(rg.usual))</code></pre>
 <pre class="ro"><code>## [1] 216</code></pre>
 <pre class="r"><code>rg.nuis = ref_grid(mtcars.lm, non.nuisance = &quot;cyl&quot;)
 rg.nuis</code></pre>
@@ -382,7 +382,7 @@ rg.nuis</code></pre>
 ##     am = 0, 1
 ## Nuisance factors that have been collapsed by averaging:
 ##     disp(1), hp(1), drat(1), wt(1), vs(2), gear(3), carb(6)</code></pre>
-<pre class="r"><code>nrow(rg.nuis@linfct)</code></pre>
+<pre class="r"><code>nrow(linfct(rg.nuis))</code></pre>
 <pre class="ro"><code>## [1] 6</code></pre>
 <p>Notice that we left <code>am</code> out of <code>non.nuisance</code>
 and hence included it in <code>nuisance</code>. However, it interacts
