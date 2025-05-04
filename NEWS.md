@@ -1,6 +1,36 @@
 ---
 title: "NEWS for the emmeans package"
 ---
+
+## emmeans 1.11.1
+  * Modified `as.data.frame.summary_emm` so it can't loop infinitely (#525)
+  * Added documentation to `ref_grid` and `FAQs` vignette to clarify how we
+    use `all.vars()` to identify predictors, e.g. if a model formula contains 
+    `log(dose)`, the covariate is `dose`, not `log(dose)` (#523)
+  * **UPCOMING:** In ordinal-model support, changed all estimator names to match mode names
+    (this was true for `"prob"` and `"exc.prob"`, but not `"cum.prob"`).
+    [This change is on hold as it breaks another package.]
+  * Added a contrast function `opoly.emmc()` that does not rescale the coefficients
+    to integers, and allows unequally-spaced levels to be specified as `scores` 
+    (#527). In addition, unlike `poly.emmc`, `opoly.emmc` supports the
+    `exclude` and `include` arguments.
+  * Also added contrast functions `helmert.emmc` and `nrmlz.emmc`. The latter is
+    a wrapper that can be used to normalize the contrast coefficients from any
+    other `.emmc` function.
+  * Fixed a scoping issue in `contrast.emmGrid` to make a custom `.emmc` function
+    easier to find. This bug prevented some examples from being rendered correctly
+    in all contexts.
+  * Restored the `joint_tests()` code that was omitted in 1.11.0 because apparently
+    it was right the first time. (#528)
+  * Added an argument `npts` to `make.meanint()` and `make.symmint()` to facilitate
+    generating an interval with more than two points. 
+  * Fix to `test()` for situations with non-estimability and infinite df (#528)
+  * Added `linfct.emm_list())` method
+  * Made `emmobj()` less rigid (so that `as.emmGrid(as.list(obj))` more faithfully
+    reproduces `obj`)
+  * Added an optional `drop` argument (`TRUE` by default) to the `emm_list` methods.
+  * Added optional arguments `se.bhat` and `se.diff` to `emmobj()` (#529)
+  
 ## emmeans 1.11.0
   * Added a `linfct()` generic and default method that returns `object@linfct`
   * Removed some code in `joint_tests()` that prevented some terms from
@@ -10,7 +40,7 @@ title: "NEWS for the emmeans package"
     (#522).
     This creates a list of all sets of means (and contrasts), thus creating 
     an `emm_list` object. This also works in `emtrends()`.
-  * In certain `emm_list` methods, ee changed the default for `which` from
+  * In certain `emm_list` methods, we changed the default for `which` from
     `1` to to `NULL`
 
 ## emmeans 1.10.7

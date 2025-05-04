@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.11.0" />
+<meta name="author" content="emmeans package, Version 1.11.1" />
 
 
 <title>FAQs for emmeans</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">FAQs for emmeans</h1>
-<h4 class="author">emmeans package, Version 1.11.0</h4>
+<h4 class="author">emmeans package, Version 1.11.1</h4>
 
 
 
@@ -80,6 +80,7 @@ interact</a></li>
 factor(s)</a></li>
 <li><a href="#polys">I have covariate(s) and am fitting a polynomial
 model</a></li>
+<li><a href="#trancovs">I have transformed covariate(s)</a></li>
 <li><a href="#CIerror">Some “significant” comparisons have overlapping
 confidence intervals</a></li>
 <li><a href="#notfactor">All my pairwise comparisons have the same
@@ -205,6 +206,40 @@ reference grid uses the mean of each covariate – and
 that the covariates are set consistently with respect to the model. See
 <a href="basics.html#depcovs">this subsection of the “basics”
 vignette</a> for an example.</p>
+</div>
+<div id="trancovs" class="section level2">
+<h2>I have transformed covariate(s)</h2>
+<p>Suppose you have this code:</p>
+<pre><code>mod &lt;- lm(log(strength) ~ machine + sqrt(diameter), data = fiber)
+emmeans(mod, &quot;machine&quot;)</code></pre>
+<p>This yields adjusted means of <code>log(strength)</code> for each
+machine. But be aware that these results are predictions at the mean
+<code>diameter</code>, not at the mean <code>sqrt(diameter)</code>. That
+is because <strong>emmeans</strong> determines the variables in a model
+via <code>all.vars()</code>:</p>
+<pre><code>all.vars(formula(mod))
+## [1] &quot;strength&quot; &quot;machine&quot;  &quot;diameter&quot;</code></pre>
+<p>… and note that this includes <code>diameter</code>, not
+<code>sqrt(diameter)</code>.</p>
+<p>It is quite reasonable to want the adjusted means computed at
+<code>mean(sqrt(diameter))</code>, and if you want that to be done, your
+options are:</p>
+<ol style="list-style-type: decimal">
+<li>Create a separate variable for <code>sqrt(diameter)</code> and use
+that in fitting the model</li>
+<li>Use
+<code>at = list(diameter = mean(sqrt(fiber$diameter))^2)</code></li>
+<li>Use <code>cov.reduce = \(x) mean(sqrt(x))^2</code> (but this will be
+used for <em>all</em> covariates)</li>
+</ol>
+<p>In (2) and (3), be careful that the transformed means be
+back-transformed.</p>
+<p>Why can’t we just use the means of the transformed predictors
+automatically? Because in <strong>R</strong>, lots of model formulas
+include function calls for lots of different reasons, and it would be
+very difficult to identify which are intended to be treated as
+transformed predictors.</p>
+<p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="CIerror" class="section level2">
 <h2>Some “significant” comparisons have overlapping confidence

@@ -49,6 +49,10 @@ ply
 coef(ply)
 
 ## -----------------------------------------------------------------------------
+nrmlz.emmc(1:4, family = "helmert")
+contrast(pigs.emm.s, "nrmlz", family = "pairwise")
+
+## -----------------------------------------------------------------------------
 org.aov <- aov(sales1 ~ day + Error(store), data = oranges,
                contrasts = list(day = "contr.sum"))
 org.emml <- emmeans(org.aov, consec ~ day)

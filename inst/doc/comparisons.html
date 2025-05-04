@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.11.0" />
+<meta name="author" content="emmeans package, Version 1.11.1" />
 
 
 <title>Comparisons and contrasts in emmeans</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Comparisons and contrasts in emmeans</h1>
-<h4 class="author">emmeans package, Version 1.11.0</h4>
+<h4 class="author">emmeans package, Version 1.11.1</h4>
 
 
 
@@ -280,10 +280,10 @@ ones that are very close.</p>
 may use <code>coef()</code> to see the coefficients of these linear
 functions:</p>
 <pre class="r"><code>coef(pairs(pigs.emm.s))</code></pre>
-<pre class="ro"><code>##      source c.1 c.2 c.3
-## fish   fish   1   1   0
-## soy     soy  -1   0   1
-## skim   skim   0  -1  -1</code></pre>
+<pre class="ro"><code>##   source c.1 c.2 c.3
+## 1   fish   1   1   0
+## 2    soy  -1   0   1
+## 3   skim   0  -1  -1</code></pre>
 <p>The pairwise comparisons correspond to columns of the above results.
 For example, the first pairwise comparison, <code>fish - soy</code>,
 gives coefficients of 1, -1, and 0 to fish, soy, and skim, respectively.
@@ -309,11 +309,11 @@ ply</code></pre>
 ## Results are averaged over the levels of: source 
 ## Results are given on the log (not the response) scale.</code></pre>
 <pre class="r"><code>coef(ply)</code></pre>
-<pre class="ro"><code>##           percent c.1 c.2 c.3
-## percent9        9  -3   1  -1
-## percent12      12  -1  -1   3
-## percent15      15   1  -1  -3
-## percent18      18   3   1   1</code></pre>
+<pre class="ro"><code>##   percent c.1 c.2 c.3
+## 1       9  -3   1  -1
+## 2      12  -1  -1   3
+## 3      15   1  -1  -3
+## 4      18   3   1   1</code></pre>
 <p>We obtain tests for the linear, quadratic, and cubic trends. The
 coefficients are those that can be found in tables in many
 experimental-design texts. It is important to understand that the
@@ -329,7 +329,35 @@ linearly. It <em>does</em> test the linear trend, however.</p>
 same as <code>Pairs()</code> and
 <code>pairs(..., reverse = TRUE)</code>. See
 <code>help(&quot;contrast-methods&quot;)</code> for details.</p>
+<div id="nrmlze" class="section level3">
+<h3>Normalized contrasts</h3>
+<!-- @index Normalized contrasts; `nrmlz.emmc`; Contrasts!Normalized -->
+<p>Sometimes users like contrast coefficients to be normalized – i.e.,
+the sum of the squares of each set of contrast coefficients is equal to
+1. This is possible with any contrast family by specifying
+<code>&quot;nrmlz&quot;</code> as the method and the desired contrast family as
+the <code>family</code> argument. For example,</p>
+<pre class="r"><code>nrmlz.emmc(1:4, family = &quot;helmert&quot;)</code></pre>
+<pre class="ro"><code>##   2 vs earlier 3 vs earlier 4 vs earlier
+## 1   -0.7071068   -0.4082483   -0.2886751
+## 2    0.7071068   -0.4082483   -0.2886751
+## 3    0.0000000    0.8164966   -0.2886751
+## 4    0.0000000    0.0000000    0.8660254</code></pre>
+<pre class="r"><code>contrast(pigs.emm.s, &quot;nrmlz&quot;, family = &quot;pairwise&quot;)</code></pre>
+<pre class="ro"><code>##  contrast    estimate     SE df t.ratio p.value
+##  fish - soy   -0.1929 0.0374 23  -5.153  0.0001
+##  fish - skim  -0.2845 0.0383 23  -7.428  &lt;.0001
+##  soy - skim   -0.0916 0.0375 23  -2.442  0.0570
+## 
+## Results are averaged over the levels of: percent 
+## Results are given on the log (not the response) scale. 
+## P value adjustment: tukey method for comparing a family of 3 estimates</code></pre>
+<p>Note that the above estimates and SEs differ from those in the
+example at <a href="#pairwise">the beginning of this vignette</a>, but
+the the <em>t</em> ratios and <em>P</em> values are the same, because
+all we have done is rescale those comparisons.</p>
 <p><a href="#contents">Back to Contents</a></p>
+</div>
 </div>
 <div id="formulas" class="section level2">
 <h2>Formula interface</h2>
@@ -359,9 +387,9 @@ org.emml</code></pre>
 ## $contrasts
 ##  contrast    estimate   SE df t.ratio p.value
 ##  day2 - day1   -0.772 3.78 25  -0.204  0.9997
-##  day3 - day2    6.658 3.78 25   1.763  0.3243
-##  day4 - day3   -5.716 3.78 25  -1.513  0.4677
-##  day5 - day4    4.882 3.78 25   1.293  0.6129
+##  day3 - day2    6.658 3.78 25   1.763  0.3245
+##  day4 - day3   -5.716 3.78 25  -1.513  0.4680
+##  day5 - day4    4.882 3.78 25   1.293  0.6126
 ##  day6 - day5   -1.321 3.78 25  -0.350  0.9965
 ## 
 ## P value adjustment: mvt method for 5 tests</code></pre>

@@ -179,7 +179,10 @@ emmeans.list = function(object, specs, ...) {
 #' a convenience, but it can create a sizeable \code{emm_list} object and it is
 #' coded rather inefficiently. While it is permissible to include contrasts
 #' via a \code{contr} argument or formula left-hand-side, we recommend instead
-#' doing this in a follow-up test with \code{\link{contrast.emm_list}}.
+#' doing this in a follow-up test with \code{\link{contrast.emm_list}}. \emph{Caution}:
+#' In models with nested fixed effects, using \code{.} creates results where
+#' nested factors interact with nesting factors; in those cases, any contrasts 
+#' you specify will go across nests, which is likely not what is desired.
 #' 
 #' In the special case where the mean (or weighted mean) of all the predictions
 #' is desired, specify \code{specs} as \code{~ 1} or \code{"1"}.
@@ -608,6 +611,12 @@ emmeans = function(object, specs, by = NULL,
 #'   such a sample is unavailable.
 #' @param nesting Nesting specification as in \code{\link{ref_grid}}. This is
 #'   ignored if \code{model.info} is supplied.
+#' @param se.bhat,se.diff Alternative way of specifying \code{V}. If \code{se.bhat}
+#'   is specified, \code{V} is constructed using \code{se.bhat}, the standard errors of \code{bhat},
+#'   and \code{se.diffs}, the standard errors of its pairwise differences. \code{se.diff}
+#'   should be a vector of length \code{k*(k-1)/2} where \code{k} is the length
+#'   of \code{se.bhat}, and its elements should be in the order \code{12,13,...,1k,23,...2k,...}.
+#'   If \code{se.diff} is missing, \code{V} is computed as if the \code{bhat} are independent.
 #' @param ... Arguments passed to \code{\link{update.emmGrid}}
 #' 
 #' @seealso \code{\link{qdrg}}, an alternative that is useful when starting 
@@ -628,17 +637,35 @@ emmeans = function(object, specs, by = NULL,
 #' Satt.df <- function(x, dfargs)
 #'     sum(x * dfargs$v)^2 / sum((x * dfargs$v)^2 / (dfargs$n - 1))
 #'     
-#' expt.rg <- emmobj(bhat = ybar, V = diag(se2),
+#' expt.emm <- emmobj(bhat = ybar, V = diag(se2),
 #'     levels = levels, linfct = diag(c(1, 1, 1, 1)),
 #'     df = Satt.df, dfargs = list(v = se2, n = n), estName = "mean")
-#' plot(expt.rg)
 #' 
-#' ( trt.emm <- emmeans(expt.rg, "trt") )
-#' ( dose.emm <- emmeans(expt.rg, "dose") )
+#' ( trt.emm <- emmeans(expt.emm, "trt") )
+#' ( dose.emm <- emmeans(expt.emm, "dose") )
 #' 
 #' rbind(pairs(trt.emm), pairs(dose.emm), adjust = "mvt")
+#' 
+#' ### Create an emmobj from means and SEs
+#' ### (This illustration reproduces the MOats example for Variety = "Victory")
+#' means = c(71.50000,  89.66667, 110.83333, 118.50000)
+#' semeans = c(5.540591, 6.602048, 8.695358, 7.303221)
+#' sediffs = c(7.310571,  9.894724,  7.463615, 10.248306,  4.935698,  8.694507)
+#' foo = emmobj(bhat = means, se.bhat = semeans, se.diff = sediffs, 
+#'              levels = list(nitro = seq(0, .6, by = .2)), df = 10)
+#' plot(foo, comparisons = TRUE)
+#' 
 emmobj = function(bhat, V, levels, linfct = diag(length(bhat)), df = NA, dffun, dfargs = list(), 
-                  post.beta = matrix(NA), nesting = NULL, ...) {
+                  post.beta = matrix(NA), nesting = NULL, 
+                  se.bhat, se.diff, ...) {
+    if (!missing(se.bhat)) {
+        V = D = diag(vb <- se.bhat^2)
+        if (!missing(se.diff)) {
+            V[lower.tri(V)] = se.diff^2
+            V = (-V - t(V) + sweep(D, 1, vb, "+") + + sweep(D, 2, vb, "+"))/2
+            diag(V) = vb
+        }
+    }
     if ((nrow(V) != ncol(V)) || (nrow(V) != ncol(linfct)) || (length(bhat) != ncol(linfct)))
         stop("bhat, V, and linfct are incompatible")
     if (!is.list(levels))
@@ -665,10 +692,19 @@ emmobj = function(bhat, V, levels, linfct = diag(length(bhat)), df = NA, dffun, 
         dffun = function(x, dfargs) dfargs$df
         dfargs = list(df = df)
     }
-    misc = list(estName = "estimate", estType = "prediction", infer = c(TRUE,FALSE), level = .95,
-                adjust = "none", famSize = nrow(linfct), 
+    ### let's not be so brute-force about what's needed in misc
+    # misc = list(estName = "estimate", estType = "prediction", infer = c(TRUE,FALSE), level = .95,
+    #             adjust = "none", famSize = nrow(linfct), 
+    #             avgd.over = character(0), pri.vars = pri.vars,
+    #             methDesc = "emmobj", display = dotargs$display, .pairby = dotargs$.pairby)
+    dflt = list(estName = "estimate", estType = "prediction", infer = c(TRUE,FALSE), level = .95,
+                adjust = "none", famSize = nrow(linfct),
                 avgd.over = character(0), pri.vars = pri.vars,
-                methDesc = "emmobj", display = dotargs$display)
+                methDesc = "emmobj")
+    misc = dflt[setdiff(names(dflt), names(dotargs))]  # use defaults when not specified
+    nm = setdiff(names(dotargs), c(names(misc), "extras", "model.info")) # otherwise use dots
+    misc = c(misc, dotargs[nm])
+    
     result = new("emmGrid", model.info=model.info, roles=roles, grid=grid,
                  levels = levels, matlevs=list(),
                  linfct=linfct, bhat=bhat, nbasis=all.estble, V=V,

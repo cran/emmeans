@@ -342,8 +342,10 @@ contrast.emmGrid = function(object, method = "eff", interaction = FALSE,
     }
     else if (is.character(method)) {
         fn = paste(method, "emmc", sep=".")
-        method = if (exists(fn, mode="function")) 
-            get(fn) 
+        if (exists(fn, mode = "function")) 
+            method = get(fn) 
+        else if (exists(fn, mode = "function", envir = parent.frame()))
+            method = get(fn, envir = parent.frame()) 
         else 
             stop(paste("Contrast function '", fn, "' not found", sep=""))
         if(!missing(wts) && any(is.na(wts))) {
@@ -608,6 +610,7 @@ coef.emmGrid = function(object, ...) {
         return (NULL)
     }
     cc = as.data.frame(t(cc))
+    rownames(cc) = NULL
     names(cc) = paste("c", seq_len(ncol(cc)), sep = ".")
     cbind(object@misc$orig.grid, cc)
 }
