@@ -207,7 +207,7 @@ emm_basis.clm = function (object, trms, xlev, grid,
                         lambda = env$lambda)
         }
         misc$tran = link
-        misc$inv.lbl = "cumprob" ### change to "cum.prob" in future
+        misc$inv.lbl = "cum.prob"
         misc$offset.mult = -1
         if (!is.null(S))
             X = cbind(X, S)
@@ -237,7 +237,7 @@ emm_basis.clm = function (object, trms, xlev, grid,
         object@bhat = 1 - object@bhat
         if(!is.null(object@post.beta[1]))
             object@post.beta = 1 - object@post.beta
-        object@misc$estName = "cumprob" ### change to "cum.prob" in next update
+        object@misc$estName = "cum.prob"
     }
     if (mode == "prob") {
         object = .clm.prob.grid(object, ...)
