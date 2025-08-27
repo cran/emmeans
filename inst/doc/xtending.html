@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.11.2" />
+<meta name="author" content="emmeans package, Version 1.11.2.8" />
 
 
 <title>For developers: Extending emmeans</title>
@@ -58,7 +58,7 @@ ul.task-list{list-style: none;}
 
 <h1 class="title toc-ignore">For developers: Extending
 <strong>emmeans</strong></h1>
-<h4 class="author">emmeans package, Version 1.11.2</h4>
+<h4 class="author">emmeans package, Version 1.11.2.8</h4>
 
 
 
@@ -183,7 +183,7 @@ method. Look at the one for <code>lm</code> objects:</p>
 ##     recover_data(fcall, delete.response(terms(object)), object$na.action, 
 ##         frame = frame, pwts = weights(object), ...)
 ## }
-## &lt;bytecode: 0x0000024ce678dd90&gt;
+## &lt;bytecode: 0x000001d7a065cc40&gt;
 ## &lt;environment: namespace:emmeans&gt;</code></pre>
 <p>Note that all it does is obtain the <code>call</code> component and
 call the method for class <code>call</code>, with additional arguments
@@ -295,7 +295,7 @@ Following this advice, let’s take a look at it:</p>
 ##     X &lt;- model.matrix(Terms, m, contrasts.arg = object$contrasts)
 ##     drop(X %*% object$coefficients)
 ## }
-## &lt;bytecode: 0x0000024ce0aa9578&gt;
+## &lt;bytecode: 0x000001d79a10a468&gt;
 ## &lt;environment: namespace:MASS&gt;</code></pre>
 <div id="eblqs" class="section level6">
 <h6></h6>
@@ -471,10 +471,11 @@ some of its S3 methods for <code>recover_data</code> and/or
 <code>methods(&quot;emm_basis&quot;)</code> to discover which ones. It may be that
 all you need is to invoke one of those methods and perhaps make some
 small changes—especially if your model-fitting algorithm makes heavy use
-of an existing model type supported by <strong>emmeans</strong>. For
-those methods that are not exported, use <code>recover_data()</code> and
-<code>.emm_basis()</code>, which run in <strong>emmeans</strong>’s
-namespace, thus providing access to all available methods..</p>
+of an existing model type supported by <strong>emmeans</strong>. <!-- 
+For those methods that are not exported, use `.recover_data()`
+and `.emm_basis()`, which run in **emmeans**'s namespace, thus providing access
+to all available methods.
+--></p>
 <p>A few additional functions are exported because they may be useful to
 developers. They are as follows:</p>
 <ul>
