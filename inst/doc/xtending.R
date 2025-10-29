@@ -20,6 +20,23 @@ library(emmeans)
 emmeans(fake.rlm, ~ B | A)
 
 ## -------------------------------------------------------------------------------------------------
+require(robmixglm, quietly = TRUE)
+fit <- robmixglm(inverse(conc) ~ source + factor(percent), family = "gamma",
+                 data = pigs, cores = 1)
+
+## -------------------------------------------------------------------------------------------------
+qdrg.robmixglm <- function(object, data = eval(object$call$data), ...) {
+    coef <- coef(object)
+    idx <- seq_along(coef)
+    qdrg(formula = formula(object), data = data, coef = coef,
+         vcov = object$fit@vcov[idx, idx, drop = FALSE], ...)
+}
+
+## -------------------------------------------------------------------------------------------------
+rg <- qdrg(object = fit, link = "log")
+emmeans(rg, ~ ., type = "response")
+
+## -------------------------------------------------------------------------------------------------
 fake.lts = ltsreg(y ~ A * B, data = fake)
 
 ## -------------------------------------------------------------------------------------------------

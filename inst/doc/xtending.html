@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 1.11.2.8" />
+<meta name="author" content="emmeans package, Version 2.0.0" />
 
 
 <title>For developers: Extending emmeans</title>
@@ -58,7 +58,7 @@ ul.task-list{list-style: none;}
 
 <h1 class="title toc-ignore">For developers: Extending
 <strong>emmeans</strong></h1>
-<h4 class="author">emmeans package, Version 1.11.2.8</h4>
+<h4 class="author">emmeans package, Version 2.0.0</h4>
 
 
 
@@ -74,6 +74,7 @@ function.</p>
 <li><a href="#intro">Introduction</a></li>
 <li><a href="#dataex">Data example</a></li>
 <li><a href="#rlm">Supporting <code>rlm</code> objects</a></li>
+<li><a href="#qdrg">Quick and dirty support</a></li>
 <li><a href="#lqs">Supporting <code>lqs</code> objects</a></li>
 <li><a href="#communic">Communication between methods</a></li>
 <li><a href="#hooks">Hook functions</a></li>
@@ -160,6 +161,79 @@ objects inherit from <code>lm</code>, which is supported by the
 enough different to create any problems.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
+<div id="qdrg" class="section level2">
+<h2>Quick and dirty support</h2>
+<!-- @index `qdrg()`!S3 methods; **robmixglm** example; -->
+<p>Later, we will talk about how to fully support a model object in
+<strong>emmeans</strong>. But it is often very easy to provide
+<em>partial</em> support via the <code>qdrg()</code> (“quick and dirty
+reference grid”) function. <code>qdrg()</code> creates a reference grid
+for a model, and that reference grid can subsequently be used in a call
+to <code>emmeans()</code> or many other functions (but not
+<code>emtrends()</code>). In the past, <code>qdrg()</code> was just a
+standalone function; but now, it can dispath S3 methods based on the
+class of its <code>object</code> argument. Consider for example a model
+fitted in the <strong>robmixglm</strong> package:</p>
+<pre class="r"><code>require(robmixglm, quietly = TRUE)</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;robmixglm&#39;:
+##   method            from
+##   print.outlierTest car</code></pre>
+<pre class="r"><code>fit &lt;- robmixglm(inverse(conc) ~ source + factor(percent), family = &quot;gamma&quot;,
+                 data = pigs, cores = 1)</code></pre>
+<p>Examining the model object <code>fmx</code>, it is not at all obvious
+how to get the needed parameters for <code>qdrg()</code>; but they are
+buried in there. Here is an S3 method that supports this model
+class:</p>
+<pre class="r"><code>qdrg.robmixglm &lt;- function(object, data = eval(object$call$data), ...) {
+    coef &lt;- coef(object)
+    idx &lt;- seq_along(coef)
+    qdrg(formula = formula(object), data = data, coef = coef,
+         vcov = object$fit@vcov[idx, idx, drop = FALSE], ...)
+}</code></pre>
+<p>In this method, the <code>vcov</code> matrix includes covariances for
+some extra parameters besides the regression coefficients, so we have to
+use a subset of that matrix. Note that <code>qdrg()</code> functions as
+a standalone function as long as its <code>object</code> argument is
+missing; and a typical <code>qdrg</code> method will just determine what
+arguments to pass to this non-generic <code>qdrg()</code>. Let’s get the
+reference grid for a selection of <code>bp</code> values:</p>
+<pre class="r"><code>rg &lt;- qdrg(object = fit, link = &quot;log&quot;)
+emmeans(rg, ~ ., type = &quot;response&quot;)</code></pre>
+<pre class="ro"><code>## $`emmeans of source`
+##  source response    SE  df asymp.LCL asymp.UCL
+##  fish       29.7 0.964 Inf      27.9      31.7
+##  soy        39.0 1.290 Inf      36.6      41.7
+##  skim       44.1 1.550 Inf      41.1      47.2
+## 
+## Results are averaged over the levels of: percent 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the inverse[log] scale 
+## 
+## $`emmeans of percent`
+##  percent response   SE  df asymp.LCL asymp.UCL
+##        9     31.2 1.13 Inf      29.0      33.4
+##       12     37.4 1.27 Inf      35.0      40.0
+##       15     38.7 1.50 Inf      35.9      41.7
+##       18     42.1 1.98 Inf      38.4      46.2
+## 
+## Results are averaged over the levels of: source 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the inverse[log] scale</code></pre>
+<p>Here, the <code>link</code> argument got passed via <code>...</code>
+to <code>qdrg()</code>; It was needed since I don’t immediately see how
+to get the link function from the object, though I imagine there is a
+way.</p>
+<p>Be careful when using these methods; since <code>object</code> is not
+the first argument of the generic <code>qdrg()</code> function, it is
+best to specify <code>object =</code> in the call to this method, though
+the code tries to work around this.</p>
+<p>Package developers may provide minimal emmeans support by providing a
+<code>qdrg</code> method like this. If you do this in your package, you
+should <a href="#exporting">export and register the method</a>, and add
+<code>emmeans (&gt;=2.0.0)</code> and <code>estimability</code> to the
+package’s <code>Suggests</code> list.</p>
+<p><a href="#contents">Back to Contents</a></p>
+</div>
 <div id="lqs" class="section level2">
 <h2>Supporting <code>lqs</code> objects</h2>
 <!-- @index Examples!`lqs` objects -->
@@ -183,7 +257,7 @@ method. Look at the one for <code>lm</code> objects:</p>
 ##     recover_data(fcall, delete.response(terms(object)), object$na.action, 
 ##         frame = frame, pwts = weights(object), ...)
 ## }
-## &lt;bytecode: 0x000001d7a065cc40&gt;
+## &lt;bytecode: 0x0000015bc4639808&gt;
 ## &lt;environment: namespace:emmeans&gt;</code></pre>
 <p>Note that all it does is obtain the <code>call</code> component and
 call the method for class <code>call</code>, with additional arguments
@@ -295,7 +369,7 @@ Following this advice, let’s take a look at it:</p>
 ##     X &lt;- model.matrix(Terms, m, contrasts.arg = object$contrasts)
 ##     drop(X %*% object$coefficients)
 ## }
-## &lt;bytecode: 0x000001d79a10a468&gt;
+## &lt;bytecode: 0x0000015bd868a458&gt;
 ## &lt;environment: namespace:MASS&gt;</code></pre>
 <div id="eblqs" class="section level6">
 <h6></h6>
@@ -318,15 +392,15 @@ for <code>lqs</code> objects:</p>
 <pre class="r"><code>emmeans(fake.lts, ~ B | A)</code></pre>
 <pre class="ro"><code>## A = a1:
 ##  B  emmean    SE df lower.CL upper.CL
-##  b1   11.9 0.228 24     11.4     12.3
-##  b2   23.1 0.228 24     22.6     23.6
-##  b3   17.8 0.228 24     17.3     18.2
+##  b1   11.9 0.238 24     11.5     12.4
+##  b2   23.2 0.238 24     22.7     23.7
+##  b3   17.8 0.238 24     17.4     18.3
 ## 
 ## A = a2:
 ##  B  emmean    SE df lower.CL upper.CL
-##  b1   13.9 0.228 24     13.4     14.4
-##  b2   24.1 0.228 24     23.6     24.5
-##  b3   20.5 0.228 24     20.0     21.0
+##  b1   14.3 0.238 24     13.8     14.8
+##  b2   24.0 0.238 24     23.5     24.5
+##  b3   20.8 0.238 24     20.3     21.3
 ## 
 ## Confidence level used: 0.95</code></pre>
 <p>Hooray! Note the results are comparable to those we had for
@@ -769,9 +843,10 @@ provide methods for, there are no restrictions on them.</p>
 </div>
 <div id="exporting" class="section level2">
 <h2>Exporting and registering your methods</h2>
-<!-- @index **emmeans** package!Exporting extensions to 
-     Registering `recover_data` and `emm_basis` methods -->
-<p>To make the methods available to users of your package, the methods
+<!-- @index **emmeans** package!Exporting extensions to;
+     Registering `recover_data` and `emm_basis` methods;
+     Registering `qdrg` methods; -->
+<p>To make your methods available to users of your package, the methods
 must be exported. R and CRAN are evolving in a way that having S3
 methods in the registry is increasingly important; so it is a good idea
 to provide for that. The problem is not all of your package users will
@@ -794,6 +869,11 @@ in your package (traditionally saved in the source file
 <code>estimability</code> (which is required by
 <strong>emmeans</strong>) to the <code>Suggests</code> field of your
 <code>DESCRIPTION</code> file.</p>
+<p>When registering a <code>qdrg</code> method, do the same as shown
+above, but add the argument <code>qdrg = TRUE</code> to the
+<code>.emm_register()</code> call, and in <code>Suggests</code>, use
+<code>emmeans (&gt;= 1.12)</code> as well as
+<code>estimability</code>.</p>
 <p><a href="#contents">Back to Contents</a></p>
 </div>
 <div id="concl" class="section level2">

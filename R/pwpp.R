@@ -116,7 +116,8 @@ pwpp = function(emm, method = "pairwise", by, sort = TRUE, values = TRUE,
                 rows = ".",
                 xlab, ylab, xsub = "", plim = numeric(0), add.space = 0, 
                 aes, ...) {
-    emm = .chk.list(emm, ...)
+
+        emm = .chk.list(emm, ...)
     if(missing(by)) 
         by = emm@misc$by.vars
     
@@ -220,12 +221,12 @@ pwpp = function(emm, method = "pairwise", by, sort = TRUE, values = TRUE,
         tick.max = min(exmaj[exmaj >= max(pvtmp)])
         
         # args for geom_segment
-        sarg = c(list(mapping = quote(ggplot2::aes_(xend = ~p.value, yend = ~midpt)),
+        sarg = c(list(mapping = quote(ggplot2::aes(xend = .data$p.value, yend = .data$midpt)),
                     data = NULL, stat = "identity", position = "identity"), 
                     aes$segment)
         grobj = ggplot2::ggplot(data = con.summ, 
-                                ggplot2::aes_(x = ~p.value, y = ~plus,
-                                              color = ~minus, group = ~minus)) +
+                                ggplot2::aes(x = .data$p.value, y = .data$plus,
+                                              color = .data$minus, group = .data$minus)) +
             do.call(ggplot2::geom_point, aes$point) +
             do.call(ggplot2::geom_segment, sarg) +
             ggplot2::geom_point(ggplot2::aes(x = tick.min, y = 1), alpha = 0) +
@@ -255,13 +256,13 @@ pwpp = function(emm, method = "pairwise", by, sort = TRUE, values = TRUE,
             lpad = lpad * (1.1 - tminp) # scale closer to actual width of scales
             lpos = .pval.inv(tminp - lpad)   # pvalue at left end of label
             
-            larg = c(list(mapping = quote(ggplot2::aes_(x = pos, y = ~minus,
-                                            label = ~fmtval, hjust = "right")),
+            larg = c(list(mapping = quote(ggplot2::aes(x = pos, y = .data$minus,
+                                            label = .data$fmtval, hjust = "right")),
                         data = emm.summ, stat = "identity", position = "identity"),  
                         aes$label)
             grobj = grobj + 
                 do.call(ggplot2::geom_label, larg) +
-                ggplot2::geom_point(ggplot2::aes_(x = lpos, y = 1), alpha = 0) # invisible point to stake out space
+                ggplot2::geom_point(ggplot2::aes(x = lpos, y = 1), alpha = 0) # invisible point to stake out space
         }
         else
             lpad = 0
@@ -279,7 +280,7 @@ pwpp = function(emm, method = "pairwise", by, sort = TRUE, values = TRUE,
             #### expand = ggplot2::expand_scale(add = c(.025 + lpad, .025))) +
             ggplot2::guides(color = "none")
         
-        grobj + ggplot2::labs(x = xlab, y = ylab, caption = xsub)
+        grobj + ggplot2::labs(x = xlab, y = ylab, caption = xsub) + theme_emm()
 }
     
 # capitalize

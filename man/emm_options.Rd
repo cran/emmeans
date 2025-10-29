@@ -8,7 +8,7 @@
 \alias{emm_defaults}
 \title{Set or change emmeans options}
 \format{
-An object of class \code{list} of length 22.
+An object of class \code{list} of length 24.
 }
 \usage{
 emm_options(..., disable)
@@ -70,7 +70,7 @@ object.}
 \item{\code{summary}}{A named \code{list} of defaults used by the methods
   \code{\link{summary.emmGrid}}, \code{\link{predict.emmGrid}}, \code{\link{test.emmGrid}},
   \code{\link{confint.emmGrid}}, and \code{\link{emmip}}. The only option that can
-  affect the latter four is \code{"predict.method"}.}
+  affect the latter four is \code{"predict.type"}.}
 \item{\code{allow.na.levs}}{A logical value that if \code{TRUE} (the default), allows
   \code{NA} to be among the levels of a factor. Older versions of \pkg{emmeans} did not
   allow this. So if problems come up (say in a messy dataset that includes incomplete cases), 
@@ -90,6 +90,9 @@ object.}
 \item{\code{graphics.engine}}{A character value matching 
   \code{c("ggplot", "lattice")}, setting the default engine to use in
   \code{\link{emmip}} and \code{\link{plot.emmGrid}}.  Defaults to \code{"ggplot"}.}
+\item{\code{gg.theme}}{An integer. Set it to 1 or 2 if you want the appearance
+  of plots used in \pkg{emmeans} version 1.x.x or 2.x.x. Or set it to the actual theme
+  that you want to use, e.g., \code{emm_options(gg.theme = ggplot2::theme_dark())}}
 \item{\code{msg.interaction}}{A logical value controlling whether or not
   a message is displayed when \code{emmeans} averages over a factor involved
   in an interaction. It is probably not appropriate to do this, unless
@@ -143,6 +146,8 @@ and \code{lmerTest.limit}
 options affect how degrees of freedom are computed for \code{lmerMod} objects
 produced by the \pkg{lme4} package). See that section of the "models" vignette
 for details.}
+\item{\code{post.ci.method}}{method for estimating confidence intervals for Bayesian models. 
+Options are \code{"HPD"} (default) or \code{"quantile"}.} 
 } %%%%%% end \describe
 }
 \section{Reproducible bugs}{
@@ -160,6 +165,16 @@ is equivalent to \code{emm_options(saved.opts = emm_options())} and
 \code{emm_options(disable = FALSE)} is equivalent to 
 \code{options(emmeans = get_emm_option("saved.opts"))}. To completely erase
 all options, use \code{options(emmeans = NULL)}
+}
+
+\section{Startup options}{
+
+\pkg{emmeans}'s options are kept in the system options in a list names \code{emmeans}.
+Thus, if the user wants certain options set on startup, this can be arranged by
+setting the \code{emmeans} option in one's startup script. For example,
+the user's \code{.Rprofile} file could contain:
+\preformatted{    options(emmeans = list(summary = list(predict.type = "response"), 
+                           lmer.df = "satterthwaite"))}
 }
 
 \examples{
@@ -193,10 +208,11 @@ emm_options(disable = FALSE)
 }
 
 
-# Illustration of how 'opt.digits' affects the results of print()
-# Note that the returned value is printed with the default setting (opt.digits = TRUE)
-pigs.lm <- lm(inverse(conc) ~ source, data = pigs)
-with_emm_options(opt.digits = FALSE, print(emmeans(pigs.lm, "source")))
+# Temporarily alter the formatting of labels in an interaction contrast:
+pigs.lm <- lm(inverse(conc) ~ source * factor(percent), data = pigs)
+with_emm_options(parens = c("\\\\-", "<", ">"), sep = ": ",
+    contrast(contrast(ref_grid(pigs.lm), "consec", by = "percent"),
+        "consec", by = NULL))
 
 }
 \seealso{
