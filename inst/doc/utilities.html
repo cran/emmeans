@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 2.0.0" />
+<meta name="author" content="emmeans package, Version 2.0.1" />
 
 
 <title>Utilities and options for emmeans</title>
@@ -44,7 +44,29 @@ ul.task-list{list-style: none;}
 
 
 
-<style type="text/css">body {font-size: 11pt; font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;margin: 30px 50px 30px 50px; }h1,h2,h3,h4,h5,h6 { font-family: Arial,Helvetica,Sans-serif; }a { text-decoration: none; }a:link { color:darkblue; } a:visited { color:darkblue; } a:hover { color:dodgerblue; }a:active { color:dodgerblue; } code {color: #602000;font-family: "Lucida Console", Monaco, monospace; font-size: 90%;}.r { color: darkred; }.ro { color: darkgreen; background-color: #eeeeee; }.re { color: red;}.r code, a code, .ro code, .re code { color: inherit; }.vigindex ul { list-style-type: none; }.vigindex ul li { list-style: none; }.vigindex a code { color: inherit; }.vigindex li code { color: inherit; }</style>
+<style type="text/css">body {
+font-size: 11pt; font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+margin: 30px 50px 30px 50px; }
+h1,h2,h3,h4,h5,h6 { font-family: Arial,Helvetica,Sans-serif; }
+a { text-decoration: none; }
+a:link { color:darkblue; } a:visited { color:darkblue; } a:hover { color:dodgerblue; }
+a:active { color:dodgerblue; } code {
+color: #602000;
+font-family: "Lucida Console", Monaco, monospace; font-size: 90%;
+}
+.r { 
+color: darkred; }
+.ro { 
+color: darkgreen; background-color: #eeeeee; }
+.re { 
+color: red;
+}
+.r code, a code, .ro code, .re code { color: inherit; }
+.vigindex ul { list-style-type: none; }
+.vigindex ul li { list-style: none; }
+.vigindex a code { color: inherit; }
+.vigindex li code { color: inherit; }
+</style>
 
 
 
@@ -57,7 +79,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Utilities and options for emmeans</h1>
-<h4 class="author">emmeans package, Version 2.0.0</h4>
+<h4 class="author">emmeans package, Version 2.0.1</h4>
 
 
 
@@ -114,7 +136,7 @@ pigs.emm.s</code></pre>
 <pre class="ro"><code>##  source emmean     SE df  n lower.CL upper.CL null t.ratio p.value
 ##  fish     3.39 0.0367 23 10     3.32     3.47 3.56  -4.385  0.0002
 ##  soy      3.67 0.0374 23 10     3.59     3.74 3.56   2.988  0.0066
-##  skim     3.80 0.0394 23  9     3.72     3.88 3.56   6.130  &lt;.0001
+##  skim     3.80 0.0394 23  9     3.72     3.88 3.56   6.130 &lt;0.0001
 ## 
 ## Results are averaged over the levels of: percent 
 ## Results are given on the log (not the response) scale. 
@@ -287,7 +309,7 @@ multiplicity adjustment. This is done quite simply:</p>
 <pre class="r"><code>rbind(pairs(pigs.emm.s), pigs.anal.p[[2]])</code></pre>
 <pre class="ro"><code>##  contrast              estimate     SE df t.ratio p.value
 ##  fish - soy             -0.2728 0.0529 23  -5.153  0.0002
-##  fish - skim            -0.4023 0.0542 23  -7.428  &lt;.0001
+##  fish - skim            -0.4023 0.0542 23  -7.428 &lt;0.0001
 ##  soy - skim             -0.1295 0.0530 23  -2.442  0.1364
 ##  percent12 - percent9    0.1796 0.0561 23   3.202  0.0238
 ##  percent15 - percent12   0.0378 0.0582 23   0.650  1.0000
@@ -308,7 +330,7 @@ multiplicity adjustment.</p>
 ##  percent15 / percent12 1.039 0.0604 23    0.881    1.224    1   0.650  0.9681
 ##  percent18 / percent15 1.086 0.0750 23    0.894    1.320    1   1.194  0.7305
 ##  fish / soy            0.761 0.0403 23    0.656    0.884    1  -5.153  0.0002
-##  fish / skim           0.669 0.0362 23    0.574    0.779    1  -7.428  &lt;.0001
+##  fish / skim           0.669 0.0362 23    0.574    0.779    1  -7.428 &lt;0.0001
 ##  soy / skim            0.879 0.0466 23    0.756    1.020    1  -2.442  0.1109
 ## 
 ## Results are averaged over some or all of the levels of: source, percent 
