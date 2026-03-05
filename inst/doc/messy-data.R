@@ -124,9 +124,10 @@ emmip(cows.rg, ~ drug | route)
 
 ## ----fig.width = 5.5, fig.alt = "This plot shows the same means as the previous one, but each panel shows only the drugs that are nested in each route"----
 require(ggplot2)
-emmip(cows.rg, ~ drug) + facet_wrap(~ route, scales = "free_x")
+emmip(cows.rg, ~ drug, abbr.len = 6) + 
+  facet_wrap(~ route, scales = "free_x", space = "free_x")
 
 ## ----fig.height = 2.5, fig.width = 5.5, fig.alt = "side-by-side CIs and PIs for drugs in each route. Again, with free_y scaling, each panel contains only the drugs involved"----
-plot(drug.emm, PIs = TRUE) + 
-    facet_wrap(~ route, nrow = 2, scales = "free_y")
+plot(drug.emm, by = "route", PIs = TRUE) + 
+    facet_wrap(~ route, scales = "free_y", space = "free_y")
 
