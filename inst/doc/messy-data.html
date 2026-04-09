@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 2.0.2" />
+<meta name="author" content="emmeans package, Version 2.0.3" />
 
 
 <title>Working with messy data</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Working with messy data</h1>
-<h4 class="author">emmeans package, Version 2.0.2</h4>
+<h4 class="author">emmeans package, Version 2.0.3</h4>
 
 
 
@@ -200,8 +200,11 @@ measured <code>emo</code>, the subjects’ emotional state after the
 treatment was applied. There are various demographic variables as well.
 Let’s a logistic regression model, after changing the labels for
 <code>educ</code> to shorter strings.</p>
-<pre class="r"><code>framing &lt;- mediation::framing 
-levels(framing$educ) &lt;- c(&quot;NA&quot;,&quot;Ref&quot;,&quot;&lt; HS&quot;, &quot;HS&quot;, &quot;&gt; HS&quot;,&quot;Coll +&quot;) 
+<pre class="r"><code>framing &lt;- mediation::framing </code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;lme4&#39;:
+##   method           from
+##   na.action.merMod car</code></pre>
+<pre class="r"><code>levels(framing$educ) &lt;- c(&quot;NA&quot;,&quot;Ref&quot;,&quot;&lt; HS&quot;, &quot;HS&quot;, &quot;&gt; HS&quot;,&quot;Coll +&quot;) 
 framing.glm &lt;- glm(cong_mesg ~ age + income + educ + emo + gender * factor(treat), 
     family = binomial, data = framing)</code></pre>
 <p>The conventional way to handle covariates like <code>emo</code> is to
