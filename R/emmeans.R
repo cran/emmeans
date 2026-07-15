@@ -1,5 +1,5 @@
 ##############################################################################
-#    Copyright (c) 2012-2017 Russell V. Lenth                                #
+#    Copyright (c) 2012-2026 Russell V. Lenth                                #
 #                                                                            #
 #    This file is part of the emmeans package for R (*emmeans*)              #
 #                                                                            #
@@ -751,7 +751,8 @@ emmobj = function(bhat, V, levels, linfct = diag(length(bhat)), df = NA, dffun, 
 #' pigs.anew <- as.emmGrid(pigs.sav)
 #' emmeans(pigs.anew, "source")
 as.emmGrid = function(object, ...) {
-    if (cls <- class(object)[1] %in% c("ref.grid", "lsmobj")) {
+    cls <- class(object)[1]
+    if (cls %in% c("ref.grid", "lsmobj")) {
         object = as.list.emmGrid(object)
         if (is.null(object$misc$is.new.rg))
             object$misc$is.new.rg = (cls == "ref.grid")

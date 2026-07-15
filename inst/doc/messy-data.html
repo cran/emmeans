@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 2.0.3" />
+<meta name="author" content="emmeans package, Version 2.0.4" />
 
 
 <title>Working with messy data</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Working with messy data</h1>
-<h4 class="author">emmeans package, Version 2.0.3</h4>
+<h4 class="author">emmeans package, Version 2.0.4</h4>
 
 
 
@@ -468,7 +468,8 @@ rows in the reference grid. But because of the way
 multivariate-response levels are taken into account. If the limit is
 exceeded, an error is thrown:</p>
 <pre class="r"><code>ref_grid(mtcars.lm, rg.limit = 200)</code></pre>
-<pre><code>## Error: The rows of your requested reference grid would be 216, which exceeds
+<pre><code>## Error:
+## ! The rows of your requested reference grid would be 216, which exceeds
 ## the limit of 200 (not including any multivariate responses).
 ## Your options are:
 ##   1. Specify some (or more) nuisance factors using the &#39;nuisance&#39; argument

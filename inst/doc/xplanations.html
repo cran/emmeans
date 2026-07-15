@@ -10,7 +10,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="emmeans package, Version 2.0.3" />
+<meta name="author" content="emmeans package, Version 2.0.4" />
 
 
 <title>Explanations supplement</title>
@@ -57,7 +57,7 @@ ul.task-list{list-style: none;}
 
 
 <h1 class="title toc-ignore">Explanations supplement</h1>
-<h4 class="author">emmeans package, Version 2.0.3</h4>
+<h4 class="author">emmeans package, Version 2.0.4</h4>
 
 
 
@@ -320,7 +320,8 @@ can make it even worse by upping the correlation to 0.8:</p>
 <pre class="r"><code>foo8 = foo
 foo8@V &lt;- mkmat(foo8@V, 0.8)
 plot(foo8, CIs = FALSE, comparisons = TRUE)</code></pre>
-<pre class="re"><code>## Error: Aborted -- Some comparison arrows have negative length!
+<pre class="re"><code>## Error:
+## ! Aborted -- Some comparison arrows have negative length!
 ## (in group &quot;1&quot;)</code></pre>
 <p>Now the solution actually leads to negative arrow lengths.</p>
 <p>What is happening here is we are continually reducing the SE of

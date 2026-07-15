@@ -1,11 +1,12 @@
 ## ----echo = FALSE, results = "hide", message = FALSE----------------------------------------------
 require("emmeans")
 require("lme4")
+require(lmerTest)
 options(show.signif.stars = FALSE, width = 100) 
 knitr::opts_chunk$set(fig.width = 4.5, class.output = "ro") 
 
 ## -------------------------------------------------------------------------------------------------
-library(lme4)
+library(lme4); library(lmerTest)
 Oats.lmer <- lmer(yield ~ Variety + factor(nitro) + (1|Block/Variety),
                         data = nlme::Oats, subset = -c(1,2,3,5,8,13,21,34,55))
 

@@ -1,8 +1,8 @@
 Package: emmeans
 Type: Package
 Title: Estimated Marginal Means, aka Least-Squares Means
-Version: 2.0.3
-Date: 2026-03-30
+Version: 2.0.4
+Date: 2026-07-15
 Authors@R: c(person("Russell V.", "Lenth", role = c("aut", "cph"), 
                     email = "russell-lenth@uiowa.edu"),
     person("Julia", "Piaskowski", role = c("cre", "aut"),
@@ -16,7 +16,9 @@ Authors@R: c(person("Russell V.", "Lenth", role = c("aut", "cph"),
     person("Jonathon", "Love", role = "ctb"),
     person("Fernando", "Miguez", role = "ctb"),
     person("Hannes", "Riebl", role = "ctb"),
-    person("Henrik", "Singmann", role = "ctb"))
+    person("Henrik", "Singmann", role = "ctb"),
+    person("Alexis", "Derumigny", role = "ctb"),
+    person("Paul", "Schmidt", role = "ctb"))
 Maintainer: Julia Piaskowski <julia.piask@gmail.com>
 Depends: R (>= 4.1.0)
 Imports: estimability (>= 1.4.1), graphics, methods, mvtnorm, numDeriv,
@@ -43,10 +45,10 @@ Description: Obtain estimated marginal means (EMMs) for many linear, generalized
   Statistician 34(4), 216-221 <doi:10.1080/00031305.1980.10483031>.
 License: GPL-2 | GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.3.3
+RoxygenNote: 8.0.0
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2026-04-08 22:31:47 UTC; jpiaskowski
+Packaged: 2026-07-14 23:23:15 UTC; jpiaskowski
 Author: Russell V. Lenth [aut, cph],
   Julia Piaskowski [cre, aut],
   Balazs Banfai [ctb],
@@ -58,6 +60,8 @@ Author: Russell V. Lenth [aut, cph],
   Jonathon Love [ctb],
   Fernando Miguez [ctb],
   Hannes Riebl [ctb],
-  Henrik Singmann [ctb]
+  Henrik Singmann [ctb],
+  Alexis Derumigny [ctb],
+  Paul Schmidt [ctb]
 Repository: CRAN
-Date/Publication: 2026-04-09 10:00:20 UTC
+Date/Publication: 2026-07-15 06:40:08 UTC

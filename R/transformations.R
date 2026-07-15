@@ -1,5 +1,5 @@
 ##############################################################################
-#    Copyright (c) 2012-2016 Russell V. Lenth                                #
+#    Copyright (c) 2012-2026 Russell V. Lenth                                #
 #                                                                            #
 #    This file is part of the emmeans package for R (*emmeans*)              #
 #                                                                            #
@@ -301,7 +301,7 @@ make.tran = function(type = c("genlog", "power", "boxcox", "sympower",
                mu.lbl = ifelse(alpha == 1, "mu", paste0("mu/", round(alpha,3)))
                list(linkfun = function(mu) atanh(mu/alpha),
                     linkinv = function(eta) alpha * tanh(eta),
-                    mu.eta = function(eta) alpha * (1 - tanh^2(eta)),
+                    mu.eta = function(eta) alpha * (1 - tanh(eta)^2),
                     valideta = function (eta) all(is.finite(eta)) && all(eta > -1) && all(eta < 1),
                     alpha = alpha,
                     name = paste0("atanh(", mu.lbl, ")")
